@@ -36,9 +36,12 @@ npm run preview
 
 ## GitHub Pages
 
-Pull requests run the production quality gate. Pushes to `main` additionally deploy the built app through GitHub Pages.
+Production is published from the `gh-pages` branch root. The branch contains a
+runner-independent static fallback so the public catalog remains deployable even
+when the React build workflow is unavailable.
 
-The production Vite base path is `/onod-fonts/`. CI creates `dist/404.html` from the SPA entry so direct React Router routes can resolve on GitHub Pages.
+The production Vite base path is `/onod-fonts/`. A future automated React deploy
+must preserve `dist/404.html` so direct React Router routes resolve on GitHub Pages.
 
 ## Standalone migration
 
@@ -58,7 +61,9 @@ The Figma Make export has been normalized for independent development:
 
 ## Font data
 
-The current bundled catalog contains 1,346 unique font records. The dataset is local and versioned with the application source.
+The current bundled catalog contains 1,346 unique font records. Its generator and
+source manifests live in `src/app/data/mockFonts.ts`; generated binary blobs are not
+treated as source of truth.
 
 ## Source of truth
 

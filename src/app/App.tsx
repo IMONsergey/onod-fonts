@@ -118,7 +118,7 @@ function AppContent() {
 
   // Yandex Metrika
   useEffect(() => {
-    (function(m: any, e: any, t: any, r: any, i: any, k: any, a: any) {
+    (function(m: any, e: any, t: any, r: any, i: any, k?: any, a?: any) {
       m[i] = m[i] || function() { (m[i].a = m[i].a || []).push(arguments); };
       m[i].l = 1 * new Date().getTime();
       for (var j = 0; j < document.scripts.length; j++) {
@@ -333,7 +333,18 @@ const FontDetailsWrapper = ({ mockFonts: fontList, ...props }: { mockFonts: Font
             </button>
         </div>
     );
-    return <FontDetailsPage font={font} isFavorite={props.favorites.includes(font.id)} isCompare={props.compareList.includes(font.id)} {...props} />;
+    return (
+        <FontDetailsPage
+            font={font}
+            onBack={props.onBack}
+            toggleFavorite={props.toggleFavorite}
+            isFavorite={props.favorites.includes(font.id)}
+            toggleCompare={props.toggleCompare}
+            isCompare={props.compareList.includes(font.id)}
+            testPairing={props.testPairing}
+            previewText={props.previewText}
+        />
+    );
 }
 
 export default function App() {

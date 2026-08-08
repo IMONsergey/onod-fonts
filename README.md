@@ -25,3 +25,5 @@ The production build automatically uses `/onod-fonts/` as the Vite base path. `d
 ## Origin
 
 The UI originated as a Figma Make project and was converted into a standalone codebase. Figma-specific version-qualified package imports were normalized to standard npm imports.
+
+<!-- bootstrap trigger -->

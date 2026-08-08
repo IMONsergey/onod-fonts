@@ -1,6 +1,17 @@
 # ONOD Fonts
 
-Standalone web version of **ONOD FONTS | DESIGN SPACE**, exported from Figma Make and normalized for regular React/Vite development.
+Standalone web application for **ONOD FONTS | DESIGN SPACE** — a curated interface for discovering, previewing, comparing and testing typefaces.
+
+The product was originally prototyped in Figma Make. The repository is now a regular React/Vite codebase and no longer depends on Figma Make runtime features.
+
+## Stack
+
+- React 18
+- Vite 6
+- TypeScript
+- Tailwind CSS 4
+- Motion
+- React Router
 
 ## Local development
 
@@ -9,21 +20,46 @@ npm install
 npm run dev
 ```
 
-Production check:
+Quality and production checks:
 
 ```bash
+npm run typecheck
 npm run build
+npm run check
+```
+
+Preview the production bundle:
+
+```bash
 npm run preview
 ```
 
-## Deployment
+## GitHub Pages
 
-Every push to `main` builds and deploys the project through GitHub Actions to GitHub Pages. The workflow is stored in `.github/workflows/deploy-pages.yml`.
+Pull requests run the production quality gate. Pushes to `main` additionally deploy the built app through GitHub Pages.
 
-The production build automatically uses `/onod-fonts/` as the Vite base path. `dist/404.html` is generated during CI so React Router routes also work when opened directly on GitHub Pages.
+The production Vite base path is `/onod-fonts/`. CI creates `dist/404.html` from the SPA entry so direct React Router routes can resolve on GitHub Pages.
 
-## Origin
+## Standalone migration
 
-The UI originated as a Figma Make project and was converted into a standalone codebase. Figma-specific version-qualified package imports were normalized to standard npm imports.
+The Figma Make export has been normalized for independent development:
 
-<!-- bootstrap trigger: PR merge -->
+- removed `figma:asset/*` runtime resolution;
+- reduced 55 exported image assets to the two assets actually used by the application;
+- replaced opaque Figma asset hashes with maintainable filenames;
+- normalized version-qualified package imports;
+- reduced the dependency graph to packages actually imported by runtime code;
+- replaced four Radix wrappers with small native React primitives;
+- removed dead shadcn/Figma export files and empty Make templates;
+- removed Make-specific Vite resolver logic;
+- added TypeScript validation and GitHub Pages CI/CD;
+- made the font catalog order deterministic instead of random on every page load;
+- hardened localStorage parsing and font loading retry behavior.
+
+## Font data
+
+The current bundled catalog contains 1,346 unique font records. The dataset is local and versioned with the application source.
+
+## Source of truth
+
+The `main` branch of this GitHub repository is the single source of truth for ONOD Fonts. All subsequent product changes and deployments should be committed here.

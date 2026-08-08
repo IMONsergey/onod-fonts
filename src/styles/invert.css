@@ -1,0 +1,9 @@
+html.invert-mode {
+  filter: invert(1) hue-rotate(180deg) brightness(0.9);
+  background-color: black;
+}
+html.invert-mode img,
+html.invert-mode video,
+html.invert-mode .re-invert {
+  filter: invert(1) hue-rotate(180deg);
+}

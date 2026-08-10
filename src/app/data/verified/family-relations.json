@@ -1,0 +1,37 @@
+{
+  "Source Sans Pro": {
+    "catalogFamily": "Source Sans Pro",
+    "status": "verified",
+    "relation": "historical-successor",
+    "provider": "Adobe",
+    "historical": {
+      "family": "Source Sans Pro",
+      "sourceUrl": "https://github.com/adobe-fonts/source-sans",
+      "designer": "Paul D. Hunt",
+      "licenseId": "OFL-1.1",
+      "evidence": {
+        "repository": "adobe-fonts/source-sans",
+        "commitSha": "f42c6e78cef38a192aa1e45bc3ff9b80e0d4b7f6",
+        "licensePath": "LICENSE.txt",
+        "licenseBlobSha": "87ec82c441254d7509b8c096981179fd34bbf968",
+        "facts": [
+          "Official Adobe repository history contains SourceSansPro release files and package identity for Source Sans Pro.",
+          "LICENSE.txt at the historical Source Sans Pro revision explicitly licenses the Font Software under SIL Open Font License 1.1."
+        ]
+      }
+    },
+    "successor": {
+      "family": "Source Sans 3",
+      "sourceUrl": "https://github.com/adobe-fonts/source-sans",
+      "evidence": {
+        "repository": "adobe-fonts/source-sans",
+        "commitSha": "7c691c2772570a0d3a9e1bffe8a9d6074257d985",
+        "facts": [
+          "The same official Adobe repository later releases Source Sans 3 version 3.052 and SourceSans3 font files."
+        ]
+      }
+    },
+    "loadReplacementAllowed": false,
+    "note": "This relation proves historical identity and successor lineage. It does not authorize ONOD to silently render Source Sans 3 when the catalog record asks for Source Sans Pro."
+  }
+}

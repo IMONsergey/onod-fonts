@@ -26,7 +26,6 @@ export interface FontTrustReport {
 }
 
 const verifiedGoogleFonts = verifiedGoogleFontsJson as Record<string, VerifiedGoogleFont>;
-const canonicalFamilyName = (value: string) => value.normalize("NFKD").replace(/\p{Diacritic}/gu, "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
 const isGeneratedDescription = (font: Font) => {
   const description = font.description || "";
@@ -35,8 +34,8 @@ const isGeneratedDescription = (font: Font) => {
 
 export function getVerifiedGoogleFont(font: Font): VerifiedGoogleFont | undefined {
   const candidate = verifiedGoogleFonts[font.name];
-  if (!candidate) return undefined;
-  return canonicalFamilyName(candidate.family) === canonicalFamilyName(font.name) ? candidate : undefined;
+  if (!candidate || candidate.family !== font.name) return undefined;
+  return candidate;
 }
 
 export function getFontTrustReport(font: Font): FontTrustReport {

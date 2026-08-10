@@ -3,18 +3,22 @@
 > Generated from the canonical runtime trust layer. Do not edit counts manually.
 
 Catalog families: **1346**
-Source/license trust debt: **38**
-Source/license clear: **1308**
+Identity trust debt: **36**
+License trust debt: **38**
+Source/license union debt: **38**
+Source + license clear: **1308**
+
+Identity and license are independent facts. A family can have a verified primary source while its exact license remains pending; this state must not be collapsed back into “unverified source”.
 
 ## Field-level technical debt
 
 - exact weights pending: **38** families
 - variable capability pending: **38** families
-- script/language metadata pending: **38** families
+- script coverage pending: **38** families
 
-A family can be source/license verified while some technical fields remain pending. Technical debt must stay conservative at runtime; it must not be converted back into source/license debt merely to preserve a single all-or-nothing status.
+Technical debt is also independent from source/license trust. Inspected font binaries may clear technical fields without changing provider/legal facts.
 
-## Source/license queue by recovered source
+## Source/license union queue by recovered source
 
 | Recovered source | Families pending |
 |---|---:|
@@ -64,6 +68,13 @@ A family can be source/license verified while some technical fields remain pendi
 | Open Sans Condensed | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
 | Source Sans Pro | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
 | Fire Sans | Uncut / Indie | pending | pending | pending | pending | pending | Verify at source |
+
+## Identity verified / license pending
+
+| Family | Provider | Primary source | License status |
+|---|---|---|---|
+| Lausanne | Independent | https://weltkern.com/typefaces/lausanne/ | pending |
+| Nohemi | Independent | https://rajputrajesh-4489b.web.app/products/nohemi | pending |
 
 ## Source/license verified but technically partial
 

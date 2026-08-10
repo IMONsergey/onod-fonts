@@ -1,0 +1,56 @@
+{
+  "Bromine": {
+    "family": "Bromine",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://www.indiantypefoundry.com/fonts/bromine",
+      "designer": "Indian Type Foundry",
+      "publisher": "Indian Type Foundry",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://www.indiantypefoundry.com/fonts/bromine",
+        "capturedAt": "2026-08-10T23:20:00+03:00",
+        "facts": [
+          "Official Indian Type Foundry product page identifies Bromine as a current ITF font family."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "The recovered Open Source label is not accepted. Exact ITF product/EULA capability mapping remains pending."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scriptsVerified": false
+    }
+  },
+  "Pramit": {
+    "family": "Pramit",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://www.indiantypefoundry.com/fonts/pramit",
+      "designer": "Indian Type Foundry",
+      "publisher": "Indian Type Foundry",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://www.indiantypefoundry.com/fonts/pramit",
+        "capturedAt": "2026-08-10T23:20:00+03:00",
+        "facts": [
+          "Official Indian Type Foundry product page identifies Pramit as a current ITF font family."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "The recovered Open Source label is not accepted. Exact ITF product/EULA capability mapping remains pending."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scriptsVerified": false
+    }
+  }
+}

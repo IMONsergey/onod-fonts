@@ -1,65 +1,75 @@
-# ONOD Fonts — trust debt
+# ONOD Fonts — trust debt report
 
-> Generated from the canonical catalog and runtime trust layer. Do not hand-edit counts; regenerate after metadata enrichment.
+> Generated from the canonical runtime trust layer. Do not edit counts manually.
 
-Total catalog families: **1346**
-Remaining trust-debt families: **38**
-Fully clear families: **1308**
+Catalog families: **1346**
+Source/license trust debt: **38**
+Source/license clear: **1308**
 
-A family stays in this report when metadata is still derived or when the exact license identifier must still be verified at the primary source.
+## Field-level technical debt
 
-## Sources
+- exact weights pending: **41** families
+- variable capability pending: **39** families
+- script/language metadata pending: **40** families
 
-### Fontshare — 32
+A family can be source/license verified while some technical fields remain pending. Technical debt must stay conservative at runtime; it must not be converted back into source/license debt merely to preserve a single all-or-nothing status.
 
-| Family | Raw license | Source URL |
-|---|---|---|
-| Barbara | Open Source | https://www.fontshare.com/fonts/barbara |
-| Bromine | Open Source | https://www.fontshare.com/fonts/bromine |
-| Bw Gradual | Open Source | https://www.fontshare.com/fonts/bw-gradual |
-| Bw Modelica | Open Source | https://www.fontshare.com/fonts/bw-modelica |
-| Bw Nista | Open Source | https://www.fontshare.com/fonts/bw-nista |
-| Bw Seido | Open Source | https://www.fontshare.com/fonts/bw-seido |
-| Canchal | Open Source | https://www.fontshare.com/fonts/canchal |
-| Cassandra | Open Source | https://www.fontshare.com/fonts/cassandra |
-| Deng | Open Source | https://www.fontshare.com/fonts/deng |
-| Dodi | Open Source | https://www.fontshare.com/fonts/dodi |
-| Duplet | Open Source | https://www.fontshare.com/fonts/duplet |
-| Fokkol | Open Source | https://www.fontshare.com/fonts/fokkol |
-| Gilam | Open Source | https://www.fontshare.com/fonts/gilam |
-| Gratimo Grotesk | Open Source | https://www.fontshare.com/fonts/gratimo-grotesk |
-| H.H. Samuel | Open Source | https://www.fontshare.com/fonts/h.h.-samuel |
-| Helixa | Open Source | https://www.fontshare.com/fonts/helixa |
-| Ladi | Open Source | https://www.fontshare.com/fonts/ladi |
-| Lausanne | Open Source | https://www.fontshare.com/fonts/lausanne |
-| Magro | Open Source | https://www.fontshare.com/fonts/magro |
-| Mrow | Open Source | https://www.fontshare.com/fonts/mrow |
-| Nacelle | Open Source | https://www.fontshare.com/fonts/nacelle |
-| New Spirit | Open Source | https://www.fontshare.com/fonts/new-spirit |
-| Nohemi | Open Source | https://www.fontshare.com/fonts/nohemi |
-| Ozone | Open Source | https://www.fontshare.com/fonts/ozone |
-| Polaris FS | Open Source | https://www.fontshare.com/fonts/polaris-fs |
-| Pramit | Open Source | https://www.fontshare.com/fonts/pramit |
-| Saans | Open Source | https://www.fontshare.com/fonts/saans |
-| Strawford | Open Source | https://www.fontshare.com/fonts/strawford |
-| Sudo | Open Source | https://www.fontshare.com/fonts/sudo |
-| Thica | Open Source | https://www.fontshare.com/fonts/thica |
-| Vercetti | Open Source | https://www.fontshare.com/fonts/vercetti |
-| Wotfard FS | Open Source | https://www.fontshare.com/fonts/wotfard-fs |
+## Source/license queue by recovered source
 
-### Google Fonts — 5
+| Recovered source | Families pending |
+|---|---:|
+| Fontshare | 32 |
+| Google Fonts | 5 |
+| Uncut / Indie | 1 |
 
-| Family | Raw license | Source URL |
-|---|---|---|
-| Cederville Cursive | Open Source | https://fonts.google.com/specimen/Cederville+Cursive |
-| Manual | Open Source | https://fonts.google.com/specimen/Manual |
-| Name Sans | Open Source | https://fonts.google.com/specimen/Name+Sans |
-| Open Sans Condensed | Open Source | https://fonts.google.com/specimen/Open+Sans+Condensed |
-| Source Sans Pro | Open Source | https://fonts.google.com/specimen/Source+Sans+Pro |
+## Source/license verification queue
 
-### Uncut / Indie — 1
+| Family | Recovered source | Identity | License | Weights | Variable | Scripts | Current label |
+|---|---|---|---|---|---|---|---|
+| Barbara | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Bromine | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Bw Gradual | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Bw Modelica | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Bw Nista | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Bw Seido | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Canchal | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Cassandra | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Deng | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Dodi | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Duplet | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Fokkol | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Gilam | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Gratimo Grotesk | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| H.H. Samuel | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Helixa | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Ladi | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Lausanne | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Magro | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Mrow | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Nacelle | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| New Spirit | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Nohemi | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Ozone | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Polaris FS | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Pramit | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Saans | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Strawford | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Sudo | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Thica | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Vercetti | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Wotfard FS | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Cederville Cursive | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
+| Manual | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
+| Name Sans | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
+| Open Sans Condensed | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
+| Source Sans Pro | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
+| Fire Sans | Uncut / Indie | pending | pending | pending | pending | pending | Verify at source |
 
-| Family | Raw license | Source URL |
-|---|---|---|
-| Fire Sans | Open Source | https://fonts.google.com/specimen/Fire+Sans |
+## Source/license verified but technically partial
+
+| Family | Provider | Weights | Variable | Scripts |
+|---|---|---|---|---|
+| Cal Sans | Independent | pending | verified | pending |
+| Hauora | Independent | pending | verified | verified |
+| Uncut Sans | Independent | pending | pending | pending |
 

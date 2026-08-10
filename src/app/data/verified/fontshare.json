@@ -173,7 +173,7 @@
       {
         "tag": "wght",
         "min": 100,
-        "default": 180,
+        "default": 500,
         "max": 900
       }
     ],
@@ -338,8 +338,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/alpino",
-    "sourceHash": "3ad9125532e8d5271891dd691154d241cb5158d834cd45400727512d5a881ff9",
-    "capturedAt": "2026-08-10T18:29:09.843Z"
+    "sourceHash": "e4c7f818b1694dd3b983637bbb3c58962d6d3c28b48af59f9070ba4dfe2b7b27",
+    "capturedAt": "2026-08-10T18:39:02.554Z"
   },
   "Amulya": {
     "family": "Amulya",
@@ -506,7 +506,7 @@
       {
         "tag": "wght",
         "min": 300,
-        "default": 700,
+        "default": 460,
         "max": 700
       }
     ],
@@ -732,8 +732,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/amulya",
-    "sourceHash": "1ca2e6e5c1962270457374fc2e29c815c1d64cdba02c65bd68c7c9d259f12fd7",
-    "capturedAt": "2026-08-10T18:29:09.843Z"
+    "sourceHash": "593c2050d7a7be6903fda0d07f789d19400ba072797f5c2acf8c18889cffafa4",
+    "capturedAt": "2026-08-10T18:39:02.555Z"
   },
   "Array": {
     "family": "Array",
@@ -966,7 +966,7 @@
         "providerNumber": 600,
         "italic": false,
         "variable": false,
-        "default": true,
+        "default": false,
         "providerFileUrl": "https://cdn.fontshare.com/wf/CASMZPM4VVUC7LKMFQX5SR6SI2NXI6WK/JAJOL32XMCA7KL72O3CN6EMCO3THGWPV/N2P4YTB27O7OQQY6FVFUL232EUHLL7SR",
         "metrics": {
           "ascender": 1400,
@@ -986,7 +986,7 @@
         "providerNumber": 700,
         "italic": false,
         "variable": false,
-        "default": false,
+        "default": true,
         "providerFileUrl": "https://cdn.fontshare.com/wf/UPIFVAOR6LZHAYRMF2C77WE3FN5BLNEC/INIDOMS2AGMFQXDWKOC6LOTPXKPZEIHL/2RWR7WKM4ZCDU656OKUXMQXLJH4H3EJD",
         "metrics": {
           "ascender": 1400,
@@ -1037,8 +1037,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/array",
-    "sourceHash": "70a5e5c53e345cb97810b84a386e05c3adffd6e714f09b60b8f16789aedd8b41",
-    "capturedAt": "2026-08-10T18:29:09.843Z"
+    "sourceHash": "cf35753cb6a289893625dcccdab3cba921822d6f5bf5d2c4ced300c155f121fc",
+    "capturedAt": "2026-08-10T18:39:02.555Z"
   },
   "Author": {
     "family": "Author",
@@ -1715,7 +1715,7 @@
       {
         "tag": "wght",
         "min": 300,
-        "default": 700,
+        "default": 800,
         "max": 800
       }
     ],
@@ -1978,8 +1978,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/bespoke-sans",
-    "sourceHash": "83d424389b86869b8c18932b8c38c63209576c7f0ea961869ec798fbbb3213bb",
-    "capturedAt": "2026-08-10T18:29:09.844Z"
+    "sourceHash": "688f21762b962e702294a3ab1f1dfbaa703cda0c8cf986799285222170a96767",
+    "capturedAt": "2026-08-10T18:39:02.555Z"
   },
   "Bespoke Serif": {
     "family": "Bespoke Serif",
@@ -2182,13 +2182,13 @@
       {
         "tag": "wght",
         "min": 300,
-        "default": 600,
+        "default": 400,
         "max": 800
       },
       {
         "tag": "wght",
         "min": 300,
-        "default": 750,
+        "default": 800,
         "max": 800
       }
     ],
@@ -2452,8 +2452,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/bespoke-serif",
-    "sourceHash": "9fc168557a38a32e2d4098511281dd5b7c8fa8760713a68de2308e8c2eb18ff8",
-    "capturedAt": "2026-08-10T18:29:09.844Z"
+    "sourceHash": "96a724ea61b2c7fde37e2e698c43b96389fc986b00c10794afa1d2c59a22aedf",
+    "capturedAt": "2026-08-10T18:39:02.555Z"
   },
   "Bespoke Slab": {
     "family": "Bespoke Slab",
@@ -2656,7 +2656,7 @@
       {
         "tag": "wght",
         "min": 300,
-        "default": 750,
+        "default": 350,
         "max": 800
       }
     ],
@@ -2919,8 +2919,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/bespoke-slab",
-    "sourceHash": "e29ed1adde9f95f1a16a9be32283fb8cd0e6cb9ba5bc955468a077a831833b4b",
-    "capturedAt": "2026-08-10T18:29:09.844Z"
+    "sourceHash": "6e7aaf933b272acb12b50feea8617939a3f58530c4e9477e8518a0dd80b30c41",
+    "capturedAt": "2026-08-10T18:39:02.555Z"
   },
   "Bespoke Stencil": {
     "family": "Bespoke Stencil",
@@ -3123,7 +3123,7 @@
       {
         "tag": "wght",
         "min": 300,
-        "default": 550,
+        "default": 500,
         "max": 800
       }
     ],
@@ -3386,8 +3386,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/bespoke-stencil",
-    "sourceHash": "dfb0cd0ec48f3f62de2d48e7af36f7acfe5aa908b9a49f5b71bc760e74fcf076",
-    "capturedAt": "2026-08-10T18:29:09.844Z"
+    "sourceHash": "f676ca3890a88832015131368e2e8e88488a7096910f6dbb887d302c6355632a",
+    "capturedAt": "2026-08-10T18:39:02.556Z"
   },
   "Bonny": {
     "family": "Bonny",
@@ -3554,7 +3554,7 @@
       {
         "tag": "wght",
         "min": 100,
-        "default": 580,
+        "default": 220,
         "max": 700
       }
     ],
@@ -3699,8 +3699,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/bonny",
-    "sourceHash": "14a911a46b533ad6297e30b7dff118ff3902d97154ceb0600cd3bb68fbf673f3",
-    "capturedAt": "2026-08-10T18:29:09.844Z"
+    "sourceHash": "2a4fb61642a45fb3d848a9153d39186023c01380820553d56e34348f288f5d2c",
+    "capturedAt": "2026-08-10T18:39:02.556Z"
   },
   "Boska": {
     "family": "Boska",
@@ -3867,7 +3867,7 @@
       {
         "tag": "wght",
         "min": 200,
-        "default": 620,
+        "default": 760,
         "max": 900
       }
     ],
@@ -4178,8 +4178,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/boska",
-    "sourceHash": "7b51d2e15d881a88ec4f4e0c6efcfedf4fc0e71defb538e95406e53471b782b6",
-    "capturedAt": "2026-08-10T18:29:09.844Z"
+    "sourceHash": "ffffb219d768c48698dfa786f6628d95ba1a3ab1c14edc3e91e0f461f44dad3e",
+    "capturedAt": "2026-08-10T18:39:02.556Z"
   },
   "Boxing": {
     "family": "Boxing",
@@ -4410,7 +4410,7 @@
       {
         "tag": "wght",
         "min": 300,
-        "default": 900,
+        "default": 660,
         "max": 900
       }
     ],
@@ -4534,8 +4534,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/britney",
-    "sourceHash": "15d4ea7b7344544b6190b400e7a25f9bd63c2c606e8a35c5810f7b91d1b6649b",
-    "capturedAt": "2026-08-10T18:29:09.845Z"
+    "sourceHash": "c9212b2586f0637cb10d0f2171075b8bed2a728f5fef2db6c39a0f0fe385b03f",
+    "capturedAt": "2026-08-10T18:39:02.556Z"
   },
   "Cabinet Grotesk": {
     "family": "Cabinet Grotesk",
@@ -4702,7 +4702,7 @@
       {
         "tag": "wght",
         "min": 100,
-        "default": 340,
+        "default": 500,
         "max": 900
       }
     ],
@@ -4913,8 +4913,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/cabinet-grotesk",
-    "sourceHash": "8692a9aaa25a803d61abeac8b169ffc92544cf7d92527ab6215ac285e45da6bf",
-    "capturedAt": "2026-08-10T18:29:09.845Z"
+    "sourceHash": "04f992f593ca71db97de40b1c4e979c3456ce7b2c0cabab3e0229eb6ef0fa76f",
+    "capturedAt": "2026-08-10T18:39:02.556Z"
   },
   "Chillax": {
     "family": "Chillax",
@@ -5081,7 +5081,7 @@
       {
         "tag": "wght",
         "min": 200,
-        "default": 400,
+        "default": 250,
         "max": 700
       }
     ],
@@ -5247,8 +5247,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/chillax",
-    "sourceHash": "017e1929776ad750e6ed3ae6bfa9cd0fd0945a4d8c32b304149ae5e866d7e16b",
-    "capturedAt": "2026-08-10T18:29:09.845Z"
+    "sourceHash": "e917d37df0f0d950acaeeff14617c948aa307a645cf0ffd837e392d42a1dbe5c",
+    "capturedAt": "2026-08-10T18:39:02.556Z"
   },
   "Chubbo": {
     "family": "Chubbo",
@@ -5415,13 +5415,13 @@
       {
         "tag": "wght",
         "min": 200,
-        "default": 600,
+        "default": 700,
         "max": 700
       },
       {
         "tag": "wght",
         "min": 200,
-        "default": 500,
+        "default": 250,
         "max": 700
       }
     ],
@@ -5692,13 +5692,345 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/chubbo",
-    "sourceHash": "3763deec24db5936880cdf9c94d5b047f0e98a90e5205315d66b8a0b0f1b1aab",
-    "capturedAt": "2026-08-10T18:29:09.845Z"
+    "sourceHash": "02157b6cdbac0b63cabfed14b4daaed412750e308eddd2e09cba99bd4ffed1ee",
+    "capturedAt": "2026-08-10T18:39:02.557Z"
   },
   "Clash Display": {
     "family": "Clash Display",
     "upstreamId": "72a233b1-88ac-4f52-bc94-98dd11d2c3f2",
     "slug": "clash-display",
+    "licenseType": "itf_ffl",
+    "category": "Sans",
+    "script": "latin",
+    "languages": [
+      "Afar",
+      "Afrikaans",
+      "Albanian",
+      "Aranese",
+      "Aromanian",
+      "Aymara",
+      "Azeri (Latin)",
+      "Basque",
+      "Bemba",
+      "Bislama",
+      "Bosnian",
+      "Breton",
+      "Catalan",
+      "Chamorro",
+      "Cheyenne",
+      "Chichewa",
+      "Chuukese",
+      "Cofán",
+      "Cornish",
+      "Crimean Tatar",
+      "Croatian",
+      "Czech",
+      "Danish",
+      "Dutch",
+      "English",
+      "Esperanto",
+      "Estonian",
+      "Faroese",
+      "Fijian",
+      "Finnish",
+      "French",
+      "Frisian",
+      "Friulian",
+      "Ga",
+      "Galician",
+      "Ganda",
+      "German",
+      "Gikuyu",
+      "Greenlandic",
+      "Guarani",
+      "Guaraní",
+      "Gwich’in",
+      "Haitian",
+      "Hawaiian",
+      "Hungarian",
+      "Icelandic",
+      "Ido",
+      "Igbo",
+      "Indonesian",
+      "Interlingua",
+      "Irish Gaelic",
+      "Italian",
+      "Javanese",
+      "Karelian",
+      "Kashubian",
+      "Kinyarwanda",
+      "Kiribati",
+      "Kirundi",
+      "Kituba",
+      "Kurdish (Latin)",
+      "Ladin",
+      "Latvian",
+      "Lithuanian",
+      "Luxemburgish",
+      "Malagasy",
+      "Malay",
+      "Maltese",
+      "Maninka",
+      "Manx",
+      "Māori",
+      "Marshallese",
+      "Náhuatl",
+      "Nauruan",
+      "Navajo",
+      "Ndebele (Northern)",
+      "Ndebele (Southern)",
+      "Norfuk",
+      "Norn",
+      "Norwegian (Bokmål)",
+      "Norwegian (Nynorsk)",
+      "Nyanja",
+      "Occitan",
+      "Oromo",
+      "Otomi",
+      "Palauan",
+      "Papiamento",
+      "Pedi",
+      "Polish",
+      "Portuguese",
+      "Quechua",
+      "Rarotongan",
+      "Rhaeto-Romanic",
+      "Romaji",
+      "Romani",
+      "Romanian",
+      "Sámi (Inari)",
+      "Sámi (Lule)",
+      "Sámi (Northern)",
+      "Sámi (Southern)",
+      "Samoan",
+      "Sango",
+      "Sardinian",
+      "Scottish Gaelic",
+      "Serbian (Latin)",
+      "Seychelles Creole",
+      "Shona",
+      "Silesian",
+      "Slovak",
+      "Slovene",
+      "Somali (Latin)",
+      "Sorbian",
+      "Sotho",
+      "Spanish",
+      "Swahili",
+      "Swati",
+      "Swedish",
+      "Tagalog (Filipino)",
+      "Tahitian",
+      "Tetum",
+      "Tok Pisin",
+      "Tokelauan",
+      "Tongan",
+      "Tsonga",
+      "Tswana",
+      "Turkish",
+      "Tuvalu",
+      "Twi",
+      "Ulithian",
+      "Umbundu",
+      "Veps",
+      "Vietnamese",
+      "Welsh",
+      "Wolof",
+      "Xhosa",
+      "Zulu"
+    ],
+    "designers": [
+      {
+        "name": "Indian Type Foundry",
+        "links": [
+          {
+            "name": "Twitter",
+            "url": "https://twitter.com/Indian Type Foundry"
+          }
+        ]
+      }
+    ],
+    "publisher": {
+      "id": "9abfaf87-6501-455f-8f74-9204db247290",
+      "name": "Indian Type Foundry",
+      "website": "http://www.indiantypefoundry.com/"
+    },
+    "displayPublisherAsDesigner": true,
+    "axes": [
+      {
+        "tag": "wght",
+        "min": 200,
+        "default": 550,
+        "max": 700
+      }
+    ],
+    "styles": [
+      {
+        "id": "4f2ca3b1-1ce7-40b8-b117-f3528581ad41",
+        "name": "Extralight",
+        "label": "Extralight",
+        "weight": 200,
+        "providerNumber": 200,
+        "italic": false,
+        "variable": false,
+        "default": false,
+        "providerFileUrl": "https://cdn.fontshare.com/wf/5HPV3UJUTRGUMHDLLTJKWGVPFGAKYJX3/FFBQJ5XURUJWMMBB7NX6DBDELXZR7T4I/NULWCMFPHMNO5EOBFBRF7EKVXV5JVMFB",
+        "metrics": {
+          "ascender": 890,
+          "descender": -170,
+          "capHeight": 670,
+          "xHeight": 490,
+          "yMax": 890,
+          "yMin": -250,
+          "maxCharWidth": 1739
+        }
+      },
+      {
+        "id": "e408f4e4-291b-411d-aa64-d9f1ff22d548",
+        "name": "Light",
+        "label": "Light",
+        "weight": 300,
+        "providerNumber": 300,
+        "italic": false,
+        "variable": false,
+        "default": false,
+        "providerFileUrl": "https://cdn.fontshare.com/wf/2QNEFGROUS53RDOVAHQH4CNZZUWGOWOY/XHI55XFKRZLKG77T3N3QTH2YVHMLJQ5U/KVT4BC5ZH7LF4OBHM2Q7KOOZRRZZY5ZK",
+        "metrics": {
+          "ascender": 890,
+          "descender": -170,
+          "capHeight": 670,
+          "xHeight": 491,
+          "yMax": 890,
+          "yMin": -250,
+          "maxCharWidth": 1730
+        }
+      },
+      {
+        "id": "a46ee282-9a3f-4261-8fab-6a7f9b685890",
+        "name": "Regular",
+        "label": "Regular",
+        "weight": 400,
+        "providerNumber": 400,
+        "italic": false,
+        "variable": false,
+        "default": false,
+        "providerFileUrl": "https://cdn.fontshare.com/wf/VFMK2COV3DN37JR7JQ4CAOJPZ7KWKNY7/ODD5YJNDLHZZB2MIT3DPVH4EIHAMZ34D/BSY64LPTT3OPLVKAZKL3AHKRWZ3D74AC",
+        "metrics": {
+          "ascender": 890,
+          "descender": -170,
+          "capHeight": 670,
+          "xHeight": 494,
+          "yMax": 890,
+          "yMin": -250,
+          "maxCharWidth": 1713
+        }
+      },
+      {
+        "id": "3c1e0311-1e73-4019-b0ae-f400de9f2b1a",
+        "name": "Medium",
+        "label": "Medium",
+        "weight": 500,
+        "providerNumber": 500,
+        "italic": false,
+        "variable": false,
+        "default": false,
+        "providerFileUrl": "https://cdn.fontshare.com/wf/2GQIT54GKQY3JRFTSHS4ARTRNRQISSAA/3CIP5EBHRRHE5FVQU3VFROPUERNDSTDF/JTSL5QESUXATU47LCPUNHZQBDDIWDOSW",
+        "metrics": {
+          "ascender": 890,
+          "descender": -170,
+          "capHeight": 670,
+          "xHeight": 497,
+          "yMax": 890,
+          "yMin": -250,
+          "maxCharWidth": 1690
+        }
+      },
+      {
+        "id": "7b2d66b5-04be-47cd-a6c4-92afb32b36f9",
+        "name": "Semibold",
+        "label": "Semibold",
+        "weight": 600,
+        "providerNumber": 600,
+        "italic": false,
+        "variable": false,
+        "default": false,
+        "providerFileUrl": "https://cdn.fontshare.com/wf/FPDAZ2S6SW4QMSRIIKNNGTPM6VIXYMKO/5HNPQ453FRLIQWV2FNOBUU3FKTDZQVSG/Z3MGHFHX6DCTLQ55LJYRJ5MDCZPMFZU6",
+        "metrics": {
+          "ascender": 890,
+          "descender": -170,
+          "capHeight": 670,
+          "xHeight": 501,
+          "yMax": 890,
+          "yMin": -250,
+          "maxCharWidth": 1663
+        }
+      },
+      {
+        "id": "847e9e4f-ed4a-40c3-b1a4-b9cb1735ae63",
+        "name": "Bold",
+        "label": "Bold",
+        "weight": 700,
+        "providerNumber": 700,
+        "italic": false,
+        "variable": false,
+        "default": false,
+        "providerFileUrl": "https://cdn.fontshare.com/wf/BFBSY7LX5W2U2EROCLVVTQP4VS7S4PC3/IIUX4FGTMD2LK2VWD3RVTAS4SSMUN7B5/53RZKGODFYDW3QHTIL7IPOWTBCSUEZK7",
+        "metrics": {
+          "ascender": 890,
+          "descender": -170,
+          "capHeight": 670,
+          "xHeight": 504,
+          "yMax": 890,
+          "yMin": -250,
+          "maxCharWidth": 1639
+        }
+      },
+      {
+        "id": "ce0c6870-7290-4e12-b234-4228a5ae40a8",
+        "name": "Variable",
+        "label": "Variable",
+        "weight": 0,
+        "providerNumber": 1,
+        "italic": false,
+        "variable": true,
+        "default": true,
+        "providerFileUrl": "https://cdn.fontshare.com/wf/DK2FOA46SRWJ5HXWWU5TK4N4CMHYD236/FPEAXZZSH5L2K5MTJFRIWD2MC32IJMN3/THOOS4VOCKT7H2XEB27NQDYM2NYS4AAR",
+        "metrics": {
+          "ascender": 890,
+          "descender": -170,
+          "capHeight": 670,
+          "xHeight": 504,
+          "yMax": 890,
+          "yMin": -250,
+          "maxCharWidth": 1639
+        }
+      }
+    ],
+    "features": [
+      "aalt",
+      "case",
+      "dlig",
+      "frac",
+      "liga",
+      "locl",
+      "ordn",
+      "salt",
+      "sups"
+    ],
+    "tags": [
+      "Banners",
+      "Editorial",
+      "Magazines"
+    ],
+    "version": "1.0",
+    "sourceUrl": "https://fontshare.com/fonts/clash-display",
+    "sourceHash": "0be503c2adf38d206b225eae40853be86b5805215c648143dc4fd6313fd67c55",
+    "capturedAt": "2026-08-10T18:39:02.557Z"
+  },
+  "Clash Grotesk": {
+    "family": "Clash Grotesk",
+    "upstreamId": "133e399e-482b-4df7-8801-d800ef2d94a5",
+    "slug": "clash-grotesk",
     "licenseType": "itf_ffl",
     "category": "Sans",
     "script": "latin",
@@ -5866,338 +6198,6 @@
     ],
     "styles": [
       {
-        "id": "4f2ca3b1-1ce7-40b8-b117-f3528581ad41",
-        "name": "Extralight",
-        "label": "Extralight",
-        "weight": 200,
-        "providerNumber": 200,
-        "italic": false,
-        "variable": false,
-        "default": false,
-        "providerFileUrl": "https://cdn.fontshare.com/wf/5HPV3UJUTRGUMHDLLTJKWGVPFGAKYJX3/FFBQJ5XURUJWMMBB7NX6DBDELXZR7T4I/NULWCMFPHMNO5EOBFBRF7EKVXV5JVMFB",
-        "metrics": {
-          "ascender": 890,
-          "descender": -170,
-          "capHeight": 670,
-          "xHeight": 490,
-          "yMax": 890,
-          "yMin": -250,
-          "maxCharWidth": 1739
-        }
-      },
-      {
-        "id": "e408f4e4-291b-411d-aa64-d9f1ff22d548",
-        "name": "Light",
-        "label": "Light",
-        "weight": 300,
-        "providerNumber": 300,
-        "italic": false,
-        "variable": false,
-        "default": false,
-        "providerFileUrl": "https://cdn.fontshare.com/wf/2QNEFGROUS53RDOVAHQH4CNZZUWGOWOY/XHI55XFKRZLKG77T3N3QTH2YVHMLJQ5U/KVT4BC5ZH7LF4OBHM2Q7KOOZRRZZY5ZK",
-        "metrics": {
-          "ascender": 890,
-          "descender": -170,
-          "capHeight": 670,
-          "xHeight": 491,
-          "yMax": 890,
-          "yMin": -250,
-          "maxCharWidth": 1730
-        }
-      },
-      {
-        "id": "a46ee282-9a3f-4261-8fab-6a7f9b685890",
-        "name": "Regular",
-        "label": "Regular",
-        "weight": 400,
-        "providerNumber": 400,
-        "italic": false,
-        "variable": false,
-        "default": false,
-        "providerFileUrl": "https://cdn.fontshare.com/wf/VFMK2COV3DN37JR7JQ4CAOJPZ7KWKNY7/ODD5YJNDLHZZB2MIT3DPVH4EIHAMZ34D/BSY64LPTT3OPLVKAZKL3AHKRWZ3D74AC",
-        "metrics": {
-          "ascender": 890,
-          "descender": -170,
-          "capHeight": 670,
-          "xHeight": 494,
-          "yMax": 890,
-          "yMin": -250,
-          "maxCharWidth": 1713
-        }
-      },
-      {
-        "id": "3c1e0311-1e73-4019-b0ae-f400de9f2b1a",
-        "name": "Medium",
-        "label": "Medium",
-        "weight": 500,
-        "providerNumber": 500,
-        "italic": false,
-        "variable": false,
-        "default": false,
-        "providerFileUrl": "https://cdn.fontshare.com/wf/2GQIT54GKQY3JRFTSHS4ARTRNRQISSAA/3CIP5EBHRRHE5FVQU3VFROPUERNDSTDF/JTSL5QESUXATU47LCPUNHZQBDDIWDOSW",
-        "metrics": {
-          "ascender": 890,
-          "descender": -170,
-          "capHeight": 670,
-          "xHeight": 497,
-          "yMax": 890,
-          "yMin": -250,
-          "maxCharWidth": 1690
-        }
-      },
-      {
-        "id": "7b2d66b5-04be-47cd-a6c4-92afb32b36f9",
-        "name": "Semibold",
-        "label": "Semibold",
-        "weight": 600,
-        "providerNumber": 600,
-        "italic": false,
-        "variable": false,
-        "default": false,
-        "providerFileUrl": "https://cdn.fontshare.com/wf/FPDAZ2S6SW4QMSRIIKNNGTPM6VIXYMKO/5HNPQ453FRLIQWV2FNOBUU3FKTDZQVSG/Z3MGHFHX6DCTLQ55LJYRJ5MDCZPMFZU6",
-        "metrics": {
-          "ascender": 890,
-          "descender": -170,
-          "capHeight": 670,
-          "xHeight": 501,
-          "yMax": 890,
-          "yMin": -250,
-          "maxCharWidth": 1663
-        }
-      },
-      {
-        "id": "847e9e4f-ed4a-40c3-b1a4-b9cb1735ae63",
-        "name": "Bold",
-        "label": "Bold",
-        "weight": 700,
-        "providerNumber": 700,
-        "italic": false,
-        "variable": false,
-        "default": false,
-        "providerFileUrl": "https://cdn.fontshare.com/wf/BFBSY7LX5W2U2EROCLVVTQP4VS7S4PC3/IIUX4FGTMD2LK2VWD3RVTAS4SSMUN7B5/53RZKGODFYDW3QHTIL7IPOWTBCSUEZK7",
-        "metrics": {
-          "ascender": 890,
-          "descender": -170,
-          "capHeight": 670,
-          "xHeight": 504,
-          "yMax": 890,
-          "yMin": -250,
-          "maxCharWidth": 1639
-        }
-      },
-      {
-        "id": "ce0c6870-7290-4e12-b234-4228a5ae40a8",
-        "name": "Variable",
-        "label": "Variable",
-        "weight": 0,
-        "providerNumber": 1,
-        "italic": false,
-        "variable": true,
-        "default": true,
-        "providerFileUrl": "https://cdn.fontshare.com/wf/DK2FOA46SRWJ5HXWWU5TK4N4CMHYD236/FPEAXZZSH5L2K5MTJFRIWD2MC32IJMN3/THOOS4VOCKT7H2XEB27NQDYM2NYS4AAR",
-        "metrics": {
-          "ascender": 890,
-          "descender": -170,
-          "capHeight": 670,
-          "xHeight": 504,
-          "yMax": 890,
-          "yMin": -250,
-          "maxCharWidth": 1639
-        }
-      }
-    ],
-    "features": [
-      "aalt",
-      "case",
-      "dlig",
-      "frac",
-      "liga",
-      "locl",
-      "ordn",
-      "salt",
-      "sups"
-    ],
-    "tags": [
-      "Banners",
-      "Editorial",
-      "Magazines"
-    ],
-    "version": "1.0",
-    "sourceUrl": "https://fontshare.com/fonts/clash-display",
-    "sourceHash": "c7f77d71b85b49b881cdb9d3b079f7ec6516c32746e094ecb85c988261f39acd",
-    "capturedAt": "2026-08-10T18:29:09.845Z"
-  },
-  "Clash Grotesk": {
-    "family": "Clash Grotesk",
-    "upstreamId": "133e399e-482b-4df7-8801-d800ef2d94a5",
-    "slug": "clash-grotesk",
-    "licenseType": "itf_ffl",
-    "category": "Sans",
-    "script": "latin",
-    "languages": [
-      "Afar",
-      "Afrikaans",
-      "Albanian",
-      "Aranese",
-      "Aromanian",
-      "Aymara",
-      "Azeri (Latin)",
-      "Basque",
-      "Bemba",
-      "Bislama",
-      "Bosnian",
-      "Breton",
-      "Catalan",
-      "Chamorro",
-      "Cheyenne",
-      "Chichewa",
-      "Chuukese",
-      "Cofán",
-      "Cornish",
-      "Crimean Tatar",
-      "Croatian",
-      "Czech",
-      "Danish",
-      "Dutch",
-      "English",
-      "Esperanto",
-      "Estonian",
-      "Faroese",
-      "Fijian",
-      "Finnish",
-      "French",
-      "Frisian",
-      "Friulian",
-      "Ga",
-      "Galician",
-      "Ganda",
-      "German",
-      "Gikuyu",
-      "Greenlandic",
-      "Guarani",
-      "Guaraní",
-      "Gwich’in",
-      "Haitian",
-      "Hawaiian",
-      "Hungarian",
-      "Icelandic",
-      "Ido",
-      "Igbo",
-      "Indonesian",
-      "Interlingua",
-      "Irish Gaelic",
-      "Italian",
-      "Javanese",
-      "Karelian",
-      "Kashubian",
-      "Kinyarwanda",
-      "Kiribati",
-      "Kirundi",
-      "Kituba",
-      "Kurdish (Latin)",
-      "Ladin",
-      "Latvian",
-      "Lithuanian",
-      "Luxemburgish",
-      "Malagasy",
-      "Malay",
-      "Maltese",
-      "Maninka",
-      "Manx",
-      "Māori",
-      "Marshallese",
-      "Náhuatl",
-      "Nauruan",
-      "Navajo",
-      "Ndebele (Northern)",
-      "Ndebele (Southern)",
-      "Norfuk",
-      "Norn",
-      "Norwegian (Bokmål)",
-      "Norwegian (Nynorsk)",
-      "Nyanja",
-      "Occitan",
-      "Oromo",
-      "Otomi",
-      "Palauan",
-      "Papiamento",
-      "Pedi",
-      "Polish",
-      "Portuguese",
-      "Quechua",
-      "Rarotongan",
-      "Rhaeto-Romanic",
-      "Romaji",
-      "Romani",
-      "Romanian",
-      "Sámi (Inari)",
-      "Sámi (Lule)",
-      "Sámi (Northern)",
-      "Sámi (Southern)",
-      "Samoan",
-      "Sango",
-      "Sardinian",
-      "Scottish Gaelic",
-      "Serbian (Latin)",
-      "Seychelles Creole",
-      "Shona",
-      "Silesian",
-      "Slovak",
-      "Slovene",
-      "Somali (Latin)",
-      "Sorbian",
-      "Sotho",
-      "Spanish",
-      "Swahili",
-      "Swati",
-      "Swedish",
-      "Tagalog (Filipino)",
-      "Tahitian",
-      "Tetum",
-      "Tok Pisin",
-      "Tokelauan",
-      "Tongan",
-      "Tsonga",
-      "Tswana",
-      "Turkish",
-      "Tuvalu",
-      "Twi",
-      "Ulithian",
-      "Umbundu",
-      "Veps",
-      "Vietnamese",
-      "Welsh",
-      "Wolof",
-      "Xhosa",
-      "Zulu"
-    ],
-    "designers": [
-      {
-        "name": "Indian Type Foundry",
-        "links": [
-          {
-            "name": "Twitter",
-            "url": "https://twitter.com/Indian Type Foundry"
-          }
-        ]
-      }
-    ],
-    "publisher": {
-      "id": "9abfaf87-6501-455f-8f74-9204db247290",
-      "name": "Indian Type Foundry",
-      "website": "http://www.indiantypefoundry.com/"
-    },
-    "displayPublisherAsDesigner": true,
-    "axes": [
-      {
-        "tag": "wght",
-        "min": 200,
-        "default": 500,
-        "max": 700
-      }
-    ],
-    "styles": [
-      {
         "id": "71e3a07d-b08a-421e-8ba9-1188030499f3",
         "name": "Extralight",
         "label": "Extralight",
@@ -6358,8 +6358,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/clash-grotesk",
-    "sourceHash": "5a2b50f574447d5b082e643c34b699efd87d743044e05408358669696ed15a4b",
-    "capturedAt": "2026-08-10T18:29:09.845Z"
+    "sourceHash": "19ce453d877d97dc543642ca60da96e5bbcfc9ddafaafcb478f2d8e1f00f81ae",
+    "capturedAt": "2026-08-10T18:39:02.557Z"
   },
   "Comico": {
     "family": "Comico",
@@ -6737,7 +6737,7 @@
       {
         "tag": "wght",
         "min": 300,
-        "default": 500,
+        "default": 620,
         "max": 700
       }
     ],
@@ -7000,8 +7000,8 @@
     ],
     "version": "1.022",
     "sourceUrl": "https://fontshare.com/fonts/erode",
-    "sourceHash": "5f988edaef9b76e19c97c153cbbcf83e7f0ed5c754147cc3e3e12c1997d53073",
-    "capturedAt": "2026-08-10T18:29:09.846Z"
+    "sourceHash": "77b6090635aaf4be2ecac87a0f4daca88c4088a22120fad19386001f22ea41f2",
+    "capturedAt": "2026-08-10T18:39:02.557Z"
   },
   "Excon": {
     "family": "Excon",
@@ -7168,7 +7168,7 @@
       {
         "tag": "wght",
         "min": 100,
-        "default": 900,
+        "default": 420,
         "max": 900
       }
     ],
@@ -7331,8 +7331,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/excon",
-    "sourceHash": "75c28e63c2a6539a57018933eb333b7ce7909539db7baf5bb715ceec47464334",
-    "capturedAt": "2026-08-10T18:29:09.846Z"
+    "sourceHash": "1026b090ef70775cdab3c5ba77b6bd4706ed61d914159ea9de824618f94f99b2",
+    "capturedAt": "2026-08-10T18:39:02.557Z"
   },
   "Gambetta": {
     "family": "Gambetta",
@@ -7499,13 +7499,13 @@
       {
         "tag": "wght",
         "min": 300,
-        "default": 580,
+        "default": 500,
         "max": 700
       },
       {
         "tag": "wght",
         "min": 300,
-        "default": 660,
+        "default": 460,
         "max": 700
       }
     ],
@@ -7722,8 +7722,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/gambetta",
-    "sourceHash": "8627353817ee329cafcfb322f1add30f312d501b7d077ceb166beae04b43d627",
-    "capturedAt": "2026-08-10T18:29:09.846Z"
+    "sourceHash": "606d3cbba76668d5e15c1a3ed97fb72d8400a1d3070f5dc959bad3cb0ce2ca06",
+    "capturedAt": "2026-08-10T18:39:02.558Z"
   },
   "General Sans": {
     "family": "General Sans",
@@ -8370,7 +8370,7 @@
       {
         "tag": "wght",
         "min": 200,
-        "default": 700,
+        "default": 250,
         "max": 700
       }
     ],
@@ -8515,8 +8515,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/hoover",
-    "sourceHash": "fe378c35935879517a6a9aacf580ad3b22ea6f82196882cd23d99010793865c0",
-    "capturedAt": "2026-08-10T18:29:09.846Z"
+    "sourceHash": "2c3382e4fd7ed23cc0ae7e1f3d4e15cb5f202842d3c7edf1f9a03905288daeab",
+    "capturedAt": "2026-08-10T18:39:02.558Z"
   },
   "Kola": {
     "family": "Kola",
@@ -8886,7 +8886,7 @@
       {
         "tag": "wght",
         "min": 300,
-        "default": 380,
+        "default": 500,
         "max": 700
       }
     ],
@@ -9037,8 +9037,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/melodrama",
-    "sourceHash": "cef840572d4665cfd0c81d4aed8f3fd6be0ac1cce5cbf592f953a501c3dc83e5",
-    "capturedAt": "2026-08-10T18:29:09.848Z"
+    "sourceHash": "3c2bb7f09151245987ed03f6088aa4e22598eab08fb8428470687f54648a2026",
+    "capturedAt": "2026-08-10T18:39:02.558Z"
   },
   "Nippo": {
     "family": "Nippo",
@@ -9205,7 +9205,7 @@
       {
         "tag": "wght",
         "min": 200,
-        "default": 400,
+        "default": 700,
         "max": 700
       }
     ],
@@ -9359,8 +9359,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/nippo",
-    "sourceHash": "cf1539da62f55abebe7b16b566c7fbde73f87019524f6023e6a703ed59863be4",
-    "capturedAt": "2026-08-10T18:29:09.848Z"
+    "sourceHash": "072fdb433080076c28bba016f84424024a0d375d9fa0c00669a819d95761dd2b",
+    "capturedAt": "2026-08-10T18:39:02.560Z"
   },
   "Pally": {
     "family": "Pally",
@@ -9527,7 +9527,7 @@
       {
         "tag": "wght",
         "min": 400,
-        "default": 550,
+        "default": 610,
         "max": 700
       }
     ],
@@ -9633,8 +9633,8 @@
     ],
     "version": "1.2",
     "sourceUrl": "https://fontshare.com/fonts/pally",
-    "sourceHash": "71bb92249947ca4f9dba09ca8b8e64591dda1920f4732e54b979438876ab3922",
-    "capturedAt": "2026-08-10T18:29:09.848Z"
+    "sourceHash": "06a684383336981eb75bccd95091fedc8fda5bc6dfbd3eb21c1989ffe22d41fe",
+    "capturedAt": "2026-08-10T18:39:02.560Z"
   },
   "Panchang": {
     "family": "Panchang",
@@ -9810,7 +9810,7 @@
       {
         "tag": "wght",
         "min": 200,
-        "default": 680,
+        "default": 260,
         "max": 800
       }
     ],
@@ -9994,8 +9994,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/panchang",
-    "sourceHash": "2b241be06101a9a479a6922d59f1fbfb15a3fac166d24e79195731699942fe12",
-    "capturedAt": "2026-08-10T18:29:09.848Z"
+    "sourceHash": "f57b5e3b3376b8005df988a2e8815c30bd0b156c11d4b195ab3ae6e1d2b939f1",
+    "capturedAt": "2026-08-10T18:39:02.560Z"
   },
   "Pilcrow Rounded": {
     "family": "Pilcrow Rounded",
@@ -10162,7 +10162,7 @@
       {
         "tag": "wght",
         "min": 400,
-        "default": 550,
+        "default": 700,
         "max": 900
       }
     ],
@@ -10310,8 +10310,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/pilcrow-rounded",
-    "sourceHash": "5dde373b1addc0e88a1cd66fd172532e34d83f347fca175c062de4a22c84cdc9",
-    "capturedAt": "2026-08-10T18:29:09.848Z"
+    "sourceHash": "18078d24faa7a65e34a257d4ba54da0651bf1d3be9211a66274947af03deee9b",
+    "capturedAt": "2026-08-10T18:39:02.560Z"
   },
   "Plein": {
     "family": "Plein",
@@ -10927,7 +10927,7 @@
       {
         "tag": "wght",
         "min": 100,
-        "default": 220,
+        "default": 700,
         "max": 700
       }
     ],
@@ -11192,8 +11192,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/ranade",
-    "sourceHash": "fea3678f28f6967923096f4058c42c15e9e343a7ee38f18a9b0937f96abf8af0",
-    "capturedAt": "2026-08-10T18:29:09.849Z"
+    "sourceHash": "3636912ce8351d7618ae6be7c63929454709cdeaa0c88ecfe2649e40cbb8dad6",
+    "capturedAt": "2026-08-10T18:39:02.560Z"
   },
   "Recia": {
     "family": "Recia",
@@ -11360,13 +11360,13 @@
       {
         "tag": "wght",
         "min": 300,
-        "default": 380,
+        "default": 420,
         "max": 700
       },
       {
         "tag": "wght",
         "min": 300,
-        "default": 540,
+        "default": 580,
         "max": 700
       }
     ],
@@ -11637,8 +11637,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/recia",
-    "sourceHash": "ec9a941207d4794e72bb13a8d4bb7be93cf54fb9dbe5581fbe0e135ab49acf72",
-    "capturedAt": "2026-08-10T18:29:09.849Z"
+    "sourceHash": "67dab38ff47e6921e4a623a7be3210b98db6b6170737f22d1a768fb56ce81871",
+    "capturedAt": "2026-08-10T18:39:02.560Z"
   },
   "Rowan": {
     "family": "Rowan",
@@ -11805,7 +11805,7 @@
       {
         "tag": "wght",
         "min": 300,
-        "default": 420,
+        "default": 580,
         "max": 700
       }
     ],
@@ -12072,8 +12072,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/rowan",
-    "sourceHash": "5e96212560b01d5522126f83f8148085b34ebfd78dbb4f2a5290351ed709139e",
-    "capturedAt": "2026-08-10T18:29:09.849Z"
+    "sourceHash": "f80246110d082618bd25467e53a8c12a0a91939dbccd9d562040e5d0bbe8e318",
+    "capturedAt": "2026-08-10T18:39:02.560Z"
   },
   "Satoshi": {
     "family": "Satoshi",
@@ -12240,7 +12240,7 @@
       {
         "tag": "wght",
         "min": 300,
-        "default": 420,
+        "default": 900,
         "max": 900
       }
     ],
@@ -12515,8 +12515,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/satoshi",
-    "sourceHash": "d62c7edb09e4dc993c0ab1c1631fa3a6a967861d0980d30febb3c4165732ed21",
-    "capturedAt": "2026-08-10T18:29:09.849Z"
+    "sourceHash": "e660c7968f642ac2becf3472f76d9f7bfd2d325d7a0b7fab6d884e281a0758d9",
+    "capturedAt": "2026-08-10T18:39:02.561Z"
   },
   "Sentient": {
     "family": "Sentient",
@@ -12683,13 +12683,13 @@
       {
         "tag": "wght",
         "min": 200,
-        "default": 350,
+        "default": 550,
         "max": 700
       },
       {
         "tag": "wght",
         "min": 200,
-        "default": 600,
+        "default": 250,
         "max": 700
       }
     ],
@@ -12959,8 +12959,8 @@
     ],
     "version": "1.001",
     "sourceUrl": "https://fontshare.com/fonts/sentient",
-    "sourceHash": "a9df199624a03af8be65b7d16378e8013efba45cccc79cc02d0b13a764a419b3",
-    "capturedAt": "2026-08-10T18:29:09.849Z"
+    "sourceHash": "d4adde41940bffbc014b073cb7b470e35ff8f24cc80f6ef994645a93c3da95a9",
+    "capturedAt": "2026-08-10T18:39:02.561Z"
   },
   "Sharpie": {
     "family": "Sharpie",
@@ -13127,7 +13127,7 @@
       {
         "tag": "wght",
         "min": 300,
-        "default": 600,
+        "default": 720,
         "max": 900
       }
     ],
@@ -13271,8 +13271,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/sharpie",
-    "sourceHash": "f78d60f605a8342eaa2863da53dce3c680f11a1ee3dd8cf6b9c89884e51ecd09",
-    "capturedAt": "2026-08-10T18:29:09.849Z"
+    "sourceHash": "4613aa4ece05a475ffd6431d0f5599b5e8e0188d2f93f5458a9d1207873b71dd",
+    "capturedAt": "2026-08-10T18:39:02.561Z"
   },
   "Stardom": {
     "family": "Stardom",
@@ -13653,7 +13653,7 @@
       {
         "tag": "wght",
         "min": 100,
-        "default": 380,
+        "default": 520,
         "max": 800
       }
     ],
@@ -13998,8 +13998,8 @@
     ],
     "version": "1.1",
     "sourceUrl": "https://fontshare.com/fonts/supreme",
-    "sourceHash": "146e3c3464926e4f752348447f11bb174f164714db1fcb6fbd1f64b1efccc0b7",
-    "capturedAt": "2026-08-10T18:29:09.849Z"
+    "sourceHash": "dc3d918efc90459c65652ac7baf5a324bdda373b1e626778e4305ed67b47f286",
+    "capturedAt": "2026-08-10T18:39:02.561Z"
   },
   "Switzer": {
     "family": "Switzer",
@@ -14166,7 +14166,7 @@
       {
         "tag": "wght",
         "min": 100,
-        "default": 340,
+        "default": 420,
         "max": 900
       }
     ],
@@ -14591,8 +14591,8 @@
     ],
     "version": "1.2",
     "sourceUrl": "https://fontshare.com/fonts/switzer",
-    "sourceHash": "0641d01c2b687c9d6c9d69d290580c7a8cbb30e4be0b19f5a7f52f9280914e01",
-    "capturedAt": "2026-08-10T18:29:09.849Z"
+    "sourceHash": "85c4f76dc1db00ce7449a8e2271ccc810c4be045ecaf04a02c2a9453d13f4cee",
+    "capturedAt": "2026-08-10T18:39:02.561Z"
   },
   "Synonym": {
     "family": "Synonym",
@@ -14759,7 +14759,7 @@
       {
         "tag": "wght",
         "min": 200,
-        "default": 350,
+        "default": 450,
         "max": 700
       }
     ],
@@ -14924,8 +14924,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/synonym",
-    "sourceHash": "74c6755cb3a1f9b1939d4df0647cba72dbd713cd42c4c72d174be51c87caf5fc",
-    "capturedAt": "2026-08-10T18:29:09.849Z"
+    "sourceHash": "78014269fe806cf330a6ede5d501bb74a768ce0be1b47e00504a34edd7a2f5bd",
+    "capturedAt": "2026-08-10T18:39:02.561Z"
   },
   "Tabular": {
     "family": "Tabular",
@@ -15101,7 +15101,7 @@
       {
         "tag": "wght",
         "min": 300,
-        "default": 500,
+        "default": 340,
         "max": 700
       }
     ],
@@ -15365,8 +15365,8 @@
     ],
     "version": "1.15",
     "sourceUrl": "https://fontshare.com/fonts/tabular",
-    "sourceHash": "2d24bcc19c60d161988dc33187db7d9a5142b27961cb82c1739050b7d3fba9cc",
-    "capturedAt": "2026-08-10T18:29:09.850Z"
+    "sourceHash": "44873324654427e1924f0d9ae89cc0690823b6e70e0477fb72637745f29e6ff7",
+    "capturedAt": "2026-08-10T18:39:02.561Z"
   },
   "Tanker": {
     "family": "Tanker",
@@ -15601,7 +15601,7 @@
       {
         "tag": "wght",
         "min": 200,
-        "default": 340,
+        "default": 830,
         "max": 900
       }
     ],
@@ -15784,8 +15784,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/technor",
-    "sourceHash": "e1b8b15a5db2c8e8dfd41f0ecb72be31381cac59895c65f9e9e059cc2b590a2b",
-    "capturedAt": "2026-08-10T18:29:09.850Z"
+    "sourceHash": "3cd370060cd484fd5d46d2afdc6b53d2150f3a22e150aca5959185799ae8e021",
+    "capturedAt": "2026-08-10T18:39:02.561Z"
   },
   "Telma": {
     "family": "Telma",
@@ -15952,7 +15952,7 @@
       {
         "tag": "wght",
         "min": 300,
-        "default": 840,
+        "default": 660,
         "max": 900
       }
     ],
@@ -16098,8 +16098,8 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/telma",
-    "sourceHash": "367a721396f5f40970ab22ebccf248f43e9d04894901c433e7b63da67ab540e8",
-    "capturedAt": "2026-08-10T18:29:09.850Z"
+    "sourceHash": "81119e762c058cf7d2b19d70e20dca1abfbdc709123247e06ce64152c8808a95",
+    "capturedAt": "2026-08-10T18:39:02.561Z"
   },
   "Zodiak": {
     "family": "Zodiak",
@@ -16302,7 +16302,7 @@
       {
         "tag": "wght",
         "min": 100,
-        "default": 340,
+        "default": 500,
         "max": 900
       }
     ],
@@ -16605,7 +16605,7 @@
     ],
     "version": "1.0",
     "sourceUrl": "https://fontshare.com/fonts/zodiak",
-    "sourceHash": "856ae2dc61a51124c7b7e2329fafcee27d09f383a044341adc2c88817b6c9846",
-    "capturedAt": "2026-08-10T18:29:09.850Z"
+    "sourceHash": "1c23dc1cadd1a17dcd78299fd57875bcfd169dc92d4f03825b77fb5731d6c510",
+    "capturedAt": "2026-08-10T18:39:02.561Z"
   }
 }

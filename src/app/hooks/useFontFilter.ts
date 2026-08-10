@@ -3,6 +3,13 @@ import { FilterState } from "@/components/FilterPanel";
 import { Font } from "@/data/mockFonts";
 import { getEffectiveLanguages, getEffectiveWeights, isEffectivelyVariable } from "@/lib/fontTrust";
 
+const toRuntimeSafeFont = (font: Font): Font => ({
+  ...font,
+  weights: getEffectiveWeights(font),
+  variable: isEffectivelyVariable(font),
+  languages: getEffectiveLanguages(font),
+});
+
 export const useFontFilter = (fonts: Font[], filters: FilterState) => {
   return React.useMemo(() => {
     const searchLower = filters.search?.trim().toLowerCase() || "";
@@ -13,33 +20,20 @@ export const useFontFilter = (fonts: Font[], filters: FilterState) => {
         if (!haystack.includes(searchLower)) return false;
       }
 
-      if (filters.categories.length > 0) {
-        const hasCategory = filters.categories.some(filterCategory => font.categories.includes(filterCategory));
-        if (!hasCategory) return false;
-      }
+      if (filters.categories.length > 0 && !filters.categories.some(category => font.categories.includes(category))) return false;
 
       if (filters.languages.length > 0) {
-        const effectiveLanguages = getEffectiveLanguages(font);
-        const hasLanguage = filters.languages.some(language =>
-          effectiveLanguages.some(candidate => candidate.toLowerCase() === language.toLowerCase()),
-        );
-        if (!hasLanguage) return false;
+        const languages = getEffectiveLanguages(font);
+        if (!filters.languages.some(language => languages.some(candidate => candidate.toLowerCase() === language.toLowerCase()))) return false;
       }
 
       if (filters.sources.length > 0 && !filters.sources.includes(font.source)) return false;
-
       if (filters.variableOnly && !isEffectivelyVariable(font)) return false;
 
-      if (filters.licenses.length > 0) {
-        const hasLicense = filters.licenses.some(license =>
-          font.license === license || font.license.toLowerCase().includes(license.toLowerCase()),
-        );
-        if (!hasLicense) return false;
-      }
-
+      if (filters.licenses.length > 0 && !filters.licenses.some(license => font.license === license || font.license.toLowerCase().includes(license.toLowerCase()))) return false;
       if (filters.minWeights && getEffectiveWeights(font).length < filters.minWeights) return false;
 
       return true;
-    });
+    }).map(toRuntimeSafeFont);
   }, [fonts, filters]);
 };

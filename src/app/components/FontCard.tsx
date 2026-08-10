@@ -6,7 +6,7 @@ import { useLanguage } from "@/lib/i18n";
 import { toast } from "sonner";
 import { copyToClipboard } from "@/lib/clipboard";
 import { useFontRuntimeStatus } from "@/lib/fontRuntime";
-import { getEffectiveAuthor, getEffectiveLanguages, getEffectiveSourceUrl, getEffectiveWeights, getFontTrustReport, isEffectivelyVariable } from "@/lib/fontTrust";
+import { getEffectiveAuthor, getEffectiveLanguages, getEffectiveSourceLabel, getEffectiveSourceUrl, getEffectiveWeights, getFontTrustReport, isEffectivelyVariable } from "@/lib/fontTrust";
 
 interface FontCardProps {
   font: Font;
@@ -41,11 +41,13 @@ export const FontCard: React.FC<FontCardProps> = memo(({
   const effectiveLanguages = getEffectiveLanguages(font);
   const effectiveAuthor = getEffectiveAuthor(font);
   const effectiveSourceUrl = getEffectiveSourceUrl(font);
+  const effectiveSourceLabel = getEffectiveSourceLabel(font);
   const defaultWeight = effectiveWeights.includes("400") ? 400 : Number(effectiveWeights[0] || 400);
   const [localWeight, setLocalWeight] = useState(defaultWeight);
   const [cssCopied, setCssCopied] = useState(false);
   const sourceAndLicenseVerified = trust.identityVerified && trust.licenseVerified;
   const hasWeightControls = trust.weightsVerified && effectiveVariable && effectiveWeights.length > 1;
+  const showLegacyDownload = Boolean(font.downloadUrl && trust.identityVerified && trust.licenseVerified && trust.provider !== "Fontshare" && trust.provider !== "Independent");
 
   const style = {
     fontFamily: font.cssStack,
@@ -77,13 +79,15 @@ export const FontCard: React.FC<FontCardProps> = memo(({
   };
 
   const MetadataBadges = ({ compact = false }: { compact?: boolean }) => (
-    <div className="flex gap-1 items-center">
+    <div className="flex gap-1 items-center flex-wrap justify-end">
       {runtimeBadge && <span title={runtime.message} className={cn("font-mono uppercase border px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]", runtimeBadge.className)}>{runtimeBadge.label}</span>}
       {sourceAndLicenseVerified && <span title={trust.verificationSource} className={cn("font-mono uppercase border border-emerald-300 text-emerald-700 bg-emerald-50 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>VERIFIED</span>}
-      {!sourceAndLicenseVerified && <span title={language === 'ru' ? 'Источник или точная лицензия ещё не подтверждены первичным источником' : 'Source identity or exact license is not yet verified by primary evidence'} className={cn("font-mono uppercase border border-amber-300 text-amber-700 bg-amber-50 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>META?</span>}
-      {sourceAndLicenseVerified && !trust.weightsVerified && <span title={language === 'ru' ? 'Источник подтверждён, точные веса ещё проверяются' : 'Source is verified; exact weights are still pending'} className={cn("font-mono uppercase border border-amber-200 text-amber-700 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>WEIGHTS?</span>}
+      {trust.identityVerified && !trust.licenseVerified && <span title={trust.verificationSource} className={cn("font-mono uppercase border border-emerald-200 text-emerald-700 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>SOURCE✓</span>}
+      {trust.identityVerified && !trust.licenseVerified && <span title={language === 'ru' ? 'Точная лицензия ещё проверяется' : 'Exact license is still pending review'} className={cn("font-mono uppercase border border-amber-300 text-amber-700 bg-amber-50 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>LICENSE?</span>}
+      {!trust.identityVerified && <span title={language === 'ru' ? 'Источник ещё не подтверждён первичным источником' : 'Source identity has not yet been verified by primary evidence'} className={cn("font-mono uppercase border border-amber-300 text-amber-700 bg-amber-50 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>SOURCE?</span>}
+      {!trust.weightsVerified && <span title={language === 'ru' ? 'Точные веса ещё проверяются' : 'Exact weights are still pending'} className={cn("font-mono uppercase border border-amber-200 text-amber-700 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>WEIGHTS?</span>}
       {effectiveLanguages.includes("Cyrillic") && <span className={cn("font-mono uppercase border border-neutral-300 px-1 pt-0.5", compact ? "text-[8px]" : "text-[9px]")}>{trust.scriptsVerified ? "CYR" : "CYR?"}</span>}
-      {effectiveVariable && <span title={trust.variableVerified ? undefined : 'Variable capability not verified'} className={cn("font-mono uppercase bg-neutral-800 text-white px-1 pt-0.5", compact ? "text-[8px]" : "text-[9px]")}>{trust.variableVerified ? "VAR" : "VAR?"}</span>}
+      {effectiveVariable && <span className={cn("font-mono uppercase bg-neutral-800 text-white px-1 pt-0.5", compact ? "text-[8px]" : "text-[9px]")}>VAR</span>}
     </div>
   );
 
@@ -92,14 +96,14 @@ export const FontCard: React.FC<FontCardProps> = memo(({
       <article className="group border-b border-neutral-200 bg-white min-h-[300px] flex flex-col md:flex-row transition-colors hover:bg-neutral-50">
         <div className="w-full md:w-72 flex-shrink-0 p-4 md:p-6 border-r border-neutral-200 flex flex-col justify-between relative">
           <div>
-            <div className="flex items-center justify-between mb-4 gap-2">
+            <div className="flex items-start justify-between mb-4 gap-2">
               <span className="font-mono text-[10px] uppercase tracking-tighter text-neutral-500">ID: {(font.id.split('-')[1] || font.id).substring(0, 4).padStart(3, '0')}</span>
               <MetadataBadges />
             </div>
 
             <button type="button" className="block text-left text-xl md:text-3xl tracking-tighter leading-none mb-1 hover:underline decoration-2 underline-offset-4" onClick={() => onViewDetails(font.id)} style={{ fontWeight: 700 }}>{font.name}</button>
             <p className="font-mono text-[10px] text-neutral-500 uppercase tracking-wide mb-1">{effectiveAuthor}</p>
-            <p className="font-mono text-[9px] text-neutral-400 uppercase tracking-wide mb-6">{font.source}</p>
+            <p className="font-mono text-[9px] text-neutral-400 uppercase tracking-wide mb-6">{effectiveSourceLabel}</p>
 
             <div className={cn("space-y-6 transition-opacity duration-300", runtime.status === "error" ? "opacity-30" : "opacity-20 group-hover:opacity-100")}>
               {hasWeightControls && (
@@ -116,8 +120,8 @@ export const FontCard: React.FC<FontCardProps> = memo(({
             <button type="button" onClick={(e) => { e.stopPropagation(); onToggleFavorite(font.id); }} className="hover:opacity-50 transition-opacity" aria-label={isFavorite ? t('card.removeFromFavorites') : t('card.addToFavorites')}><Heart className={cn("w-4 h-4", isFavorite ? "fill-black" : "stroke-black")} /></button>
             <button type="button" onClick={(e) => { e.stopPropagation(); onToggleCompare(font.id); }} className="hover:opacity-50 transition-opacity flex items-center gap-1 group/btn" aria-label={isCompared ? t('card.removeFromCompare') : t('card.addToCompare')}>{isCompared ? <span className="bg-neutral-800 text-white p-0.5"><Check className="w-3 h-3" /></span> : <Plus className="w-4 h-4 stroke-black group-hover/btn:stroke-neutral-500" />}<span className="font-mono text-[9px] uppercase hidden group-hover/btn:inline">{isCompared ? t('card.inStack') : t('card.addToStack')}</span></button>
             <button type="button" onClick={copyCss} className="hover:opacity-50 transition-opacity" title="Copy CSS" aria-label="Copy CSS">{cssCopied ? <Check className="w-4 h-4 text-green-600" /> : <Code className="w-4 h-4 stroke-neutral-400" />}</button>
-            {font.downloadUrl && <button type="button" onClick={(e) => openExternal(font.downloadUrl!, e)} className="hover:opacity-50 transition-opacity ml-auto" aria-label={t('details.download')}><Download className="w-4 h-4 stroke-black" /></button>}
-            <button type="button" onClick={(e) => openExternal(effectiveSourceUrl, e)} className={cn("hover:opacity-50 transition-opacity", !font.downloadUrl && "ml-auto")} aria-label="Open source"><ExternalLink className="w-4 h-4 stroke-black" /></button>
+            {showLegacyDownload && <button type="button" onClick={(e) => openExternal(font.downloadUrl!, e)} className="hover:opacity-50 transition-opacity ml-auto" aria-label={t('details.download')}><Download className="w-4 h-4 stroke-black" /></button>}
+            <button type="button" onClick={(e) => openExternal(effectiveSourceUrl, e)} className={cn("hover:opacity-50 transition-opacity", !showLegacyDownload && "ml-auto")} aria-label="Open source"><ExternalLink className="w-4 h-4 stroke-black" /></button>
           </div>
         </div>
 
@@ -133,7 +137,7 @@ export const FontCard: React.FC<FontCardProps> = memo(({
   return (
     <article className="group bg-white border-b border-r border-neutral-200 flex flex-col h-[350px] relative hover:bg-neutral-50 transition-colors">
       <div className="p-3 flex justify-between items-start border-b border-neutral-100 gap-2">
-        <div className="min-w-0"><button type="button" onClick={() => onViewDetails(font.id)} className="block text-left text-sm text-black tracking-tight hover:underline truncate" style={{ fontWeight: 700 }}>{font.name}</button><p className="font-mono text-[9px] text-neutral-500 uppercase truncate">{font.source}</p></div>
+        <div className="min-w-0"><button type="button" onClick={() => onViewDetails(font.id)} className="block text-left text-sm text-black tracking-tight hover:underline truncate" style={{ fontWeight: 700 }}>{font.name}</button><p className="font-mono text-[9px] text-neutral-500 uppercase truncate">{effectiveSourceLabel}</p></div>
         <div className="flex items-center gap-1.5 shrink-0"><MetadataBadges compact /><button type="button" onClick={copyCss} className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity" title="Copy CSS" aria-label="Copy CSS">{cssCopied ? <Check className="w-3 h-3 text-green-600" /> : <Code className="w-3 h-3 text-neutral-400" />}</button><button type="button" onClick={() => onToggleFavorite(font.id)} aria-label={isFavorite ? t('card.removeFromFavorites') : t('card.addToFavorites')}><Heart className={cn("w-3 h-3", isFavorite ? "fill-black" : "stroke-black")} /></button></div>
       </div>
 

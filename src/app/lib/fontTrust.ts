@@ -1,5 +1,5 @@
-import type { Font } from "@/data/mockFonts";
-import verifiedGoogleFontsJson from "@/data/verified/google-fonts.json";
+import type { Font } from "../data/mockFonts";
+import verifiedGoogleFontsJson from "../data/verified/google-fonts.json" with { type: "json" };
 
 export type FontDataConfidence = "curated" | "derived";
 
@@ -51,13 +51,8 @@ export function getFontTrustReport(font: Font): FontTrustReport {
   const confidence: FontDataConfidence = isGeneratedDescription(font) ? "derived" : "curated";
   const warnings: string[] = [];
 
-  if (confidence === "derived") {
-    warnings.push("Catalog metadata for this family was generated from a source manifest and has not yet been fully verified against the upstream font files.");
-  }
-
-  if (font.license === "Open Source") {
-    warnings.push("The exact upstream license identifier is not recorded yet. Verify the license at the source before redistribution or commercial delivery.");
-  }
+  if (confidence === "derived") warnings.push("Catalog metadata for this family was generated from a source manifest and has not yet been fully verified against the upstream font files.");
+  if (font.license === "Open Source") warnings.push("The exact upstream license identifier is not recorded yet. Verify the license at the source before redistribution or commercial delivery.");
 
   return {
     confidence,
@@ -90,7 +85,6 @@ export function getEffectiveWeights(font: Font) {
     const weights = Array.from(new Set(upstream.weights)).sort((a, b) => a - b).map(String);
     return weights.length ? weights : ["400"];
   }
-
   if (!hasTrustedMetricMetadata(font)) return ["400"];
   const weights = font.weights.filter(weight => /^\d+$/.test(weight));
   return weights.length ? weights : ["400"];
@@ -105,30 +99,10 @@ export function isEffectivelyVariable(font: Font) {
 const subsetToScript = (subset: string) => {
   const normalized = subset.toLowerCase().replace(/-ext$/, "");
   const map: Record<string, string> = {
-    latin: "Latin",
-    cyrillic: "Cyrillic",
-    greek: "Greek",
-    vietnamese: "Vietnamese",
-    arabic: "Arabic",
-    hebrew: "Hebrew",
-    devanagari: "Devanagari",
-    bengali: "Bengali",
-    gurmukhi: "Gurmukhi",
-    gujarati: "Gujarati",
-    oriya: "Odia",
-    odia: "Odia",
-    tamil: "Tamil",
-    telugu: "Telugu",
-    kannada: "Kannada",
-    malayalam: "Malayalam",
-    thai: "Thai",
-    lao: "Lao",
-    khmer: "Khmer",
-    myanmar: "Myanmar",
-    sinhala: "Sinhala",
-    tibetan: "Tibetan",
-    korean: "Korean",
-    japanese: "Japanese",
+    latin: "Latin", cyrillic: "Cyrillic", greek: "Greek", vietnamese: "Vietnamese", arabic: "Arabic", hebrew: "Hebrew",
+    devanagari: "Devanagari", bengali: "Bengali", gurmukhi: "Gurmukhi", gujarati: "Gujarati", oriya: "Odia", odia: "Odia",
+    tamil: "Tamil", telugu: "Telugu", kannada: "Kannada", malayalam: "Malayalam", thai: "Thai", lao: "Lao", khmer: "Khmer",
+    myanmar: "Myanmar", sinhala: "Sinhala", tibetan: "Tibetan", korean: "Korean", japanese: "Japanese",
   };
   if (map[normalized]) return map[normalized];
   if (normalized.startsWith("chinese")) return "Chinese";
@@ -141,7 +115,6 @@ export function getEffectiveLanguages(font: Font) {
     const scripts = new Set(upstream.subsets.map(subsetToScript).filter((value): value is string => Boolean(value)));
     if (scripts.size) return Array.from(scripts);
   }
-
   const languages = new Set(font.languages);
   const name = font.name.toLowerCase();
   if (name.startsWith("noto sans jp") || name.startsWith("noto serif jp")) languages.add("Japanese");

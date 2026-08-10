@@ -2,26 +2,56 @@
 
 Date: 2026-08-10
 
-Use this checkpoint together with `docs/PROJECT-CONTEXT.md`, Issue #15 and draft PR #16. Repository state always wins if newer commits conflict with this document.
+This is the durable handoff for active Font Data Engine work. Read it together with `docs/PROJECT-CONTEXT.md`, Issue #15 and draft PR #16. Current repository state always wins if newer commits conflict with this document.
 
-## Active development state
+## Active state
 
-Trust Engine is merged to `main` as `71dc94910b56b76bc8d5dc02dd7ff031582845d2`.
-
-Active work:
-
-- Issue #15 — Font Data Engine
-- branch `feat/font-data-engine`
-- draft PR #16
+- repository: `IMONsergey/onod-fonts`
+- default branch: `main`
+- Trust Engine merged to `main` as `71dc94910b56b76bc8d5dc02dd7ff031582845d2`
+- active branch: `feat/font-data-engine`
+- active issue: #15
+- active draft PR: #16
 - recovered catalog baseline: **1,346 families**
 
-PR #16 is intentionally still draft. Do not merge it until a current human-authored head passes the full release gate after all evidence/runtime changes.
+PR #16 must remain draft until a current human-authored head passes the complete release gate after the final evidence/runtime changes.
 
-## Current trust model
+## Latest measured trust state
 
-Verification is field-level, not all-or-nothing.
+Generated `docs/TRUST-DEBT.md` after the first historical relation now reports:
 
-`FontTrustReport` separates:
+- catalog: **1,346**
+- identity trust debt: **27**
+- license trust debt: **37**
+- source/license union debt: **37**
+- source + license clear: **1,309**
+- exact weights pending: **38**
+- variable capability pending: **37**
+- script coverage pending: **30**
+- verified variable families exposed at runtime: **61**
+
+Latest decisive green human code head before this checkpoint:
+
+`4ef79f1f0898fe6d727a6d5e39ad062668827ed1`
+
+CI run **#193** passed:
+
+- production dependency audit: 0 vulnerabilities at the configured production/high gate;
+- Google runtime metadata: 1,190 families / 2 reviewed aliases;
+- current Fontshare runtime evidence: 45 families;
+- independent runtime evidence: 15 current independent identities / 5 verified independent OFL licenses;
+- verified historical relation evidence: 1 relation;
+- open artifact evidence: 5 eligible / 5 inspected;
+- strict artifact identity aliases: 2;
+- catalog validation: 1,346 unique families;
+- runtime source/license verification: 1,309 / 1,346;
+- TypeScript, Vite build, Pages bundle validation and direct-route/asset smoke: green.
+
+Known performance debt remains: initial production JS chunk is ~923 kB minified / ~239 kB gzip and still emits the deliberate large-chunk warning. Do not suppress it; address it in the Browser QA/Performance phase.
+
+## Field-level trust model
+
+Verification is not all-or-nothing. `FontTrustReport` separates:
 
 - `identityVerified`
 - `licenseVerified`
@@ -29,48 +59,39 @@ Verification is field-level, not all-or-nothing.
 - `variableVerified`
 - `scriptsVerified`
 
-This distinction is mandatory. A primary source may prove family identity while the exact license remains unresolved; a font binary may prove technical facts without changing legal/provider facts.
+A primary source can prove family identity while license remains pending. A binary can prove technical facts without changing provider/legal facts. A historical relation can prove an old family and its license without allowing silent rendering through its successor.
 
-Latest generated trust report after web identity + artifact projection:
+Unverified script metadata is no longer allowed into canonical script filters. `getEffectiveLanguages()` returns only verified script facts for evidence-backed/pending records; it does not fall back to legacy guesses when `scriptsVerified=false`.
 
-- catalog: **1,346**
-- identity trust debt: **36**
-- license trust debt: **38**
-- source/license union debt: **38**
-- source + license clear: **1,308**
-- exact weights pending: **38**
-- variable capability pending: **38**
-- script coverage pending: **38**
-
-Canonical operational report:
-
-`docs/TRUST-DEBT.md`
-
-## Fontshare current-provider evidence
+## Fontshare current-provider split
 
 Recovered catalog contained 82 records labelled `source: Fontshare`.
 
-Official current Fontshare API comparison proved:
+Current official Fontshare API evidence proves:
 
 - **45** exact/reviewed current Fontshare identities;
-- **37** legacy/unmatched recovered Fontshare labels;
-- all 45 exact-current records report raw `license_type: itf_ffl`.
+- all 45 report `license_type: itf_ffl`;
+- **37** recovered names are absent from the current API under exact/reviewed identity.
 
-Canonical evidence:
+After independent re-sourcing of those 37 legacy records:
+
+- current Fontshare: **45**
+- legacy unmatched against current API: **37**
+- legacy records already re-sourced to other primary sources: **15**
+- unresolved legacy Fontshare identity queue: **22**
+
+Canonical files:
 
 - `src/app/data/verified/fontshare.json`
 - `src/app/data/verified/fontshare-aliases.json`
 - `src/app/data/verified/fontshare-license-policies.json`
+- `docs/FONTSHARE-SOURCE-AUDIT.md`
 
-Operational identity audit:
+Current `itf_ffl` policy treats provider API/CDN use separately from modification, redistribution, self-hosting and binary inspection. The latter capabilities remain permission-gated.
 
-`docs/FONTSHARE-SOURCE-AUDIT.md`
+## Independent official-GitHub evidence
 
-Current `itf_ffl` policy keeps modification, redistribution, self-hosting and binary inspection permission-gated. Provider CDN/API availability is not treated as permission for ONOD to mirror, modify or reverse-engineer font software.
-
-## Independent primary-source evidence
-
-Five recovered Fontshare-tagged families were re-sourced to official GitHub repositories and exact OFL-1.1 evidence:
+Five recovered Fontshare-tagged families were re-sourced to official GitHub repositories with exact OFL-1.1 evidence:
 
 1. Aspekta — `ivodolenc/aspekta`
 2. Cal Sans — `calcom/sans`
@@ -78,7 +99,7 @@ Five recovered Fontshare-tagged families were re-sourced to official GitHub repo
 4. Overused Grotesk — `RandomMaerks/Overused-Grotesk`
 5. Uncut Sans — `kaspernordkvist/uncut_sans`
 
-Canonical repository evidence:
+Canonical evidence:
 
 `src/app/data/verified/independent-sources.json`
 
@@ -86,14 +107,22 @@ Validator:
 
 `scripts/validate-independent-sources.mjs`
 
-### Identity-only official-web evidence
+## Independent official-web evidence
 
-Two additional families now have primary-source identity evidence while license remains deliberately pending:
+Ten additional families now have reviewed current primary-source identity evidence. Their licenses remain intentionally `pending` until exact capability policies are normalized:
 
-- **Lausanne** — official WELTKERN page, designer Nizar Kazan;
-- **Nohemi** — official Rajesh Rajput product page.
+- Bw Gradual — Branding with Type / Alberto Romanos — Latin verified
+- Bw Modelica — Branding with Type / Alberto Romanos — Latin + Greek + Cyrillic verified
+- Bw Nista — Branding with Type / Alberto Romanos — Latin verified
+- Duplet — Indian Type Foundry / Diana Ovezea + Rafał Buchner — Latin verified
+- Gilam — Fontfabric / Plamen Motev + Ivan Petrov — Latin + Cyrillic + Greek verified
+- Lausanne — WELTKERN / Nizar Kazan — technical fields pending
+- New Spirit — Newlyn — Latin verified
+- Nohemi — Rajesh Rajput — technical fields pending
+- Saans — Displaay / Martin Vácha — Latin + variable capability verified; numeric weight metadata pending
+- Vercetti — Richard Mandona / Filippos Fragkogiannis — Latin verified; upstream Licence Amicale fact recorded but capability policy remains pending because page-specific EULA restrictions also apply
 
-Canonical staged evidence:
+Canonical evidence:
 
 `src/app/data/verified/independent-web-sources.json`
 
@@ -101,29 +130,49 @@ Validator:
 
 `scripts/validate-independent-web-sources.mjs`
 
-Runtime projection now merges official-GitHub and approved official-web identities into `independent-runtime.json` with collisions rejected. Lausanne/Nohemi must appear as `identityVerified=true`, `licenseVerified=false`, with technical fields pending.
+The approved-host whitelist is versioned in that validator. Do not accept arbitrary external URLs as primary evidence.
 
-## Canonical source/license facets
+## Historical / successor relation layer
 
-Catalog filtering/search is no longer allowed to use recovered raw source/license claims after re-sourcing.
+Canonical relation registry:
 
-Effective helpers in `src/app/lib/fontTrust.ts` provide:
+`src/app/data/verified/family-relations.json`
 
-- canonical author;
-- canonical source URL;
-- canonical source label;
-- canonical license label;
-- effective weights/scripts/variable state.
+Runtime/UI helper:
 
-`useFontFilter` and `FilterPanel` use these effective facts. Re-sourced independent families must not remain counted as `Fontshare / Open Source` merely because the legacy manifest says so.
+`src/app/lib/fontRelations.ts`
+
+Validator:
+
+`scripts/validate-family-relations.mjs`
+
+Relation kinds are explicit and must not collapse into aliases:
+
+- `historical-successor`
+- `provider-rename`
+- `collection-member`
+
+`loadReplacementAllowed` is currently required to remain `false` for canonical relations. A relation may explain lineage but cannot silently substitute another family in rendering.
+
+### Source Sans Pro
+
+The first verified relation is `Source Sans Pro -> Source Sans 3` as `historical-successor`.
+
+Official Adobe repository history proves historical `SourceSansPro-*` releases. `LICENSE.txt` at historical commit `f42c6e78cef38a192aa1e45bc3ff9b80e0d4b7f6` is OFL-1.1. The same official project later releases Source Sans 3 at commit `7c691c2772570a0d3a9e1bffe8a9d6074257d985`.
+
+Trust result for Source Sans Pro:
+
+- identity: verified historical Adobe family;
+- license: OFL-1.1 verified;
+- weights/variable/scripts: pending until historical artifact inspection;
+- successor: Source Sans 3 is exposed as lineage context only;
+- silent successor loading: forbidden.
+
+This relation reduced source/license union debt from 38 to **37**.
 
 ## Open font artifact engine
 
-Only official-GitHub families with verified `OFL-1.1` are eligible for binary acquisition/inspection.
-
-ITF FFL families are excluded.
-
-Acquisition does not commit font binaries. CI downloads a primary artifact temporarily, computes evidence, then commits only metadata/provenance.
+Only official-GitHub identities with verified OFL-1.1 are eligible for current binary acquisition/inspection. ITF FFL records are excluded.
 
 Core implementation:
 
@@ -131,124 +180,126 @@ Core implementation:
 - `scripts/font-data/inspect-sfnt.mjs`
 - `scripts/font-data/validate-open-artifacts.mjs`
 - `scripts/font-data/validate-open-artifacts-strict.mjs`
+- `scripts/font-data/build-artifact-runtime.mjs`
 - `src/app/data/verified/artifacts/open-fonts.json`
+- `src/app/data/verified/artifacts/family-aliases.json`
+- generated `.generated/open-artifact-runtime.json`
 
-Current acquisition result: **5 eligible / 5 inspected**.
+Acquisition result: **5 eligible / 5 inspected**. Binaries themselves are never committed.
 
-Inspected artifacts:
+Artifacts:
 
-- Aspekta — `packages/fonts/variable/AspektaVF.ttf` — SHA-256 `aca4bea0033de37093916756e44cfa4e823a928316905732ecc03a070d218dda`
-- Cal Sans — `fonts/calsans-gf-api/CalSans[GEOM,SHRP,YTAS,opsz,wght].ttf` — SHA-256 `28646b365180d27bab7604e82e307760366199f9741856092eb1fd6c16d2444e`
-- Hauora — `fonts/variable/Hauora[wght].ttf` — SHA-256 `308fab3575c94ab85a4b017d80d450c0d05c5ecd4fffb86616ff8449f1c0afea`
-- Overused Grotesk — `fonts/variable/OverusedGrotesk-VF.ttf` — SHA-256 `81fe7ec52c68803073edbfab73474b93cd843df53e498e69a22dba42410b2176`
-- Uncut Sans — `Variable/UncutSans-Variable.ttf` — SHA-256 `9a7ef47d2d71dbb807d4d1d24331230fcf63cdf5312daa0439891f54664d89dc`
+- Aspekta — `AspektaVF.ttf` — SHA-256 `aca4bea0033de37093916756e44cfa4e823a928316905732ecc03a070d218dda`
+- Cal Sans — `CalSans[GEOM,SHRP,YTAS,opsz,wght].ttf` — SHA-256 `28646b365180d27bab7604e82e307760366199f9741856092eb1fd6c16d2444e`
+- Hauora — `Hauora[wght].ttf` — SHA-256 `308fab3575c94ab85a4b017d80d450c0d05c5ecd4fffb86616ff8449f1c0afea`
+- Overused Grotesk — `OverusedGrotesk-VF.ttf` — SHA-256 `81fe7ec52c68803073edbfab73474b93cd843df53e498e69a22dba42410b2176`
+- Uncut Sans — `UncutSans-Variable.ttf` — SHA-256 `9a7ef47d2d71dbb807d4d1d24331230fcf63cdf5312daa0439891f54664d89dc`
 
-Extracted technical evidence includes:
+Artifact evidence includes SHA-256, Git blob SHA, SFNT tables, `name`, `head`, `hhea`, `maxp`, `OS/2`, `fvar`, Unicode `cmap`, GSUB/GPOS feature tags and STAT presence.
 
-- SHA-256 + Git blob SHA
-- SFNT table directory
-- `name`
-- `head`
-- `hhea`
-- `maxp`
-- `OS/2`
-- `fvar`
-- Unicode `cmap` ranges/count
-- GSUB/GPOS feature tags
-- STAT presence
+Technical runtime overlay uses:
 
-`build-runtime-metadata.mjs` now upgrades independent technical trust from inspected binaries:
-
-- `fvar` supplies actual variable axes and weight ranges;
-- `cmap` supplies coarse factual script coverage;
-- legal/source provenance remains independent from artifact-derived technical facts.
-
-This is why technical debt has fallen to **38 / 38 / 38** without changing license debt.
+- `fvar` for actual axes and weight ranges;
+- `cmap` ranges for coarse factual script coverage;
+- canonical source/license evidence separately from file-derived facts.
 
 ### Reviewed artifact identity aliases
 
-Binary internal names are not globally normalized. Explicit reviewed aliases are stored in:
-
-`src/app/data/verified/artifacts/family-aliases.json`
-
-Current reviewed artifact identities:
+Exact internal family identity is default. The only current reviewed binary-name aliases are:
 
 - `Aspekta` -> `Aspekta Variable`
 - `Uncut Sans` -> `Uncut Sans Variable`
 
-Do not implement a global “strip Variable” heuristic. The strict validator accepts exact internal identity or only a versioned reviewed artifact alias.
+Do not implement global suffix stripping.
+
+## Canonical loader and consumer UI
+
+`FontLoader` now routes by canonical verified source, not raw recovered source:
+
+- verified Fontshare -> official Fontshare CSS by verified slug;
+- inspected independent OFL family -> official GitHub binary through `FontFace` API;
+- verified/current Google -> Google Fonts CSS;
+- stale legacy `customCssUrl` is not allowed to override a re-sourced canonical provider;
+- no verified loading strategy -> explicit unavailable/fallback state.
+
+`FontCard`, `FontDetailsPage`, `FilterPanel` and `useFontFilter` use canonical/effective source and license facts.
+
+Details expose independent chips for:
+
+- SOURCE
+- LICENSE
+- WEIGHTS
+- VARIABLE
+- SCRIPTS
+
+Identity-verified/license-pending families show `SOURCE VERIFIED / LICENSE?` instead of an all-or-nothing metadata status.
+
+Legacy direct download actions are not exposed for Fontshare/Independent records merely because the recovered manifest contains a URL. Source remains separate from Download.
 
 ## Mandatory release gate
 
-`npm run check` now includes:
+`npm run check` currently enforces:
 
-1. compact runtime metadata generation;
-2. Fontshare evidence validation;
-3. independent GitHub evidence validation;
-4. independent official-web identity validation;
-5. open artifact evidence validation;
-6. strict artifact internal-name/SFNT validation;
-7. catalog/field-level trust validation;
-8. TypeScript;
-9. Vite production build;
-10. Pages bundle validation;
-11. production direct-route/asset smoke.
+1. Google + Fontshare + independent runtime metadata generation;
+2. compact artifact runtime projection;
+3. Fontshare evidence validation;
+4. independent GitHub evidence validation;
+5. independent official-web evidence validation;
+6. historical relation validation;
+7. open artifact evidence validation;
+8. strict artifact internal-name/SFNT validation;
+9. catalog/field-level trust validation;
+10. TypeScript;
+11. Vite production build;
+12. GitHub Pages bundle/base validation;
+13. production direct-route and built-asset smoke.
 
-Production dependency audit remains a separate CI step and must report 0 production vulnerabilities at high severity or above.
+CI separately runs production dependency audit.
 
-## Automation edge discovered
+## Automation edge
 
-The trust-report workflow commits generated documentation as `github-actions[bot]`. Such a bot commit can become the PR head and GitHub may mark PR-triggered workflows `action_required` rather than rerunning normal CI.
+Trust-report automation commits generated reports as `github-actions[bot]`. Such a bot commit can become PR head and cause PR-triggered CI to appear `action_required`. Therefore, after important generated report commits, create a meaningful human connector commit (checkpoint/code/doc) and verify CI on that human head before treating the PR as release-ready.
 
-Latest bot-generated report commit before this checkpoint:
+Latest generated report commit at this checkpoint:
 
-`49e8b155ba27c79048a65eec9d1a864e2e7ab3ce`
+`5cda398234e6947ee886b520619a3260fcf1ff68`
 
-That commit contained only the generated `docs/TRUST-DEBT.md` refresh and confirmed:
+## Remaining source identity queue
 
-- identity debt 36;
-- license debt 38;
-- union debt 38;
-- technical debt 38/38/38;
-- Lausanne and Nohemi in the identity-verified/license-pending section.
+`docs/FONTSHARE-SOURCE-AUDIT.md` currently lists 22 unresolved legacy Fontshare-tagged identities:
 
-This checkpoint commit is intentionally human-authored through the GitHub connector so the full PR release gate runs again on the actual current tree.
+Barbara, Bromine, Bw Seido, Canchal, Cassandra, Deng, Dodi, Fokkol, Gratimo Grotesk, H.H. Samuel, Helixa, Ladi, Magro, Mrow, Nacelle, Ozone, Polaris FS, Pramit, Strawford, Sudo, Thica, Wotfard FS.
 
-## Historical/replacement Google queue
-
-Still unresolved:
+Other unresolved identity records include:
 
 - Cederville Cursive
 - Manual
 - Name Sans
 - Open Sans Condensed
-- Source Sans Pro
+- Fire Sans
 
-Do not silently rename/rebind these records. The relation model must distinguish:
+`Source Sans Pro` is no longer in source/license debt; it is historical technical debt only.
 
-- exact identity;
-- reviewed alias;
-- historical name;
-- successor/replacement;
-- unresolved.
+### Names that require relation semantics
 
-Source Sans research indicates current Source Sans 3 exists in the official Adobe/Google ecosystem, but `Source Sans Pro -> Source Sans 3` must be represented as a reviewed historical/successor relation, not exact identity.
+Do not add these as exact independent identities until relations are proven:
+
+- Wotfard FS vs current official `wotfard`
+- Bw Seido vs official Bw Seido collection/subfamilies
+- other Google deprecated/renamed family names
 
 ## Fire Sans
 
-Still unresolved.
-
-The recovered record mixes `Uncut / Indie` with a Google-Fonts-looking URL. Do not guess `Fira Sans` or another similar family without primary evidence.
+Still unresolved. The recovered record mixes `Uncut / Indie` with a Google-Fonts-looking URL. Do not guess `Fira Sans` or another similar family without primary evidence.
 
 ## Immediate next work
 
-1. Confirm this human head passes the full expanded `npm run check` gate, especially strict artifact aliases.
-2. Generate/commit `docs/ARTIFACT-INSPECTION.md` once strict gate is proven.
-3. Update Font Details and any remaining consumer surfaces to use field-level/canonical source facts rather than raw legacy labels.
-4. Continue primary-source re-sourcing of the remaining 36 identity-debt families.
-5. Introduce the explicit historical/successor relation schema before resolving Google legacy names.
-6. Resolve Fire Sans independently.
-7. Keep PR #16 focused on Font Data Engine; Pairing Engine, Workbench 2.0 and global UI redesign remain later PRs.
+1. Continue primary-source re-sourcing of the remaining 27 identity-debt records.
+2. Add only evidence-backed relation records for Wotfard FS, Bw Seido and other non-exact names.
+3. Resolve Cederville Cursive / Manual / Name Sans / Open Sans Condensed using exact historical/current provider evidence.
+4. Resolve Fire Sans independently.
+5. Consider historical artifact acquisition for Source Sans Pro so weights/scripts can become technical facts without using Source Sans 3 as replacement.
+6. Keep PR #16 focused on Font Data Engine; Browser QA/Performance, Pairing Engine, Workbench 2.0 and global UI redesign remain subsequent phases.
 
 ## Resume procedure
 
@@ -256,7 +307,7 @@ In a new session:
 
 1. read `docs/PROJECT-CONTEXT.md`;
 2. read this checkpoint;
-3. read Issue #15 and PR #16;
-4. read `docs/TRUST-DEBT.md`, `docs/FONTSHARE-SOURCE-AUDIT.md`, and `docs/ARTIFACT-INSPECTION.md` if present;
+3. inspect Issue #15 and PR #16;
+4. read generated `docs/TRUST-DEBT.md`, `docs/FONTSHARE-SOURCE-AUDIT.md`, `docs/ARTIFACT-INSPECTION.md`;
 5. inspect the actual PR #16 head and latest CI before editing;
 6. repository reality wins over narrative docs.

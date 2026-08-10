@@ -3,9 +3,11 @@ name: Sync verified Google Fonts metadata
 on:
   push:
     branches:
+      - main
       - feat/trust-engine
     paths:
       - scripts/sync-google-fonts.mjs
+      - src/app/data/verified/google-fonts-aliases.json
       - .github/workflows/sync-google-fonts.yml
   workflow_dispatch:
 
@@ -13,7 +15,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: onod-fonts-google-metadata-sync
+  group: onod-fonts-google-metadata-sync-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -36,6 +38,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node --experimental-strip-types scripts/sync-google-fonts.mjs
+
+      - name: Validate refreshed evidence before commit
+        run: |
+          node scripts/build-runtime-metadata.mjs
+          node --experimental-strip-types scripts/validate-catalog.mjs
 
       - name: Commit verified metadata evidence
         env:

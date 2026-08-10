@@ -309,6 +309,17 @@ export function getEffectiveSourceUrl(font: Font) {
   return getVerifiedGoogleFont(font)?.repositoryUrl || getVerifiedFontshareFont(font)?.sourceUrl || getVerifiedIndependentFont(font)?.identity.sourceUrl || font.sourceUrl;
 }
 
+export function getEffectiveSourceLabel(font: Font) {
+  if (getVerifiedGoogleFont(font)) return "Google Fonts";
+  if (getVerifiedFontshareFont(font)) return "Fontshare";
+  if (getVerifiedIndependentFont(font)) return "Independent";
+  return font.source;
+}
+
+export function getEffectiveLicenseLabel(font: Font) {
+  return getFontTrustReport(font).licenseLabel;
+}
+
 export function getEffectiveFontshareSlug(font: Font) {
   return getVerifiedFontshareFont(font)?.slug;
 }

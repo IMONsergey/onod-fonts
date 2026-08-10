@@ -1,0 +1,52 @@
+name: Sync open font artifact evidence
+
+on:
+  push:
+    branches:
+      - feat/font-data-engine
+    paths:
+      - src/app/data/verified/independent-sources.json
+      - scripts/font-data/inspect-sfnt.mjs
+      - scripts/font-data/acquire-open-artifacts.mjs
+      - scripts/font-data/validate-open-artifacts.mjs
+      - .github/workflows/sync-open-font-artifacts.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: onod-fonts-open-artifacts-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: Acquire and inspect verified OFL artifacts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node --experimental-strip-types scripts/font-data/acquire-open-artifacts.mjs
+      - name: Validate artifact evidence before commit
+        run: node --experimental-strip-types scripts/font-data/validate-open-artifacts.mjs
+      - name: Commit metadata evidence only
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet -- src/app/data/verified/artifacts/open-fonts.json; then
+            echo "Open font artifact evidence is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/app/data/verified/artifacts/open-fonts.json
+          git commit -m "data: sync hash-addressed open font artifact evidence"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:${GITHUB_REF_NAME}

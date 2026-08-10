@@ -12,10 +12,11 @@
     "prebuild": "npm run metadata:runtime",
     "build": "vite build",
     "preview": "vite preview",
+    "fontshare:evidence:validate": "node --experimental-strip-types scripts/validate-fontshare-evidence.mjs --require-coverage",
     "catalog:validate": "npm run metadata:runtime && node --experimental-strip-types scripts/validate-catalog.mjs",
     "build:validate": "node scripts/validate-build.mjs",
     "smoke:preview": "node scripts/smoke-preview.mjs",
-    "check": "npm run metadata:runtime && node --experimental-strip-types scripts/validate-catalog.mjs && tsc --noEmit && vite build && node scripts/validate-build.mjs && node scripts/smoke-preview.mjs"
+    "check": "npm run metadata:runtime && node --experimental-strip-types scripts/validate-fontshare-evidence.mjs --require-coverage && node --experimental-strip-types scripts/validate-catalog.mjs && tsc --noEmit && vite build && node scripts/validate-build.mjs && node scripts/smoke-preview.mjs"
   },
   "dependencies": {
     "clsx": "2.1.1",

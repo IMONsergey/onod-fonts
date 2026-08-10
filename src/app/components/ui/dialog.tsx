@@ -3,7 +3,13 @@ import { createPortal } from "react-dom";
 import { XIcon } from "lucide-react";
 import { cn } from "./utils";
 
-type DialogContextValue = { open: boolean; setOpen: (open: boolean) => void };
+type DialogContextValue = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  titleId: string;
+  descriptionId: string;
+};
+
 const DialogContext = React.createContext<DialogContextValue | null>(null);
 
 function useDialog() {
@@ -13,26 +19,25 @@ function useDialog() {
 }
 
 function Dialog({ open = false, onOpenChange, children }: { open?: boolean; onOpenChange?: (open: boolean) => void; children?: React.ReactNode }) {
+  const baseId = React.useId();
   const setOpen = React.useCallback((next: boolean) => onOpenChange?.(next), [onOpenChange]);
-  return <DialogContext.Provider value={{ open, setOpen }}>{children}</DialogContext.Provider>;
+  const value = React.useMemo(() => ({
+    open,
+    setOpen,
+    titleId: `${baseId}-title`,
+    descriptionId: `${baseId}-description`,
+  }), [baseId, open, setOpen]);
+  return <DialogContext.Provider value={value}>{children}</DialogContext.Provider>;
 }
 
 function DialogTrigger({ children, onClick, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const { setOpen } = useDialog();
-  return (
-    <button type="button" data-slot="dialog-trigger" onClick={(e) => { onClick?.(e); if (!e.defaultPrevented) setOpen(true); }} {...props}>
-      {children}
-    </button>
-  );
+  return <button type="button" data-slot="dialog-trigger" onClick={(event) => { onClick?.(event); if (!event.defaultPrevented) setOpen(true); }} {...props}>{children}</button>;
 }
 
 function DialogClose({ children, onClick, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const { setOpen } = useDialog();
-  return (
-    <button type="button" data-slot="dialog-close" onClick={(e) => { onClick?.(e); if (!e.defaultPrevented) setOpen(false); }} {...props}>
-      {children}
-    </button>
-  );
+  return <button type="button" data-slot="dialog-close" onClick={(event) => { onClick?.(event); if (!event.defaultPrevented) setOpen(false); }} {...props}>{children}</button>;
 }
 
 function DialogPortal({ children }: { children?: React.ReactNode }) {
@@ -42,31 +47,71 @@ function DialogPortal({ children }: { children?: React.ReactNode }) {
 
 function DialogOverlay({ className, onClick, ...props }: React.ComponentProps<"div">) {
   const { setOpen } = useDialog();
-  return (
-    <div
-      data-slot="dialog-overlay"
-      className={cn("fixed inset-0 z-50 bg-black/50", className)}
-      onClick={(e) => { onClick?.(e); if (!e.defaultPrevented) setOpen(false); }}
-      {...props}
-    />
-  );
+  return <div data-slot="dialog-overlay" className={cn("fixed inset-0 z-50 bg-black/50", className)} onClick={(event) => { onClick?.(event); if (!event.defaultPrevented) setOpen(false); }} {...props} />;
 }
 
+const FOCUSABLE = [
+  'a[href]',
+  'button:not([disabled])',
+  'textarea:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',');
+
 const DialogContent = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<"div">>(
-  ({ className, children, ...props }, ref) => {
-    const { open, setOpen } = useDialog();
+  ({ className, children, ...props }, forwardedRef) => {
+    const { open, setOpen, titleId, descriptionId } = useDialog();
+    const localRef = React.useRef<HTMLDivElement>(null);
+    const previousActiveRef = React.useRef<HTMLElement | null>(null);
+
+    React.useImperativeHandle(forwardedRef, () => localRef.current as HTMLDivElement);
 
     React.useEffect(() => {
       if (!open) return;
-      const onKeyDown = (event: KeyboardEvent) => {
-        if (event.key === "Escape") setOpen(false);
-      };
-      document.addEventListener("keydown", onKeyDown);
+      previousActiveRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       const previousOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
+
+      const focusFirst = () => {
+        const focusables = Array.from(localRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE) || []);
+        (focusables[0] || localRef.current)?.focus();
+      };
+      const raf = requestAnimationFrame(focusFirst);
+
+      const onKeyDown = (event: KeyboardEvent) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          setOpen(false);
+          return;
+        }
+        if (event.key !== "Tab") return;
+
+        const focusables = Array.from(localRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE) || []).filter(element => !element.hasAttribute('disabled'));
+        if (!focusables.length) {
+          event.preventDefault();
+          localRef.current?.focus();
+          return;
+        }
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement;
+        if (event.shiftKey && (active === first || !localRef.current?.contains(active))) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && active === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      };
+
+      document.addEventListener("keydown", onKeyDown);
       return () => {
+        cancelAnimationFrame(raf);
         document.removeEventListener("keydown", onKeyDown);
         document.body.style.overflow = previousOverflow;
+        requestAnimationFrame(() => previousActiveRef.current?.focus());
       };
     }, [open, setOpen]);
 
@@ -76,12 +121,15 @@ const DialogContent = React.forwardRef<HTMLDivElement, React.ComponentPropsWitho
       <DialogPortal>
         <DialogOverlay />
         <div
-          ref={ref}
+          ref={localRef}
           role="dialog"
           aria-modal="true"
+          aria-labelledby={titleId}
+          aria-describedby={descriptionId}
+          tabIndex={-1}
           data-slot="dialog-content"
           className={cn(
-            "bg-white fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-neutral-200 p-6 shadow-xl sm:max-w-lg",
+            "bg-white fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-neutral-200 p-6 shadow-xl outline-none sm:max-w-lg",
             className,
           )}
           {...props}
@@ -93,8 +141,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, React.ComponentPropsWitho
             onClick={() => setOpen(false)}
             className="absolute top-4 right-4 opacity-60 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400"
           >
-            <XIcon className="size-4" />
-            <span className="sr-only">Close</span>
+            <XIcon className="size-4" aria-hidden="true" />
           </button>
         </div>
       </DialogPortal>
@@ -112,11 +159,13 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function DialogTitle({ className, ...props }: React.ComponentProps<"h2">) {
-  return <h2 data-slot="dialog-title" className={cn("text-lg leading-none font-semibold", className)} {...props} />;
+  const { titleId } = useDialog();
+  return <h2 id={titleId} data-slot="dialog-title" className={cn("text-lg leading-none font-semibold", className)} {...props} />;
 }
 
 function DialogDescription({ className, ...props }: React.ComponentProps<"p">) {
-  return <p data-slot="dialog-description" className={cn("text-neutral-500 text-sm", className)} {...props} />;
+  const { descriptionId } = useDialog();
+  return <p id={descriptionId} data-slot="dialog-description" className={cn("text-neutral-500 text-sm", className)} {...props} />;
 }
 
 export { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogPortal, DialogTitle, DialogTrigger };

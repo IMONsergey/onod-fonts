@@ -3,18 +3,18 @@
 > Generated from the canonical runtime trust layer. Do not edit counts manually.
 
 Catalog families: **1346**
-Identity trust debt: **24**
-License trust debt: **35**
-Source/license union debt: **35**
-Source + license clear: **1311**
+Identity trust debt: **23**
+License trust debt: **34**
+Source/license union debt: **34**
+Source + license clear: **1312**
 
 Identity and license are independent facts. A family can have a verified primary source while its exact license remains pending; this state must not be collapsed back into “unverified source”.
 
 ## Field-level technical debt
 
-- exact weights pending: **37** families
-- variable capability pending: **36** families
-- script coverage pending: **28** families
+- exact weights pending: **36** families
+- variable capability pending: **35** families
+- script coverage pending: **27** families
 
 Technical debt is also independent from source/license trust. Inspected font binaries may clear technical fields without changing provider/legal facts.
 
@@ -23,7 +23,7 @@ Technical debt is also independent from source/license trust. Inspected font bin
 | Recovered source | Families pending |
 |---|---:|
 | Fontshare | 31 |
-| Google Fonts | 3 |
+| Google Fonts | 2 |
 | Uncut / Indie | 1 |
 
 ## Source/license verification queue
@@ -63,7 +63,6 @@ Technical debt is also independent from source/license trust. Inspected font bin
 | Wotfard FS | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Manual | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
 | Name Sans | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
-| Open Sans Condensed | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
 | Fire Sans | Uncut / Indie | pending | pending | pending | pending | pending | Verify at source |
 
 ## Identity verified / license pending

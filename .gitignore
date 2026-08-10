@@ -5,3 +5,4 @@ dist/
 .env.*
 !.env.example
 src/app/data/font-data/fonts.generated.json
+src/app/data/verified/.generated/

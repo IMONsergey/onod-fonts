@@ -35,11 +35,16 @@ export interface VerifiedFontshareFont {
 
 export interface VerifiedIndependentFont {
   family: string;
-  sourceType: "official-github";
-  repository: string;
-  sourceUrl: string;
-  designer: string;
-  licenseId: string;
+  identity: {
+    sourceType: "official-github" | "official-web";
+    repository?: string;
+    sourceUrl: string;
+    designer: string;
+  };
+  license: {
+    status: "verified" | "pending";
+    id?: string;
+  };
   technical: {
     variable?: boolean;
     weights?: number[];
@@ -131,6 +136,8 @@ export function getFontTrustReport(font: Font): FontTrustReport {
         licenseLabel: "Verify at source",
         warnings: [`Fontshare provider license type '${fontshare.licenseType}' has no reviewed ONOD capability policy.`],
         upstreamVerified: false,
+        verificationSource: fontshare.sourceUrl,
+        provider: "Fontshare",
       };
     }
 
@@ -156,21 +163,23 @@ export function getFontTrustReport(font: Font): FontTrustReport {
 
   const independent = getVerifiedIndependentFont(font);
   if (independent) {
+    const licenseVerified = independent.license.status === "verified" && Boolean(independent.license.id);
     const warnings: string[] = [];
-    if (!independent.technical.weightsVerified) warnings.push("Source identity and license are verified, but exact weight metadata is still pending technical evidence; ONOD keeps preview weights conservative.");
+    if (!licenseVerified) warnings.push("Primary source identity is verified, but the exact license is still pending review. Source actions are safe to expose; license-sensitive download/redistribution claims are not.");
+    if (!independent.technical.weightsVerified) warnings.push("Source identity is verified, but exact weight metadata is still pending technical evidence; ONOD keeps preview weights conservative.");
     if (!independent.technical.variableVerified) warnings.push("Variable-font capability has not yet been independently verified for this family.");
     if (!independent.technical.scriptsVerified) warnings.push("Script/language coverage is not yet independently verified for this family.");
     return {
-      confidence: "curated",
+      confidence: licenseVerified ? "curated" : "derived",
       identityVerified: true,
-      licenseVerified: true,
+      licenseVerified,
       weightsVerified: independent.technical.weightsVerified,
       variableVerified: independent.technical.variableVerified,
       scriptsVerified: independent.technical.scriptsVerified,
-      licenseLabel: independent.licenseId,
+      licenseLabel: licenseVerified ? independent.license.id! : "Verify at source",
       warnings,
-      upstreamVerified: true,
-      verificationSource: independent.sourceUrl,
+      upstreamVerified: licenseVerified,
+      verificationSource: independent.identity.sourceUrl,
       provider: "Independent",
     };
   }
@@ -293,11 +302,11 @@ export function getEffectiveLanguages(font: Font) {
 }
 
 export function getEffectiveAuthor(font: Font) {
-  return getVerifiedGoogleFont(font)?.designer || getVerifiedFontshareFont(font)?.designer || getVerifiedIndependentFont(font)?.designer || font.author;
+  return getVerifiedGoogleFont(font)?.designer || getVerifiedFontshareFont(font)?.designer || getVerifiedIndependentFont(font)?.identity.designer || font.author;
 }
 
 export function getEffectiveSourceUrl(font: Font) {
-  return getVerifiedGoogleFont(font)?.repositoryUrl || getVerifiedFontshareFont(font)?.sourceUrl || getVerifiedIndependentFont(font)?.sourceUrl || font.sourceUrl;
+  return getVerifiedGoogleFont(font)?.repositoryUrl || getVerifiedFontshareFont(font)?.sourceUrl || getVerifiedIndependentFont(font)?.identity.sourceUrl || font.sourceUrl;
 }
 
 export function getEffectiveFontshareSlug(font: Font) {

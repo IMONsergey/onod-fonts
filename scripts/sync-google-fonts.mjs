@@ -5,8 +5,9 @@ import { mockFonts } from '../src/app/data/mockFonts.ts';
 const token = process.env.GITHUB_TOKEN;
 if (!token) throw new Error('GITHUB_TOKEN is required for Google Fonts metadata sync.');
 
-const target = resolve(process.cwd(), 'src/app/data/verified/google-fonts.json');
-const previous = JSON.parse(readFileSync(target, 'utf8'));
+const evidenceTarget = resolve(process.cwd(), 'src/app/data/verified/google-fonts.json');
+const runtimeTarget = resolve(process.cwd(), 'src/app/data/verified/google-fonts-runtime.json');
+const previous = JSON.parse(readFileSync(evidenceTarget, 'utf8'));
 
 const NON_GOOGLE_SOURCES = new Set([
   'Fontshare', 'Velvetyne', 'Collletttivo', 'Font Library', 'iA', 'GNU', 'DejaVu', 'Liberation', 'GitHub', 'GitHub Next',
@@ -146,10 +147,22 @@ for (const [name, metadata] of Object.entries(previous)) {
 }
 Object.assign(next, fetched);
 
-const ordered = Object.fromEntries(Object.entries(next).sort(([a], [b]) => a.localeCompare(b)));
-writeFileSync(target, `${JSON.stringify(ordered, null, 2)}\n`);
+const orderedEvidence = Object.fromEntries(Object.entries(next).sort(([a], [b]) => a.localeCompare(b)));
+const orderedRuntime = Object.fromEntries(Object.entries(orderedEvidence).map(([name, metadata]) => [name, {
+  family: metadata.family,
+  designer: metadata.designer,
+  license: metadata.license,
+  subsets: metadata.subsets,
+  axes: metadata.axes,
+  weights: metadata.weights,
+  ...(metadata.repositoryUrl ? { repositoryUrl: metadata.repositoryUrl } : {}),
+  metadataPath: metadata.metadataPath,
+}]));
 
-console.log(`Google Fonts metadata sync complete: ${success}/${candidates.length} refreshed; ${Object.keys(ordered).length} versioned verified records total.`);
+writeFileSync(evidenceTarget, `${JSON.stringify(orderedEvidence, null, 2)}\n`);
+writeFileSync(runtimeTarget, `${JSON.stringify(orderedRuntime)}\n`);
+
+console.log(`Google Fonts metadata sync complete: ${success}/${candidates.length} refreshed; ${Object.keys(orderedEvidence).length} versioned verified records total.`);
 console.log(`Not found in google/fonts by normalized family slug: ${misses.length}.`);
 console.log(`Rejected exact-name collisions: ${collisions.length}.`);
 if (misses.length) console.log(`Sample misses: ${misses.slice(0, 40).join(', ')}`);

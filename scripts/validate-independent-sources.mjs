@@ -7,35 +7,76 @@ const catalogByName = new Map(mockFonts.map(font => [font.name, font]));
 const errors = [];
 const repositories = new Set();
 const allowedLicenses = new Set(['OFL-1.1']);
+const allowedSourceTypes = new Set(['official-github', 'official-web']);
 
 const isSha = value => /^[0-9a-f]{40}$/i.test(value || '');
-const isGitHubUrl = value => {
+const isHttpUrl = value => {
   try {
     const url = new URL(value);
-    return url.protocol === 'https:' && url.hostname === 'github.com';
+    return url.protocol === 'https:' || url.protocol === 'http:';
   } catch {
     return false;
   }
 };
 
+const validateEvidence = (catalogName, label, proof, sourceType) => {
+  if (!proof || typeof proof !== 'object') {
+    errors.push(`${catalogName}: ${label} evidence is required.`);
+    return;
+  }
+
+  if (sourceType === 'official-github') {
+    if (proof.kind !== 'github-blob') errors.push(`${catalogName}: ${label} GitHub evidence must use kind=github-blob.`);
+    if (typeof proof.ref !== 'string' || !proof.ref) errors.push(`${catalogName}: ${label} evidence ref missing.`);
+    if (typeof proof.path !== 'string' || !proof.path) errors.push(`${catalogName}: ${label} evidence path missing.`);
+    if (!isSha(proof.blobSha)) errors.push(`${catalogName}: ${label} evidence blobSha must be a Git blob SHA.`);
+    return;
+  }
+
+  if (sourceType === 'official-web') {
+    if (proof.kind !== 'official-web') errors.push(`${catalogName}: ${label} web evidence must use kind=official-web.`);
+    if (!isHttpUrl(proof.url)) errors.push(`${catalogName}: ${label} web evidence URL is invalid.`);
+    if (!proof.capturedAt || Number.isNaN(Date.parse(proof.capturedAt))) errors.push(`${catalogName}: ${label} web evidence capturedAt is invalid.`);
+    return;
+  }
+
+  errors.push(`${catalogName}: cannot validate ${label} evidence for unsupported source type '${sourceType}'.`);
+};
+
 for (const [catalogName, record] of Object.entries(evidence)) {
   if (!catalogByName.has(catalogName)) errors.push(`${catalogName}: family is not present in catalog.`);
   if (record?.family !== catalogName) errors.push(`${catalogName}: family identity must match evidence key exactly.`);
-  if (record?.sourceType !== 'official-github') errors.push(`${catalogName}: unsupported sourceType '${record?.sourceType}'.`);
-  if (typeof record?.repository !== 'string' || !/^[^/]+\/[^/]+$/.test(record.repository)) errors.push(`${catalogName}: invalid repository '${record?.repository}'.`);
-  else repositories.add(record.repository);
-  if (!isGitHubUrl(record?.sourceUrl) || !record.sourceUrl.endsWith(record.repository)) errors.push(`${catalogName}: sourceUrl must point to the reviewed repository.`);
-  if (typeof record?.designer !== 'string' || !record.designer.trim()) errors.push(`${catalogName}: reviewed designer/publisher identity is required.`);
-  if (!allowedLicenses.has(record?.licenseId)) errors.push(`${catalogName}: license '${record?.licenseId}' has no reviewed independent-source policy.`);
 
-  for (const [kind, proof] of [['identity', record?.identityEvidence], ['license', record?.licenseEvidence]]) {
-    if (!proof || typeof proof !== 'object') {
-      errors.push(`${catalogName}: ${kind} evidence is required.`);
-      continue;
+  const identity = record?.identity;
+  if (!identity || typeof identity !== 'object') {
+    errors.push(`${catalogName}: identity block is required.`);
+    continue;
+  }
+  if (identity.status !== 'verified') errors.push(`${catalogName}: independent evidence records must have identity.status=verified.`);
+  if (!allowedSourceTypes.has(identity.sourceType)) errors.push(`${catalogName}: unsupported identity sourceType '${identity.sourceType}'.`);
+  if (!isHttpUrl(identity.sourceUrl)) errors.push(`${catalogName}: invalid identity sourceUrl '${identity.sourceUrl}'.`);
+  if (typeof identity.designer !== 'string' || !identity.designer.trim()) errors.push(`${catalogName}: reviewed designer/publisher identity is required.`);
+
+  if (identity.sourceType === 'official-github') {
+    if (typeof identity.repository !== 'string' || !/^[^/]+\/[^/]+$/.test(identity.repository)) errors.push(`${catalogName}: invalid repository '${identity.repository}'.`);
+    else {
+      repositories.add(identity.repository);
+      if (identity.sourceUrl !== `https://github.com/${identity.repository}`) errors.push(`${catalogName}: GitHub sourceUrl must exactly match reviewed repository.`);
     }
-    if (typeof proof.ref !== 'string' || !proof.ref) errors.push(`${catalogName}: ${kind} evidence ref missing.`);
-    if (typeof proof.path !== 'string' || !proof.path) errors.push(`${catalogName}: ${kind} evidence path missing.`);
-    if (!isSha(proof.blobSha)) errors.push(`${catalogName}: ${kind} evidence blobSha must be a Git blob SHA.`);
+  }
+  validateEvidence(catalogName, 'identity', identity.evidence, identity.sourceType);
+
+  const license = record?.license;
+  if (!license || typeof license !== 'object') {
+    errors.push(`${catalogName}: license block is required.`);
+  } else if (license.status === 'verified') {
+    if (!allowedLicenses.has(license.id)) errors.push(`${catalogName}: license '${license.id}' has no reviewed independent-source policy.`);
+    validateEvidence(catalogName, 'license', license.evidence, identity.sourceType);
+  } else if (license.status === 'pending') {
+    if (license.id) errors.push(`${catalogName}: pending license must not expose a definitive id.`);
+    if (license.evidence) errors.push(`${catalogName}: pending license must not attach evidence as if it were verified.`);
+  } else {
+    errors.push(`${catalogName}: license.status must be verified or pending.`);
   }
 
   const technical = record?.technical || {};
@@ -66,10 +107,13 @@ for (const [catalogName, record] of Object.entries(evidence)) {
   }
 }
 
-console.log(`Independent-source evidence validation: ${Object.keys(evidence).length} families across ${repositories.size} reviewed repositories.`);
+const identityVerified = Object.values(evidence).filter(record => record?.identity?.status === 'verified').length;
+const licenseVerified = Object.values(evidence).filter(record => record?.license?.status === 'verified').length;
+const licensePending = Object.values(evidence).filter(record => record?.license?.status === 'pending').length;
+console.log(`Independent-source evidence validation: ${Object.keys(evidence).length} families; identity verified=${identityVerified}; license verified=${licenseVerified}; license pending=${licensePending}; GitHub repos=${repositories.size}.`);
 if (errors.length) {
   console.error(`Errors: ${errors.length}`);
   errors.forEach(error => console.error(`  ERROR ${error}`));
   process.exit(1);
 }
-console.log('Independent-source evidence validation passed.');
+console.log('Independent-source identity/license evidence validation passed.');

@@ -30,7 +30,7 @@ Primary branch: `feat/trust-engine`
 
 Primary PR: **#12 — feat: ONOD Fonts trust engine — rendering truth and catalog integrity**
 
-PR #12 is intentionally kept as a draft until the complete release gate is green after the final accessibility/QA changes.
+PR #12 is intentionally kept as a draft until the complete release gate is green after the final accessibility/QA/automation changes.
 
 The audit and release plan are canonical background documents:
 
@@ -52,20 +52,24 @@ The audit and release plan are canonical background documents:
 - Runtime trust layer: `src/app/lib/fontTrust.ts`.
 - Runtime font state: `src/app/lib/fontRuntime.ts`.
 - Canonical Google Fonts evidence: `src/app/data/verified/google-fonts.json`.
-- Canonical evidence includes exact `METADATA.pb` path and Git blob SHA.
+- Canonical evidence includes the Google Fonts `METADATA.pb` path and Git blob SHA.
+- Explicitly reviewed family aliases live in `src/app/data/verified/google-fonts-aliases.json`.
+- Normalized/slug equality never grants verification by itself. A non-exact upstream family name is trusted only when a reviewed alias is versioned.
+- Current reviewed aliases include the catalog display names `Unifraktur Cook` -> upstream `UnifrakturCook` and `Unifraktur Maguntia` -> upstream `UnifrakturMaguntia`, verified against the official Google Fonts metadata.
 - Compact runtime metadata is generated, not committed, under `src/app/data/verified/.generated/`.
 - Generator: `scripts/build-runtime-metadata.mjs`.
 - Google Fonts upstream sync: `scripts/sync-google-fonts.mjs` + `.github/workflows/sync-google-fonts.yml`.
-- Ambiguous family-name/slug matches are rejected rather than promoted to verified.
 - UI distinguishes verified/curated data from `META?`/derived data.
 - Generic `Open Source` is not treated as an exact license identifier.
 
-Latest trustworthy measurement before this handoff:
+Latest fully green trust measurement before final workflow cleanup (CI run #88):
 
 - 1,346 catalog families total.
-- 1,188 families backed by versioned Google Fonts `METADATA.pb` evidence.
-- About 90 derived records remain as trust debt.
+- 1,190 families backed by versioned Google Fonts `METADATA.pb` evidence/runtime verification.
+- 2 of those 1,190 use explicit reviewed family aliases.
+- 88 derived records remain as trust debt.
 - Derived records remain visibly marked and are constrained to Regular 400 until verified.
+- production dependency audit reported 0 runtime vulnerabilities.
 
 ### Workspace continuity
 
@@ -87,34 +91,41 @@ Latest trustworthy measurement before this handoff:
 
 - React Router was upgraded from 7.13.0 to patched 7.18.2 after CI caught high-severity production advisories.
 - CI blocks high-severity production dependency advisories.
-- Third-party Yandex Metrika/Webvisor/clickmap runtime was removed until a deliberate analytics/consent architecture exists.
+- Third-party Yandex Metrika/Webvisor/clickmap runtime was physically removed from `App.tsx`; the obsolete `window.ym` type was removed too.
 - Privacy/Terms/License copy was aligned with actual runtime behavior and metadata uncertainty.
-- The fake whole-page CSS invert theme was removed rather than presented as a real dark theme.
+- The fake whole-page CSS invert theme and its UI controls were removed rather than presented as a real dark theme.
 
 ### Accessibility and motion
 
-- `prefers-reduced-motion` is respected globally.
+- `prefers-reduced-motion` is respected globally and Motion-heavy interactive components use reduced-motion-aware transitions.
 - Custom Dialog has focus trapping, focus restoration and accessible title/description wiring.
-- Remaining click-only controls must be replaced with semantic controls; MarkBuilder was identified as a specific target.
+- Header navigation uses semantic buttons, current-page semantics, keyboard focus states, Escape-close behavior and an accessible mobile menu.
+- MarkBuilder 5x5 grid uses real buttons instead of click-only divs, supports keyboard activation, Escape cancellation, accessible point labels/status, and cancels stale animation timers.
 
 ### QA and deployment
 
-- Catalog/trust validation: `scripts/validate-catalog.mjs`.
+- Catalog/evidence/trust validation: `scripts/validate-catalog.mjs`.
 - Production bundle validation: `scripts/validate-build.mjs`.
-- Production preview smoke checks exist for base/direct routes/assets.
-- `npm run check` is the release gate.
+- Production preview smoke: `scripts/smoke-preview.mjs`.
+- `npm run check` now obligatorily runs metadata generation, catalog/evidence validation, TypeScript, Vite build, Pages bundle validation and production preview smoke.
+- Smoke checks exercise the Pages base URL, direct Workbench route, direct font route and built assets.
 - GitHub Pages emergency diagnostics/double-publish plumbing was removed after production recovered.
+- `.github/workflows/sync-google-fonts.yml` and `.github/workflows/trust-debt-report.yml` are branch-safe for both the remediation branch and `main`; they no longer hard-code a future-dead feature branch as their push target.
+- Metadata sync validates refreshed evidence before committing it.
+- Trust debt is generated by `scripts/build-trust-report.mjs`; the generated repository report is `docs/TRUST-DEBT.md` when the report workflow has run.
 
 ## Important current validator architecture
 
 Do not merge runtime and evidence responsibilities again.
 
-Canonical evidence (`google-fonts.json`) contains audit/provenance-only fields such as `metadataSha`.
+Canonical evidence (`google-fonts.json`) contains audit/provenance-only fields such as `metadataSha` and exact upstream family names.
 
-Compact runtime metadata deliberately excludes fields the browser does not need. Therefore:
+Compact runtime metadata deliberately excludes fields the browser does not need and rewrites a reviewed alias to the catalog identity while preserving optional `upstreamFamily` context. Therefore:
 
 - browser/runtime code validates only runtime fields;
-- build-time catalog validation separately reads the canonical evidence file and validates exact family names, metadata paths, SHA provenance, licenses and source URLs.
+- build-time catalog validation separately reads the canonical evidence file and validates metadata paths, SHA provenance, licenses and source URLs;
+- exact family identity is the default;
+- a non-exact family identity passes only through `google-fonts-aliases.json`, which is explicitly validated against both the catalog and canonical evidence.
 
 A prior CI failure occurred because the validator incorrectly required `metadataSha` from the compact runtime object. The fix is to validate canonical evidence separately rather than bloating the runtime map.
 
@@ -125,7 +136,7 @@ All of these must pass on the current PR head:
 1. `npm ci`
 2. `npm audit --omit=dev --audit-level=high`
 3. generated runtime metadata succeeds
-4. catalog/evidence/trust validation succeeds
+4. canonical evidence + reviewed aliases + catalog/trust validation succeeds
 5. TypeScript succeeds
 6. Vite production build succeeds
 7. GitHub Pages base-path/bundle validation succeeds
@@ -143,10 +154,10 @@ Work in this order unless repository reality dictates otherwise.
 
 Goal: remove the remaining trust debt and establish direct font-file intelligence.
 
-- Generate and maintain an exact remaining trust-debt queue grouped by source.
+- Maintain an exact trust-debt queue grouped by source in `docs/TRUST-DEBT.md`.
 - Verify non-Google/legacy records against primary sources.
 - Record exact license identifiers and primary-source provenance.
-- Add verified download URLs only where source/license terms support them.
+- Add verified download URLs only where source/license terms support it.
 - Build a font-file acquisition/cache layer for files we are allowed to inspect.
 - Extract tables/metadata from actual files: `name`, `OS/2`, `fvar`, `STAT`, `GSUB`, `GPOS`, `cmap`, metrics and OpenType features.
 - Keep provenance for every derived fact.
@@ -171,6 +182,7 @@ Goal: make regressions difficult to ship.
 - Add visual regression screenshots for core routes/states.
 - Test direct GitHub Pages routes, font CDN failure, empty/localStorage corruption and shareable Workbench URLs.
 - Add performance budgets and bundle-size gates.
+- Address the current large initial JS chunk; the trust release still emits a chunk-size warning and this becomes a measured performance task, not a suppressed warning.
 - Add catalog virtualization / font-load throttling if needed.
 
 ### Phase 4 — Typography Intelligence / Pairing Engine
@@ -222,18 +234,21 @@ Desired direction:
 - GitHub is the source of truth.
 - Prefer primary upstream sources for metadata.
 - Never turn uncertain metadata into authoritative UI merely to make the catalog look complete.
+- Slug/canonicalized-name equality is not evidence of family identity; only exact names or reviewed aliases are accepted.
 - Do not manually edit generated runtime metadata.
 - Do not hand-edit `gh-pages` production output.
 - Do not run breaking dependency fixes with `--force` without understanding the change.
 - A green compile alone is not a release gate.
 - Preserve the 1,346-family recovered catalog baseline unless removal is intentional and documented.
+- Do not suppress the large-chunk warning just to make CI quieter; either split the bundle or create an explicit measured budget.
 - Every major architectural decision or discovered failure mode should be recorded in GitHub docs/issues/PRs.
 
 ## How to resume in a new session
 
 1. Read this file.
 2. Read Issue #11.
-3. Read PR #12 and its latest CI run.
+3. Read PR #12 and its latest CI run if PR #12 is still open.
 4. Read `docs/AUDIT-2026-08-10.md` and `docs/AUDIT-REMEDIATION-PLAN.md` if broader context is needed.
 5. Do not assume PR #12 is merge-ready until its latest head has a fully green release gate.
-6. After PR #12 merges, start a new branch/PR for Font Data Engine rather than continuing unrelated work in the old remediation PR.
+6. After PR #12 merges, create/use a dedicated Font Data Engine branch/PR instead of continuing unrelated work in the old remediation PR.
+7. Use `docs/TRUST-DEBT.md` as the operational queue for the remaining source verification work once generated.

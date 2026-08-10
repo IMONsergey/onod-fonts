@@ -3,10 +3,10 @@
 > Generated from the canonical runtime trust layer. Do not edit counts manually.
 
 Catalog families: **1346**
-Identity trust debt: **28**
-License trust debt: **38**
-Source/license union debt: **38**
-Source + license clear: **1308**
+Identity trust debt: **27**
+License trust debt: **37**
+Source/license union debt: **37**
+Source + license clear: **1309**
 
 Identity and license are independent facts. A family can have a verified primary source while its exact license remains pending; this state must not be collapsed back into “unverified source”.
 
@@ -23,7 +23,7 @@ Technical debt is also independent from source/license trust. Inspected font bin
 | Recovered source | Families pending |
 |---|---:|
 | Fontshare | 32 |
-| Google Fonts | 5 |
+| Google Fonts | 4 |
 | Uncut / Indie | 1 |
 
 ## Source/license verification queue
@@ -66,7 +66,6 @@ Technical debt is also independent from source/license trust. Inspected font bin
 | Manual | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
 | Name Sans | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
 | Open Sans Condensed | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
-| Source Sans Pro | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
 | Fire Sans | Uncut / Indie | pending | pending | pending | pending | pending | Verify at source |
 
 ## Identity verified / license pending
@@ -88,4 +87,5 @@ Technical debt is also independent from source/license trust. Inspected font bin
 
 | Family | Provider | Weights | Variable | Scripts |
 |---|---|---|---|---|
+| Source Sans Pro | Historical | pending | pending | pending |
 

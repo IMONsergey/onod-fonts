@@ -7,6 +7,7 @@ on:
       - feat/font-data-engine
     paths:
       - src/app/data/verified/artifacts/open-fonts.json
+      - src/app/data/verified/artifacts/family-aliases.json
       - scripts/font-data/inspect-sfnt.mjs
       - scripts/font-data/validate-open-artifacts-strict.mjs
       - scripts/font-data/build-artifact-report.mjs

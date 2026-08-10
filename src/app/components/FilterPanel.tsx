@@ -6,7 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { useLanguage } from "@/lib/i18n";
 import { mockFonts } from "@/data/mockFonts";
 import { cn } from "@/lib/utils";
-import { getEffectiveLanguages, getEffectiveWeights, isEffectivelyVariable } from "@/lib/fontTrust";
+import { getEffectiveLanguages, getEffectiveLicenseLabel, getEffectiveSourceLabel, getEffectiveWeights, isEffectivelyVariable } from "@/lib/fontTrust";
 
 export interface FilterState {
   search: string;
@@ -37,10 +37,12 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters })
     let variableCount = 0;
 
     mockFonts.forEach(font => {
-      sourceCounts[font.source] = (sourceCounts[font.source] || 0) + 1;
+      const source = getEffectiveSourceLabel(font);
+      const license = getEffectiveLicenseLabel(font);
+      sourceCounts[source] = (sourceCounts[source] || 0) + 1;
       font.categories.forEach(category => { categoryCounts[category] = (categoryCounts[category] || 0) + 1; });
       getEffectiveLanguages(font).forEach(script => { languageCounts[script] = (languageCounts[script] || 0) + 1; });
-      licenseCounts[font.license] = (licenseCounts[font.license] || 0) + 1;
+      licenseCounts[license] = (licenseCounts[license] || 0) + 1;
       const weightCount = getEffectiveWeights(font).length;
       weightCounts[weightCount] = (weightCounts[weightCount] || 0) + 1;
       if (isEffectivelyVariable(font)) variableCount += 1;
@@ -151,7 +153,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters })
         <section className="space-y-4">
           <h3 className="font-mono text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{language === 'ru' ? 'Лицензия' : 'License'}</h3>
           <div className="space-y-2">{licenses.map(license => <FilterCheckbox key={license} group="license" value={license} checked={filters.licenses.includes(license)} count={fontCounts.licenses[license] || 0} onChange={() => toggleArrayFilter("licenses", license)} />)}</div>
-          {fontCounts.licenses["Open Source"] > 0 && <p className="font-mono text-[8px] text-amber-700 leading-relaxed border border-amber-200 bg-amber-50 p-2">{language === 'ru' ? 'OPEN SOURCE — временная общая метка. Точный идентификатор лицензии для этих записей ещё проверяется по первоисточнику.' : 'OPEN SOURCE is a temporary generic label. Exact license identifiers for these records are still being verified upstream.'}</p>}
+          {(fontCounts.licenses["Verify at source"] || 0) > 0 && <p className="font-mono text-[8px] text-amber-700 leading-relaxed border border-amber-200 bg-amber-50 p-2">{language === 'ru' ? 'VERIFY AT SOURCE — источник или точная лицензия ещё не полностью подтверждены. Такие записи намеренно не объединяются с OFL/FFL.' : 'VERIFY AT SOURCE means source identity or the exact license is still pending. These records are intentionally not grouped with OFL/FFL.'}</p>}
         </section>
 
         <section className="space-y-4">

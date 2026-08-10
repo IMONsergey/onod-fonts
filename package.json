@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "catalog:validate": "node --experimental-strip-types scripts/validate-catalog.mjs",
-    "check": "npm run catalog:validate && npm run typecheck && npm run build",
+    "build:validate": "node scripts/validate-build.mjs",
+    "check": "npm run catalog:validate && npm run typecheck && npm run build && npm run build:validate",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

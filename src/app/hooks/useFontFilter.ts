@@ -1,7 +1,7 @@
 import React from "react";
 import { FilterState } from "@/components/FilterPanel";
 import { Font } from "@/data/mockFonts";
-import { getEffectiveAuthor, getEffectiveLanguages, getEffectiveSourceLabel, getEffectiveSourceUrl, getEffectiveWeights, getFontTrustReport, isEffectivelyVariable } from "@/lib/fontTrust";
+import { getEffectiveAuthor, getEffectiveFamilyName, getEffectiveLanguages, getEffectiveSourceLabel, getEffectiveSourceUrl, getEffectiveWeights, getFontTrustReport, isEffectivelyVariable } from "@/lib/fontTrust";
 
 const toRuntimeSafeFont = (font: Font): Font => {
   const trust = getFontTrustReport(font);
@@ -23,13 +23,14 @@ export const useFontFilter = (fonts: Font[], filters: FilterState) => {
 
     return fonts
       .filter((font) => {
+        const familyName = getEffectiveFamilyName(font);
         const author = getEffectiveAuthor(font);
         const source = getEffectiveSourceLabel(font);
         const sourceUrl = getEffectiveSourceUrl(font);
         const trust = getFontTrustReport(font);
 
         if (searchLower) {
-          const haystack = `${font.name} ${author} ${source} ${sourceUrl} ${trust.licenseLabel} ${font.description} ${font.tags?.join(" ") || ""}`.toLowerCase();
+          const haystack = `${familyName} ${font.name} ${author} ${source} ${sourceUrl} ${trust.licenseLabel} ${font.description} ${font.tags?.join(" ") || ""}`.toLowerCase();
           if (!haystack.includes(searchLower)) return false;
         }
 

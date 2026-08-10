@@ -1,0 +1,66 @@
+name: Refresh trust reports after evidence ingestion
+
+on:
+  workflow_run:
+    workflows:
+      - Ingest independent web evidence
+    types:
+      - completed
+
+permissions:
+  contents: write
+
+concurrency:
+  group: onod-fonts-post-ingest-trust-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      (github.event.workflow_run.head_branch == 'main' || github.event.workflow_run.head_branch == 'feat/font-data-engine')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout ingestion branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate runtime trust metadata
+        run: npm run metadata:runtime
+
+      - name: Validate canonical evidence
+        run: |
+          node --experimental-strip-types scripts/validate-independent-web-sources.mjs
+          node --experimental-strip-types scripts/validate-family-relations.mjs
+          node --experimental-strip-types scripts/font-data/validate-open-artifacts.mjs
+          node --experimental-strip-types scripts/font-data/validate-open-artifacts-strict.mjs
+
+      - name: Rebuild operational reports
+        run: |
+          node --experimental-strip-types scripts/build-trust-report.mjs
+          node --experimental-strip-types scripts/build-fontshare-source-audit.mjs
+
+      - name: Commit refreshed reports
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$(git status --porcelain -- docs/TRUST-DEBT.md docs/FONTSHARE-SOURCE-AUDIT.md)" ]; then
+            echo "Post-ingest reports are already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/TRUST-DEBT.md docs/FONTSHARE-SOURCE-AUDIT.md
+          git commit -m "docs: refresh post-ingest trust reports"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:${{ github.event.workflow_run.head_branch }}

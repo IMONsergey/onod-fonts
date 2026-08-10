@@ -16,239 +16,155 @@ This document is the durable handoff for continuing ONOD Fonts development when 
 
 ONOD Fonts is evolving from a Figma Make-derived font catalog into a trustworthy typography operating environment.
 
-The intended product loop is:
+Intended product loop:
 
 `Discover -> Inspect -> Compare -> Build typography system -> Export`
 
-The product should eventually know what is actually inside font files, not merely repeat provider descriptions. Core product values are metadata provenance, faithful font rendering, strong typography tooling, portable workspaces, and transparent uncertainty.
+The product should know what is actually inside font files rather than merely repeat provider descriptions. Core product values are metadata provenance, faithful font rendering, strong typography tooling, portable workspaces, and transparent uncertainty.
 
-## Current primary remediation
+## Completed foundation — Trust Engine
 
-Umbrella issue: **#11 — Audit remediation: restore catalog trust, font fidelity, and portable workflows**.
+Umbrella audit issue: **#11 — Audit remediation: restore catalog trust, font fidelity, and portable workflows**.
 
-Primary branch: `feat/trust-engine`
+Trust Engine PR: **#12 — feat: ONOD Fonts trust engine — rendering truth and catalog integrity**.
 
-Primary PR: **#12 — feat: ONOD Fonts trust engine — rendering truth and catalog integrity**
+PR #12 was merged to `main` on 2026-08-10 as squash commit:
 
-PR #12 is intentionally kept as a draft until the complete release gate is green after the final accessibility/QA/automation changes.
+`71dc94910b56b76bc8d5dc02dd7ff031582845d2`
 
-The audit and release plan are canonical background documents:
+Canonical audit documents:
 
 - `docs/AUDIT-2026-08-10.md`
 - `docs/AUDIT-REMEDIATION-PLAN.md`
+- `docs/TRUST-DEBT.md`
 
-## What PR #12 changes
+### Trust Engine state at merge
 
-### Rendering truth
+- catalog baseline: **1,346** families;
+- Google Fonts canonical evidence/runtime verification: **1,190** families;
+- explicit reviewed upstream aliases: **2**;
+- remaining trust debt: **88** families;
+- production dependency audit: **0 runtime vulnerabilities**;
+- `npm run check` enforces runtime metadata generation, canonical evidence/trust validation, TypeScript, Vite build, GitHub Pages bundle validation and production preview/direct-route/asset smoke;
+- the large initial JS chunk remains a known post-remediation performance task; do not suppress the warning without a measured budget or real code splitting.
 
-- Font loading is family-specific rather than batch-index keyed.
-- `document.fonts` verifies whether the intended face actually registered.
-- Font loading state is observable (`loading`, `ready`, `error`).
-- Failed font loads display `FALLBACK`; system fallback is no longer silently presented as the requested font.
-- Unverified metric records are constrained to conservative Regular 400 at runtime.
+### Rendering and trust rules now established
 
-### Catalog trust
-
+- Font loading is family-addressed rather than batch-index keyed.
+- `document.fonts` verifies actual face registration.
+- Failed font loads show `FALLBACK`; the product does not silently present system fallback as the requested family.
+- Unverified metric records are constrained to conservative Regular 400 and cannot expose fake variable axes.
 - Runtime trust layer: `src/app/lib/fontTrust.ts`.
 - Runtime font state: `src/app/lib/fontRuntime.ts`.
 - Canonical Google Fonts evidence: `src/app/data/verified/google-fonts.json`.
-- Canonical evidence includes the Google Fonts `METADATA.pb` path and Git blob SHA.
-- Explicitly reviewed family aliases live in `src/app/data/verified/google-fonts-aliases.json`.
-- Normalized/slug equality never grants verification by itself. A non-exact upstream family name is trusted only when a reviewed alias is versioned.
-- Current reviewed aliases include the catalog display names `Unifraktur Cook` -> upstream `UnifrakturCook` and `Unifraktur Maguntia` -> upstream `UnifrakturMaguntia`, verified against the official Google Fonts metadata.
-- Compact runtime metadata is generated, not committed, under `src/app/data/verified/.generated/`.
-- Generator: `scripts/build-runtime-metadata.mjs`.
-- Google Fonts upstream sync: `scripts/sync-google-fonts.mjs` + `.github/workflows/sync-google-fonts.yml`.
-- UI distinguishes verified/curated data from `META?`/derived data.
-- Generic `Open Source` is not treated as an exact license identifier.
+- Explicit reviewed Google family aliases: `src/app/data/verified/google-fonts-aliases.json`.
+- Compact runtime metadata is generated under `src/app/data/verified/.generated/` and must not be hand-edited.
+- Slug/canonicalized-name equality is discovery only, never proof of identity. A non-exact upstream family name is trusted only through a reviewed versioned alias.
+- Current reviewed aliases include `Unifraktur Cook -> UnifrakturCook` and `Unifraktur Maguntia -> UnifrakturMaguntia`.
+- Canonical evidence retains audit-only provenance such as exact `METADATA.pb` path and Git blob SHA; runtime metadata deliberately omits fields the browser does not need.
 
-Latest fully green trust measurement before final workflow cleanup (CI run #88):
+### Workflow / semantics / accessibility foundation
 
-- 1,346 catalog families total.
-- 1,190 families backed by versioned Google Fonts `METADATA.pb` evidence/runtime verification.
-- 2 of those 1,190 use explicit reviewed family aliases.
-- 88 derived records remain as trust debt.
-- Derived records remain visibly marked and are constrained to Regular 400 until verified.
-- production dependency audit reported 0 runtime vulnerabilities.
+- Catalog search/filter/sort/view/preview state is URL-backed.
+- Workbench links include selected font IDs and settings and are portable between browsers.
+- Detail Back preserves source context.
+- Source and Download are distinct product actions.
+- Pairing/Related/Glyphs no longer overclaim capabilities.
+- React Router is patched to 7.18.2 and high-severity production dependency audit is a CI blocker.
+- Third-party analytics/session replay was removed until a deliberate consent architecture exists.
+- Fake whole-page invert theme was removed.
+- `prefers-reduced-motion` is respected.
+- Dialog and mobile navigation trap/restore focus.
+- MarkBuilder uses keyboard-operable semantic grid controls.
 
-### Workspace continuity
+## Active phase — Font Data Engine
 
-- Catalog filter/search/sort/view/preview state is encoded in the URL.
-- Details -> Back preserves originating Catalog/Favorites context.
-- Workbench URLs include selected font IDs and typography settings; they are portable across browsers instead of depending only on localStorage.
-- License/source/script filters are exposed consistently.
-- Core preview controls are usable on mobile.
+Primary issue: **#15 — Font Data Engine: close trust debt and inspect canonical font files**.
 
-### Product semantics
+Active branch: `feat/font-data-engine`
 
-- `Download` and `Source` are distinct actions.
-- If no verified download URL exists, the UI does not imply that Source is a download.
-- Previous pseudo-pairing is explicitly labeled as a contrast/category heuristic.
-- Previous `Related` output is described as same-category rather than semantic similarity.
-- Glyph panel is explicitly a sample character set until real cmap analysis exists.
+Create/use a dedicated draft PR from that branch; do not reopen or continue PR #12 for new product work.
 
-### Safety, privacy and dependencies
+Operational queue: `docs/TRUST-DEBT.md`.
 
-- React Router was upgraded from 7.13.0 to patched 7.18.2 after CI caught high-severity production advisories.
-- CI blocks high-severity production dependency advisories.
-- Third-party Yandex Metrika/Webvisor/clickmap runtime was physically removed from `App.tsx`; the obsolete `window.ym` type was removed too.
-- Privacy/Terms/License copy was aligned with actual runtime behavior and metadata uncertainty.
-- The fake whole-page CSS invert theme and its UI controls were removed rather than presented as a real dark theme.
+Current trust-debt composition:
 
-### Accessibility and motion
+- **82 Fontshare** families;
+- **5 Google Fonts** legacy/currently-unmatched names: `Cederville Cursive`, `Manual`, `Name Sans`, `Open Sans Condensed`, `Source Sans Pro`;
+- **1 Uncut / Indie** record: `Fire Sans`, currently carrying a suspicious Google Fonts URL and requiring identity verification.
 
-- `prefers-reduced-motion` is respected globally and Motion-heavy interactive components use reduced-motion-aware transitions.
-- Custom Dialog has focus trapping, focus restoration and accessible title/description wiring.
-- Header navigation uses semantic buttons, current-page semantics, keyboard focus states, Escape-close behavior and an accessible mobile menu.
-- MarkBuilder 5x5 grid uses real buttons instead of click-only divs, supports keyboard activation, Escape cancellation, accessible point labels/status, and cancels stale animation timers.
+### Critical Fontshare licensing finding
 
-### QA and deployment
+Fontshare’s own documentation distinguishes two materially different classes:
 
-- Catalog/evidence/trust validation: `scripts/validate-catalog.mjs`.
-- Production bundle validation: `scripts/validate-build.mjs`.
-- Production preview smoke: `scripts/smoke-preview.mjs`.
-- `npm run check` now obligatorily runs metadata generation, catalog/evidence validation, TypeScript, Vite build, Pages bundle validation and production preview smoke.
-- Smoke checks exercise the Pages base URL, direct Workbench route, direct font route and built assets.
-- GitHub Pages emergency diagnostics/double-publish plumbing was removed after production recovered.
-- `.github/workflows/sync-google-fonts.yml` and `.github/workflows/trust-debt-report.yml` are branch-safe for both the remediation branch and `main`; they no longer hard-code a future-dead feature branch as their push target.
-- Metadata sync validates refreshed evidence before committing it.
-- Trust debt is generated by `scripts/build-trust-report.mjs`; the generated repository report is `docs/TRUST-DEBT.md` when the report workflow has run.
+- Open Source families governed by SIL Open Font License (OFL);
+- Closed Source / Indian Type Foundry families governed by ITF Free Font License (FFL).
 
-## Important current validator architecture
+Both may be free for use, but their redistribution/modification conditions differ. The recovered catalog’s blanket `Open Source` claim for the 82 Fontshare trust-debt records is therefore not acceptable as verified metadata.
 
-Do not merge runtime and evidence responsibilities again.
+Primary-source URLs and exact interpretation are recorded in Issue #15. Do not promote a Fontshare family to a verified license class without family-level primary evidence.
 
-Canonical evidence (`google-fonts.json`) contains audit/provenance-only fields such as `metadataSha` and exact upstream family names.
+### Font Data Engine objectives
 
-Compact runtime metadata deliberately excludes fields the browser does not need and rewrites a reviewed alias to the catalog identity while preserving optional `upstreamFamily` context. Therefore:
+1. Build a primary-source Fontshare evidence pipeline and determine each family’s exact license class.
+2. Add canonical/versioned provenance for source identity, license, designer/foundry and available faces/axes where supported by primary evidence.
+3. Make Download/Source behavior license-aware; do not mirror/re-distribute proprietary FFL font software without explicit permission for that exact behavior.
+4. Resolve the six non-Fontshare trust-debt records individually against primary sources.
+5. Build a direct font-file acquisition/inspection layer for artifacts ONOD is allowed to inspect.
+6. Extract and version useful file intelligence: `name`, `OS/2`, `head`, `hhea`, metrics, `fvar`, `STAT`, `cmap`, `GSUB`, `GPOS`, and OpenType features.
+7. Retain provenance and define precedence between provider metadata, file-derived facts and manually reviewed aliases.
+8. Regenerate `docs/TRUST-DEBT.md` after every enrichment pass and keep `npm run check` green.
 
-- browser/runtime code validates only runtime fields;
-- build-time catalog validation separately reads the canonical evidence file and validates metadata paths, SHA provenance, licenses and source URLs;
-- exact family identity is the default;
-- a non-exact family identity passes only through `google-fonts-aliases.json`, which is explicitly validated against both the catalog and canonical evidence.
-
-A prior CI failure occurred because the validator incorrectly required `metadataSha` from the compact runtime object. The fix is to validate canonical evidence separately rather than bloating the runtime map.
-
-## Required release gate before merging PR #12
-
-All of these must pass on the current PR head:
-
-1. `npm ci`
-2. `npm audit --omit=dev --audit-level=high`
-3. generated runtime metadata succeeds
-4. canonical evidence + reviewed aliases + catalog/trust validation succeeds
-5. TypeScript succeeds
-6. Vite production build succeeds
-7. GitHub Pages base-path/bundle validation succeeds
-8. production preview smoke succeeds for base URL, direct routes and JS/CSS assets
-9. PR remains mergeable
-10. no unresolved known P0/P1 regression from the audit
-
-Only then mark PR #12 ready and merge it to `main`; deployment should happen from `main` automatically.
-
-## Next large roadmap after PR #12
-
-Work in this order unless repository reality dictates otherwise.
-
-### Phase 1 — Font Data Engine
-
-Goal: remove the remaining trust debt and establish direct font-file intelligence.
-
-- Maintain an exact trust-debt queue grouped by source in `docs/TRUST-DEBT.md`.
-- Verify non-Google/legacy records against primary sources.
-- Record exact license identifiers and primary-source provenance.
-- Add verified download URLs only where source/license terms support it.
-- Build a font-file acquisition/cache layer for files we are allowed to inspect.
-- Extract tables/metadata from actual files: `name`, `OS/2`, `fvar`, `STAT`, `GSUB`, `GPOS`, `cmap`, metrics and OpenType features.
-- Keep provenance for every derived fact.
+## Following phases
 
 ### Phase 2 — Glyph & Language Intelligence
 
-Goal: replace script badges with real coverage knowledge.
+- real `cmap` coverage;
+- Unicode block/script coverage;
+- Russian/Ukrainian/Serbian/Bulgarian and other useful language checks;
+- punctuation/currency/arrows/math/ligatures/OpenType capabilities;
+- factual confidence/provenance in UI.
 
-- Parse real `cmap` coverage.
-- Compute Unicode block/script coverage.
-- Add useful language checks, especially Cyrillic/Russian/Ukrainian/Serbian/Bulgarian distinctions.
-- Inspect punctuation, currency, arrows, math, ligatures and OpenType features.
-- Surface coverage as factual data with confidence/provenance.
+### Phase 3 — Browser QA / Performance
 
-### Phase 3 — Browser QA / performance infrastructure
-
-Goal: make regressions difficult to ship.
-
-- Add Playwright browser E2E.
-- Add mobile viewport flows.
-- Add accessibility automation (`axe` or equivalent).
-- Add visual regression screenshots for core routes/states.
-- Test direct GitHub Pages routes, font CDN failure, empty/localStorage corruption and shareable Workbench URLs.
-- Add performance budgets and bundle-size gates.
-- Address the current large initial JS chunk; the trust release still emits a chunk-size warning and this becomes a measured performance task, not a suppressed warning.
-- Add catalog virtualization / font-load throttling if needed.
+- Playwright full browser workflows;
+- mobile viewport flows;
+- axe accessibility automation;
+- visual regression;
+- direct GitHub Pages route/CDN-failure/localStorage/share-link scenarios;
+- bundle/performance budgets and real code splitting/virtualization/load throttling as needed.
 
 ### Phase 4 — Typography Intelligence / Pairing Engine
 
-Goal: replace the current heuristic with a defensible scoring system.
-
-Potential signals:
-
-- classification contrast;
-- x-height/proportions;
-- width and visual density;
-- stroke contrast;
-- aperture/terminal characteristics where measurable;
-- available weight/axis compatibility;
-- script/language overlap;
-- intended role (display, text, UI, code);
-- variable/optical-size capabilities.
-
-Recommendations must explain why a pair scores well and expose uncertainty.
+Replace current category/contrast heuristic with explainable scoring using measurable font properties, role compatibility, script overlap, weights/axes and other defensible signals.
 
 ### Phase 5 — Workbench 2.0
 
-Goal: turn comparison into a typography-system builder.
-
-- Roles: Display / Heading / Subheading / Body / Caption / UI / Data.
-- Responsive modular scales.
-- Line-height/tracking/measure constraints.
-- Variable axes and optical sizing.
-- Realistic specimens: editorial, UI, mobile, poster, data/table.
-- Export CSS variables / `@font-face` / design tokens / Tailwind theme.
-- Later: Figma variables/tokens integration.
+Build role-based typography systems (Display / Heading / Subheading / Body / Caption / UI / Data), responsive scales, optical/variable settings and export to CSS/design tokens/Tailwind; later Figma variables/tokens.
 
 ### Phase 6 — Global product/UI redesign
 
-Do this after Font/Glyph/Pairing intelligence exists, so UI is designed around real capabilities rather than the old catalog.
-
-Desired direction:
-
-- light, professional, typography-first interface;
-- less decorative chrome, more actual specimen/data space;
-- Search -> Discover -> Inspect -> Compare -> Build -> Export;
-- contextual panels rather than duplicated controls;
-- command/search palette;
-- strong responsive behavior;
-- no fake capability labels.
+Only redesign globally after the intelligence layers exist, so the interface is built around real capabilities rather than the old catalog structure.
 
 ## Engineering rules
 
 - GitHub is the source of truth.
 - Prefer primary upstream sources for metadata.
-- Never turn uncertain metadata into authoritative UI merely to make the catalog look complete.
-- Slug/canonicalized-name equality is not evidence of family identity; only exact names or reviewed aliases are accepted.
+- Never turn uncertainty into authoritative UI for completeness.
+- Exact identity or explicit reviewed alias is required for source-sensitive facts.
 - Do not manually edit generated runtime metadata.
 - Do not hand-edit `gh-pages` production output.
-- Do not run breaking dependency fixes with `--force` without understanding the change.
+- Do not use breaking dependency fixes with `--force` without understanding the change.
 - A green compile alone is not a release gate.
-- Preserve the 1,346-family recovered catalog baseline unless removal is intentional and documented.
-- Do not suppress the large-chunk warning just to make CI quieter; either split the bundle or create an explicit measured budget.
-- Every major architectural decision or discovered failure mode should be recorded in GitHub docs/issues/PRs.
+- Preserve the 1,346-family recovered baseline unless removal is intentional and documented.
+- Do not suppress performance warnings merely to make CI quiet.
+- Record every major architectural decision, source rule, failure mode and phase handoff in GitHub docs/issues/PRs.
 
 ## How to resume in a new session
 
 1. Read this file.
-2. Read Issue #11.
-3. Read PR #12 and its latest CI run if PR #12 is still open.
-4. Read `docs/AUDIT-2026-08-10.md` and `docs/AUDIT-REMEDIATION-PLAN.md` if broader context is needed.
-5. Do not assume PR #12 is merge-ready until its latest head has a fully green release gate.
-6. After PR #12 merges, create/use a dedicated Font Data Engine branch/PR instead of continuing unrelated work in the old remediation PR.
-7. Use `docs/TRUST-DEBT.md` as the operational queue for the remaining source verification work once generated.
+2. Read Issue #15 and `docs/TRUST-DEBT.md`.
+3. Inspect the current `feat/font-data-engine` branch and its draft PR.
+4. Read Issue #11 / audit documents only when broader remediation context is needed.
+5. Before major changes, read the current repository files/CI state; repository reality wins over this document.
+6. Continue Font Data Engine until its own release gates are satisfied; do not mix Glyph Intelligence, global redesign or unrelated features into the same PR unless a shared foundation genuinely requires it.

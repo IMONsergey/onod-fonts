@@ -113,5 +113,66 @@
       "variableVerified": false,
       "scriptsVerified": false
     }
+  },
+  "Saans": {
+    "family": "Saans",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://displaay.net/typeface/saans",
+      "designer": "Martin Vácha",
+      "publisher": "Displaay Type Foundry",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://displaay.net/typeface/saans",
+        "capturedAt": "2026-08-10T23:00:00+03:00",
+        "facts": [
+          "Official Displaay page identifies Saans as a Displaay family designed by Martin Vácha.",
+          "Official page lists Saans as a 12-style proportional family within the Saans collection and explicitly exposes a variable font with Weight, Slant and Mono axes.",
+          "Official support section lists Latin character sets and Latin-script languages."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "Displaay sells retail licenses and free full trials; the recovered generic Open Source label is invalid. Exact Displaay EULA capability mapping remains pending."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variable": true,
+      "variableVerified": true,
+      "scripts": ["Latin"],
+      "scriptsVerified": true
+    }
+  },
+  "Vercetti": {
+    "family": "Vercetti",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://filipposfragkogiannis.com/fonts/vercetti-regular/",
+      "designer": "Richard Mandona",
+      "publisher": "Filippos Fragkogiannis",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://filipposfragkogiannis.com/fonts/vercetti-regular/",
+        "capturedAt": "2026-08-10T23:00:00+03:00",
+        "facts": [
+          "Official creator page states that Vercetti Regular is also known as Vercetti and identifies Richard Mandona as Typeface Designer and Filippos Fragkogiannis as Creative Director.",
+          "Official page states the font is distributed under Licence Amicale and references Licence Amicale V.0.2 while imposing additional EULA restrictions; ONOD therefore keeps the normalized license policy pending until those terms are reconciled.",
+          "Official supported-language list contains Latin-script languages and no Cyrillic/Greek set."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "The official page names Licence Amicale V.0.2, but its page-specific EULA also restricts modification/public file sharing. ONOD will not map capabilities until a reviewed policy reconciles both sources."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scripts": ["Latin"],
+      "scriptsVerified": true
+    }
   }
 }

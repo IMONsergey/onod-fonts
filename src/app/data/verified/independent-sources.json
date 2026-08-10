@@ -1,20 +1,28 @@
 {
   "Aspekta": {
     "family": "Aspekta",
-    "sourceType": "official-github",
-    "repository": "ivodolenc/aspekta",
-    "sourceUrl": "https://github.com/ivodolenc/aspekta",
-    "designer": "Ivo Dolenc",
-    "licenseId": "OFL-1.1",
-    "identityEvidence": {
-      "ref": "main",
-      "path": "README.md",
-      "blobSha": "f4321c50b50dfebb9eb5594ee26e560d7d159f1e"
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-github",
+      "repository": "ivodolenc/aspekta",
+      "sourceUrl": "https://github.com/ivodolenc/aspekta",
+      "designer": "Ivo Dolenc",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "main",
+        "path": "README.md",
+        "blobSha": "f4321c50b50dfebb9eb5594ee26e560d7d159f1e"
+      }
     },
-    "licenseEvidence": {
-      "ref": "main",
-      "path": "LICENSE.txt",
-      "blobSha": "3b4c78701510d28833b3b9c9798d47f577bb2cf4"
+    "license": {
+      "status": "verified",
+      "id": "OFL-1.1",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "main",
+        "path": "LICENSE.txt",
+        "blobSha": "3b4c78701510d28833b3b9c9798d47f577bb2cf4"
+      }
     },
     "technical": {
       "variable": true,
@@ -29,20 +37,28 @@
   },
   "Cal Sans": {
     "family": "Cal Sans",
-    "sourceType": "official-github",
-    "repository": "calcom/sans",
-    "sourceUrl": "https://github.com/calcom/sans",
-    "designer": "Mark Davis",
-    "licenseId": "OFL-1.1",
-    "identityEvidence": {
-      "ref": "main",
-      "path": "README.md",
-      "blobSha": "1fa3144b88f9950be633814d260e88a135e07ee4"
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-github",
+      "repository": "calcom/sans",
+      "sourceUrl": "https://github.com/calcom/sans",
+      "designer": "Mark Davis",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "main",
+        "path": "README.md",
+        "blobSha": "1fa3144b88f9950be633814d260e88a135e07ee4"
+      }
     },
-    "licenseEvidence": {
-      "ref": "main",
-      "path": "OFL.txt",
-      "blobSha": "52135553ce36d47c868d0dd93de3accaf60fea76"
+    "license": {
+      "status": "verified",
+      "id": "OFL-1.1",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "main",
+        "path": "OFL.txt",
+        "blobSha": "52135553ce36d47c868d0dd93de3accaf60fea76"
+      }
     },
     "technical": {
       "variable": true,
@@ -56,20 +72,28 @@
   },
   "Hauora": {
     "family": "Hauora",
-    "sourceType": "official-github",
-    "repository": "WCYS-Co/Hauora-Sans",
-    "sourceUrl": "https://github.com/WCYS-Co/Hauora-Sans",
-    "designer": "WCYS & Co.",
-    "licenseId": "OFL-1.1",
-    "identityEvidence": {
-      "ref": "master",
-      "path": "README.md",
-      "blobSha": "2040e653cf6c973105fca4a1b60975604987f860"
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-github",
+      "repository": "WCYS-Co/Hauora-Sans",
+      "sourceUrl": "https://github.com/WCYS-Co/Hauora-Sans",
+      "designer": "WCYS & Co.",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "master",
+        "path": "README.md",
+        "blobSha": "2040e653cf6c973105fca4a1b60975604987f860"
+      }
     },
-    "licenseEvidence": {
-      "ref": "master",
-      "path": "OFL.txt",
-      "blobSha": "2850a01bad5a4528d0b576111cebb18fb92bd2f8"
+    "license": {
+      "status": "verified",
+      "id": "OFL-1.1",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "master",
+        "path": "OFL.txt",
+        "blobSha": "2850a01bad5a4528d0b576111cebb18fb92bd2f8"
+      }
     },
     "technical": {
       "variable": true,
@@ -81,20 +105,28 @@
   },
   "Overused Grotesk": {
     "family": "Overused Grotesk",
-    "sourceType": "official-github",
-    "repository": "RandomMaerks/Overused-Grotesk",
-    "sourceUrl": "https://github.com/RandomMaerks/Overused-Grotesk",
-    "designer": "Bao Nguyen / RandomMaerks",
-    "licenseId": "OFL-1.1",
-    "identityEvidence": {
-      "ref": "main",
-      "path": "README.md",
-      "blobSha": "509d1c9370cc678330e25a458cf64f111b461222"
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-github",
+      "repository": "RandomMaerks/Overused-Grotesk",
+      "sourceUrl": "https://github.com/RandomMaerks/Overused-Grotesk",
+      "designer": "Bao Nguyen / RandomMaerks",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "main",
+        "path": "README.md",
+        "blobSha": "509d1c9370cc678330e25a458cf64f111b461222"
+      }
     },
-    "licenseEvidence": {
-      "ref": "main",
-      "path": "LICENSE.txt",
-      "blobSha": "06a195e7a85ad38a41847c2f52ec0ed947165901"
+    "license": {
+      "status": "verified",
+      "id": "OFL-1.1",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "main",
+        "path": "LICENSE.txt",
+        "blobSha": "06a195e7a85ad38a41847c2f52ec0ed947165901"
+      }
     },
     "technical": {
       "variable": true,
@@ -110,20 +142,28 @@
   },
   "Uncut Sans": {
     "family": "Uncut Sans",
-    "sourceType": "official-github",
-    "repository": "kaspernordkvist/uncut_sans",
-    "sourceUrl": "https://github.com/kaspernordkvist/uncut_sans",
-    "designer": "Kasper Nordkvist",
-    "licenseId": "OFL-1.1",
-    "identityEvidence": {
-      "ref": "main",
-      "path": "README.md",
-      "blobSha": "719d94847c9785799c4d206c1cf790baa8d6442a"
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-github",
+      "repository": "kaspernordkvist/uncut_sans",
+      "sourceUrl": "https://github.com/kaspernordkvist/uncut_sans",
+      "designer": "Kasper Nordkvist",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "main",
+        "path": "README.md",
+        "blobSha": "719d94847c9785799c4d206c1cf790baa8d6442a"
+      }
     },
-    "licenseEvidence": {
-      "ref": "main",
-      "path": "LICENSE.txt",
-      "blobSha": "6c183e55e58cd92df368bad8199adbf3eb6ad6cf"
+    "license": {
+      "status": "verified",
+      "id": "OFL-1.1",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "main",
+        "path": "LICENSE.txt",
+        "blobSha": "6c183e55e58cd92df368bad8199adbf3eb6ad6cf"
+      }
     },
     "technical": {
       "weightsVerified": false,

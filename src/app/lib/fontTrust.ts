@@ -1,7 +1,7 @@
 import type { Font } from "../data/mockFonts";
 import verifiedGoogleFontsJson from "../data/verified/.generated/google-fonts-runtime.json" with { type: "json" };
 import verifiedFontshareJson from "../data/verified/.generated/fontshare-runtime.json" with { type: "json" };
-import { getFontshareLicensePolicy, type FontLicenseCapabilities } from "./fontSourcePolicy";
+import { getFontshareLicensePolicy, type FontLicenseCapabilities } from "./fontSourcePolicy.ts";
 
 export type FontDataConfidence = "curated" | "derived";
 

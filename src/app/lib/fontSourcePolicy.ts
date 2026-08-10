@@ -48,6 +48,10 @@ const FONTSHARE_POLICIES: Record<string, FontLicensePolicy> = {
   },
 };
 
+export function hasReviewedFontshareLicensePolicy(providerLicenseType: string) {
+  return Object.prototype.hasOwnProperty.call(FONTSHARE_POLICIES, providerLicenseType);
+}
+
 export function getFontshareLicensePolicy(providerLicenseType: string): FontLicensePolicy {
   return FONTSHARE_POLICIES[providerLicenseType] || {
     provider: "Fontshare",

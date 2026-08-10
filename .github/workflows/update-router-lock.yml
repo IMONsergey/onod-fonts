@@ -6,6 +6,7 @@ on:
       - feat/trust-engine
     paths:
       - package.json
+      - .github/workflows/update-router-lock.yml
 
 permissions:
   contents: write

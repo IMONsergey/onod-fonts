@@ -18,12 +18,13 @@ const candidates = mockFonts.filter(font =>
   !NON_GOOGLE_SOURCES.has(font.source),
 );
 
-const slugify = name => name
+const canonicalFamilyName = value => value
   .normalize('NFKD')
   .replace(/\p{Diacritic}/gu, '')
   .toLowerCase()
   .replace(/[^a-z0-9]/g, '');
 
+const slugify = canonicalFamilyName;
 const allQuoted = (text, key) => Array.from(text.matchAll(new RegExp(`^${key}:\\s*"([^"]*)"`, 'gm')), match => match[1]);
 const firstQuoted = (text, key) => allQuoted(text, key)[0] || '';
 const firstNumber = (text, key) => {
@@ -89,7 +90,8 @@ async function fetchFamily(font) {
     const text = Buffer.from(payload.content.replace(/\n/g, ''), 'base64').toString('utf8');
     const parsed = parseMetadata(text, metadataPath, payload.sha);
     if (!parsed.family || !parsed.license) throw new Error(`${font.name}: incomplete METADATA.pb at ${metadataPath}`);
-    return parsed;
+    if (canonicalFamilyName(parsed.family) !== canonicalFamilyName(font.name)) return { collision: parsed };
+    return { metadata: parsed };
   }
   return null;
 }
@@ -97,6 +99,7 @@ async function fetchFamily(font) {
 let cursor = 0;
 let success = 0;
 const misses = [];
+const collisions = [];
 const failures = [];
 const fetched = {};
 
@@ -106,10 +109,12 @@ async function worker() {
     if (index >= candidates.length) return;
     const font = candidates[index];
     try {
-      const metadata = await fetchFamily(font);
-      if (metadata) {
-        fetched[font.name] = metadata;
+      const result = await fetchFamily(font);
+      if (result?.metadata) {
+        fetched[font.name] = result.metadata;
         success += 1;
+      } else if (result?.collision) {
+        collisions.push(`${font.name} -> ${result.collision.family} (${result.collision.metadataPath})`);
       } else {
         misses.push(font.name);
       }
@@ -132,13 +137,14 @@ if (failures.length > 20) {
 const minimumCoverage = Math.min(600, Math.ceil(candidates.length * 0.5));
 if (success < minimumCoverage && Object.keys(previous).length === 0) {
   console.error(`Metadata sync coverage too low for first import: ${success}/${candidates.length}; expected at least ${minimumCoverage}.`);
-  console.error(`First misses: ${misses.slice(0, 50).join(', ')}`);
   process.exit(1);
 }
 
 const candidateNames = new Set(candidates.map(font => font.name));
 const next = {};
-for (const [name, metadata] of Object.entries(previous)) if (candidateNames.has(name)) next[name] = metadata;
+for (const [name, metadata] of Object.entries(previous)) {
+  if (candidateNames.has(name) && canonicalFamilyName(metadata.family || '') === canonicalFamilyName(name)) next[name] = metadata;
+}
 Object.assign(next, fetched);
 
 const ordered = Object.fromEntries(Object.entries(next).sort(([a], [b]) => a.localeCompare(b)));
@@ -146,8 +152,7 @@ writeFileSync(target, `${JSON.stringify(ordered, null, 2)}\n`);
 
 console.log(`Google Fonts metadata sync complete: ${success}/${candidates.length} refreshed; ${Object.keys(ordered).length} versioned verified records total.`);
 console.log(`Not found in google/fonts by normalized family slug: ${misses.length}.`);
+console.log(`Rejected canonical-name collisions: ${collisions.length}.`);
 if (misses.length) console.log(`Sample misses: ${misses.slice(0, 40).join(', ')}`);
-if (failures.length) {
-  console.warn(`Transient/API failures preserved from previous overlay: ${failures.length}.`);
-  failures.slice(0, 10).forEach(item => console.warn(`  ${item}`));
-}
+if (collisions.length) collisions.slice(0, 20).forEach(item => console.warn(`  COLLISION ${item}`));
+if (failures.length) failures.slice(0, 10).forEach(item => console.warn(`  FAILURE ${item}`));

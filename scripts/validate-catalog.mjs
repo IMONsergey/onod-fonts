@@ -1,5 +1,5 @@
 import { mockFonts } from '../src/app/data/mockFonts.ts';
-import { getEffectiveLanguages, getEffectiveWeights, getFontTrustReport, isEffectivelyVariable } from '../src/app/lib/fontTrust.ts';
+import { getEffectiveLanguages, getEffectiveWeights, getFontTrustReport, getVerifiedGoogleFont, isEffectivelyVariable } from '../src/app/lib/fontTrust.ts';
 
 const errors = [];
 const warnings = [];
@@ -53,6 +53,7 @@ if (!Array.isArray(mockFonts)) {
     const trust = getFontTrustReport(font);
     const effectiveWeights = getEffectiveWeights(font);
     const effectiveLanguages = getEffectiveLanguages(font);
+    const upstream = getVerifiedGoogleFont(font);
 
     if (trust.confidence === 'derived') {
       addWarning(font, 'metadata is generated/derived and requires upstream verification.');
@@ -60,8 +61,16 @@ if (!Array.isArray(mockFonts)) {
       if (isEffectivelyVariable(font)) addError(font, 'derived metadata must not expose variable axes as verified.');
     }
 
-    if (font.license === 'Open Source') addWarning(font, 'generic license label requires exact upstream license enrichment.');
+    if (trust.licenseLabel === 'Verify at source') addWarning(font, 'generic license label requires exact upstream license enrichment.');
     if (effectiveLanguages.length === 0) addError(font, 'effective language list must not be empty.');
+
+    if (upstream) {
+      if (!upstream.family || upstream.family !== font.name) addError(font, 'upstream verification family name does not match catalog name.');
+      if (!upstream.license || upstream.license === 'Open Source') addError(font, 'upstream verification must contain an exact license identifier.');
+      if (!/^(ofl|apache|ufl)\/.+\/METADATA\.pb$/.test(upstream.metadataPath)) addError(font, `invalid upstream metadata path: ${upstream.metadataPath}`);
+      if (!/^[0-9a-f]{40}$/i.test(upstream.metadataSha)) addError(font, `invalid upstream metadata blob SHA: ${upstream.metadataSha}`);
+      if (upstream.repositoryUrl && !isHttpUrl(upstream.repositoryUrl)) addError(font, `invalid upstream repository URL: ${upstream.repositoryUrl}`);
+    }
   }
 }
 
@@ -74,9 +83,11 @@ for (const [name, script] of [['Noto Sans JP', 'Japanese'], ['Noto Serif JP', 'J
 const derivedWarnings = warnings.filter(item => item.includes('generated/derived')).length;
 const genericLicenseWarnings = warnings.filter(item => item.includes('generic license')).length;
 const verifiedVariable = mockFonts.filter(isEffectivelyVariable).length;
+const upstreamVerified = mockFonts.filter(font => getFontTrustReport(font).upstreamVerified).length;
 
 console.log(`Catalog validation: ${mockFonts.length} families, ${seenIds.size} unique ids, ${seenNames.size} unique names.`);
-console.log(`Runtime trust policy: ${verifiedVariable} verified variable families; derived records are constrained to Regular 400.`);
+console.log(`Upstream verification: ${upstreamVerified} families backed by versioned Google Fonts METADATA.pb.`);
+console.log(`Runtime trust policy: ${verifiedVariable} verified variable families; remaining derived records are constrained to Regular 400.`);
 console.log(`Trust debt: ${derivedWarnings} derived metadata records, ${genericLicenseWarnings} generic license labels.`);
 
 if (warnings.length) {

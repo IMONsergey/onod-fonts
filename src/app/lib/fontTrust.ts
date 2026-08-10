@@ -72,9 +72,29 @@ interface RuntimeHistoricalRelation {
     family: string;
     sourceUrl: string;
   };
-  loadReplacementAllowed: boolean;
+  loadReplacementAllowed: false;
   note: string;
 }
+
+interface RuntimeCatalogCorrection {
+  catalogFamily: string;
+  status: "verified";
+  relation: "catalog-correction";
+  provider: string;
+  canonical: {
+    family: string;
+    sourceUrl: string;
+    designer: string;
+    licenseId: string;
+    weights: number[];
+    variable: boolean;
+    scripts: string[];
+  };
+  loadReplacementAllowed: true;
+  note: string;
+}
+
+type RuntimeFamilyRelation = RuntimeHistoricalRelation | RuntimeCatalogCorrection;
 
 interface RuntimeFontsharePolicy {
   label: string;
@@ -100,7 +120,7 @@ const verifiedGoogleFonts = verifiedGoogleFontsJson as Record<string, VerifiedGo
 const verifiedFontshare = verifiedFontshareJson as Record<string, VerifiedFontshareFont>;
 const verifiedIndependent = verifiedIndependentJson as Record<string, VerifiedIndependentFont>;
 const fontsharePolicies = fontsharePoliciesJson as Record<string, RuntimeFontsharePolicy>;
-const familyRelations = familyRelationsJson as Record<string, RuntimeHistoricalRelation>;
+const familyRelations = familyRelationsJson as unknown as Record<string, RuntimeFamilyRelation>;
 
 const isGeneratedDescription = (font: Font) => {
   const description = font.description || "";
@@ -110,6 +130,12 @@ const isGeneratedDescription = (font: Font) => {
 const getHistoricalSourceRelation = (font: Font): RuntimeHistoricalRelation | undefined => {
   const relation = familyRelations[font.name];
   if (!relation || relation.status !== "verified" || relation.catalogFamily !== font.name || relation.relation !== "historical-successor") return undefined;
+  return relation;
+};
+
+const getCatalogCorrectionRelation = (font: Font): RuntimeCatalogCorrection | undefined => {
+  const relation = familyRelations[font.name];
+  if (!relation || relation.status !== "verified" || relation.catalogFamily !== font.name || relation.relation !== "catalog-correction" || relation.loadReplacementAllowed !== true) return undefined;
   return relation;
 };
 
@@ -131,6 +157,18 @@ export function getVerifiedIndependentFont(font: Font): VerifiedIndependentFont 
   return candidate;
 }
 
+export function getEffectiveFamilyName(font: Font) {
+  return getCatalogCorrectionRelation(font)?.canonical.family || font.name;
+}
+
+export function getEffectiveCssStack(font: Font) {
+  const family = getEffectiveFamilyName(font);
+  if (family === font.name) return font.cssStack;
+  const comma = font.cssStack.indexOf(',');
+  const fallback = comma >= 0 ? font.cssStack.slice(comma) : ', sans-serif';
+  return `'${family.replaceAll("'", "\\'")}'${fallback}`;
+}
+
 export function getFontTrustReport(font: Font): FontTrustReport {
   const google = getVerifiedGoogleFont(font);
   if (google) {
@@ -145,6 +183,23 @@ export function getFontTrustReport(font: Font): FontTrustReport {
       warnings: [],
       upstreamVerified: true,
       verificationSource: google.metadataPath,
+      provider: "Google Fonts",
+    };
+  }
+
+  const correction = getCatalogCorrectionRelation(font);
+  if (correction) {
+    return {
+      confidence: "curated",
+      identityVerified: true,
+      licenseVerified: true,
+      weightsVerified: true,
+      variableVerified: true,
+      scriptsVerified: true,
+      licenseLabel: correction.canonical.licenseId,
+      warnings: [`Recovered catalog spelling '${font.name}' is corrected to canonical family '${correction.canonical.family}' by reviewed primary-source evidence while preserving the stable catalog ID.`],
+      upstreamVerified: true,
+      verificationSource: correction.canonical.sourceUrl,
       provider: "Google Fonts",
     };
   }
@@ -279,6 +334,9 @@ export function getEffectiveWeights(font: Font) {
     return weights.length ? weights : ["400"];
   }
 
+  const correction = getCatalogCorrectionRelation(font);
+  if (correction) return correction.canonical.weights.map(String);
+
   const fontshare = getVerifiedFontshareFont(font);
   if (fontshare) {
     const weightAxis = fontshare.axes.wght;
@@ -305,6 +363,8 @@ export function getEffectiveWeights(font: Font) {
 export function isEffectivelyVariable(font: Font) {
   const google = getVerifiedGoogleFont(font);
   if (google) return Object.keys(google.axes).length > 0;
+  const correction = getCatalogCorrectionRelation(font);
+  if (correction) return correction.canonical.variable;
   const fontshare = getVerifiedFontshareFont(font);
   if (fontshare) return fontshare.variable || Object.keys(fontshare.axes).length > 0;
   const independent = getVerifiedIndependentFont(font);
@@ -332,6 +392,9 @@ export function getEffectiveLanguages(font: Font) {
     const scripts = new Set(google.subsets.map(subsetToScript).filter((value): value is string => Boolean(value)));
     if (scripts.size) return Array.from(scripts);
   }
+
+  const correction = getCatalogCorrectionRelation(font);
+  if (correction) return correction.canonical.scripts;
 
   const fontshare = getVerifiedFontshareFont(font);
   if (fontshare) {
@@ -361,6 +424,7 @@ export function getEffectiveLanguages(font: Font) {
 
 export function getEffectiveAuthor(font: Font) {
   return getVerifiedGoogleFont(font)?.designer
+    || getCatalogCorrectionRelation(font)?.canonical.designer
     || getVerifiedFontshareFont(font)?.designer
     || getVerifiedIndependentFont(font)?.identity.designer
     || getHistoricalSourceRelation(font)?.historical.designer
@@ -369,6 +433,7 @@ export function getEffectiveAuthor(font: Font) {
 
 export function getEffectiveSourceUrl(font: Font) {
   return getVerifiedGoogleFont(font)?.repositoryUrl
+    || getCatalogCorrectionRelation(font)?.canonical.sourceUrl
     || getVerifiedFontshareFont(font)?.sourceUrl
     || getVerifiedIndependentFont(font)?.identity.sourceUrl
     || getHistoricalSourceRelation(font)?.historical.sourceUrl
@@ -376,7 +441,7 @@ export function getEffectiveSourceUrl(font: Font) {
 }
 
 export function getEffectiveSourceLabel(font: Font) {
-  if (getVerifiedGoogleFont(font)) return "Google Fonts";
+  if (getVerifiedGoogleFont(font) || getCatalogCorrectionRelation(font)) return "Google Fonts";
   if (getVerifiedFontshareFont(font)) return "Fontshare";
   if (getVerifiedIndependentFont(font)) return "Independent";
   const historical = getHistoricalSourceRelation(font);

@@ -13,6 +13,8 @@ const allowedHosts = new Set([
   'displaay.net', 'www.displaay.net',
   'atipofoundry.com', 'www.atipofoundry.com',
   'filipposfragkogiannis.com', 'www.filipposfragkogiannis.com',
+  'newlyn.com', 'www.newlyn.com',
+  'brandingwithtype.com', 'www.brandingwithtype.com',
 ]);
 
 const parseUrl = value => {

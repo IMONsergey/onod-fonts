@@ -1,3 +1,5 @@
+import fontsharePoliciesJson from "../data/verified/fontshare-license-policies.json" with { type: "json" };
+
 export type CapabilityDecision = "allowed" | "permission-required" | "unknown";
 
 export interface FontLicenseCapabilities {
@@ -29,24 +31,7 @@ const UNKNOWN_CAPABILITIES: FontLicenseCapabilities = {
   binaryInspection: "unknown",
 };
 
-const FONTSHARE_POLICIES: Record<string, FontLicensePolicy> = {
-  itf_ffl: {
-    provider: "Fontshare",
-    providerLicenseType: "itf_ffl",
-    label: "ITF Free Font License (FFL)",
-    primaryLicenseUrl: "https://www.fontshare.com/licenses/itf-ffl",
-    capabilities: {
-      personalUse: "allowed",
-      commercialUse: "allowed",
-      modification: "permission-required",
-      redistribution: "permission-required",
-      selfHosting: "permission-required",
-      providerApiHosting: "allowed",
-      binaryInspection: "permission-required",
-    },
-    note: "Provider-hosted use is not equivalent to permission for ONOD to mirror, modify, redistribute, self-host, reverse-engineer, decompile, or disassemble the font software.",
-  },
-};
+const FONTSHARE_POLICIES = fontsharePoliciesJson as Record<string, FontLicensePolicy>;
 
 export function hasReviewedFontshareLicensePolicy(providerLicenseType: string) {
   return Object.prototype.hasOwnProperty.call(FONTSHARE_POLICIES, providerLicenseType);

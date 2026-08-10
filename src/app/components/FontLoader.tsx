@@ -1,24 +1,15 @@
 import React, { useEffect } from 'react';
 import { Font } from '../data/mockFonts';
 import { setFontRuntimeStatus } from '../lib/fontRuntime';
-import { getEffectiveFontshareSlug, getEffectiveLanguages, getEffectiveWeights, isEffectivelyVariable } from '../lib/fontTrust';
+import { getEffectiveFontshareSlug, getEffectiveLanguages, getEffectiveSourceLabel, getEffectiveWeights, isEffectivelyVariable } from '../lib/fontTrust';
+import { getVerifiedOpenFontArtifact, type VerifiedOpenFontArtifact } from '../lib/fontArtifactRuntime';
 
 interface FontLoaderProps {
   fonts: Font[];
 }
 
-const NON_GOOGLE_SOURCES = new Set([
-  'Fontshare', 'Velvetyne', 'Collletttivo', 'Font Library', 'iA', 'GNU', 'DejaVu', 'Liberation', 'GitHub', 'GitHub Next',
-]);
-
-const LEGACY_FONTSHARE_SLUGS: Record<string, string> = {
-  'H.H. Samuel': 'hh-samuel',
-  'Wotfard FS': 'wotfard',
-  'Polaris FS': 'polaris',
-  'Bw Seido': 'bw-seido-raw',
-};
-
 const globalReadyIds = new Set<string>();
+const globalLoadPromises = new Map<string, Promise<void>>();
 const stylesheetId = (prefix: string, font: Font) => `${prefix}-${font.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 
 const primaryFamily = (font: Font) => {
@@ -52,6 +43,13 @@ const googleFontUrl = (font: Font) => {
   if (isEffectivelyVariable(font) && weights.length > 1) family += `:wght@${weights[0]}..${weights.at(-1)}`;
   else family += `:wght@${weights.join(';')}`;
   return `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, '+')}&display=swap`;
+};
+
+const artifactWeightDescriptor = (font: Font, artifact: VerifiedOpenFontArtifact) => {
+  const axis = artifact.axes.wght;
+  if (axis) return `${axis.min} ${axis.max}`;
+  const weights = getEffectiveWeights(font).map(Number).filter(Number.isFinite);
+  return String(weights.includes(400) ? 400 : weights[0] || 400);
 };
 
 export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
@@ -100,21 +98,72 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
       document.head.appendChild(link);
     };
 
+    const addArtifactFace = (font: Font, artifact: VerifiedOpenFontArtifact) => {
+      const id = stylesheetId(`artifact-${artifact.sha256.slice(0, 12)}`, font);
+      if (globalReadyIds.has(id)) {
+        void verifyFontFace(font);
+        return;
+      }
+
+      const existingPromise = globalLoadPromises.get(id);
+      if (existingPromise) {
+        setFontRuntimeStatus(font.id, 'loading');
+        void existingPromise.then(() => verifyFontFace(font));
+        return;
+      }
+
+      if (typeof FontFace === 'undefined' || !document.fonts) {
+        setFontRuntimeStatus(font.id, 'error', 'Browser FontFace API is unavailable for verified artifact loading.');
+        return;
+      }
+
+      setFontRuntimeStatus(font.id, 'loading');
+      const promise = (async () => {
+        try {
+          const face = new FontFace(
+            primaryFamily(font),
+            `url("${artifact.sourceUrl}")`,
+            { weight: artifactWeightDescriptor(font, artifact), style: 'normal', display: 'swap' },
+          );
+          const loaded = await face.load();
+          document.fonts.add(loaded);
+          globalReadyIds.add(id);
+          await verifyFontFace(font);
+        } catch (error) {
+          globalReadyIds.delete(id);
+          setFontRuntimeStatus(font.id, 'error', error instanceof Error ? error.message : `Verified artifact failed to load: ${artifact.sourceUrl}`);
+        } finally {
+          globalLoadPromises.delete(id);
+        }
+      })();
+      globalLoadPromises.set(id, promise);
+    };
+
     for (const font of fonts) {
-      if (font.customCssUrl) {
-        addStylesheet(font, font.customCssUrl, stylesheetId('custom', font));
+      const sourceLabel = getEffectiveSourceLabel(font);
+      const fontshareSlug = getEffectiveFontshareSlug(font);
+      if (fontshareSlug) {
+        addStylesheet(font, `https://api.fontshare.com/v2/css?f[]=${encodeURIComponent(fontshareSlug)}@1&display=swap`, stylesheetId('fontshare', font));
         continue;
       }
-      if (font.source === 'Fontshare') {
-        const slug = getEffectiveFontshareSlug(font) || LEGACY_FONTSHARE_SLUGS[font.name] || font.name.toLowerCase().replace(/\s+/g, '-');
-        addStylesheet(font, `https://api.fontshare.com/v2/css?f[]=${encodeURIComponent(slug)}@1&display=swap`, stylesheetId('fontshare', font));
+
+      const artifact = getVerifiedOpenFontArtifact(font);
+      if (artifact) {
+        addArtifactFace(font, artifact);
         continue;
       }
-      if (!NON_GOOGLE_SOURCES.has(font.source)) {
+
+      if (sourceLabel === 'Google Fonts') {
         addStylesheet(font, googleFontUrl(font), stylesheetId('google', font));
         continue;
       }
-      setFontRuntimeStatus(font.id, 'error', `No font loading strategy for source: ${font.source}`);
+
+      if (font.customCssUrl && sourceLabel === font.source) {
+        addStylesheet(font, font.customCssUrl, stylesheetId('custom', font));
+        continue;
+      }
+
+      setFontRuntimeStatus(font.id, 'error', `No verified font loading strategy for canonical source: ${sourceLabel}`);
     }
   }, [fonts]);
 

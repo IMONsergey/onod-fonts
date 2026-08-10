@@ -1,4 +1,31 @@
 {
+  "Bromine": {
+    "family": "Bromine",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://www.indiantypefoundry.com/fonts/bromine",
+      "designer": "Indian Type Foundry",
+      "publisher": "Indian Type Foundry",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://www.indiantypefoundry.com/fonts/bromine",
+        "capturedAt": "2026-08-10T23:20:00+03:00",
+        "facts": [
+          "Official Indian Type Foundry product page identifies Bromine as a current ITF font family."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "The recovered Open Source label is not accepted. Exact ITF product/EULA capability mapping remains pending."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scriptsVerified": false
+    }
+  },
   "Bw Gradual": {
     "family": "Bw Gradual",
     "identity": {
@@ -25,7 +52,9 @@
     "technical": {
       "weightsVerified": false,
       "variableVerified": false,
-      "scripts": ["Latin"],
+      "scripts": [
+        "Latin"
+      ],
       "scriptsVerified": true
     }
   },
@@ -55,7 +84,11 @@
     "technical": {
       "weightsVerified": false,
       "variableVerified": false,
-      "scripts": ["Latin", "Greek", "Cyrillic"],
+      "scripts": [
+        "Latin",
+        "Greek",
+        "Cyrillic"
+      ],
       "scriptsVerified": true
     }
   },
@@ -85,7 +118,9 @@
     "technical": {
       "weightsVerified": false,
       "variableVerified": false,
-      "scripts": ["Latin"],
+      "scripts": [
+        "Latin"
+      ],
       "scriptsVerified": true
     }
   },
@@ -115,7 +150,9 @@
     "technical": {
       "weightsVerified": false,
       "variableVerified": false,
-      "scripts": ["Latin"],
+      "scripts": [
+        "Latin"
+      ],
       "scriptsVerified": true
     }
   },
@@ -145,7 +182,11 @@
     "technical": {
       "weightsVerified": false,
       "variableVerified": false,
-      "scripts": ["Latin", "Cyrillic", "Greek"],
+      "scripts": [
+        "Latin",
+        "Cyrillic",
+        "Greek"
+      ],
       "scriptsVerified": true
     }
   },
@@ -175,7 +216,11 @@
     "technical": {
       "weightsVerified": false,
       "variableVerified": false,
-      "scripts": ["Latin", "Cyrillic", "Greek"],
+      "scripts": [
+        "Latin",
+        "Cyrillic",
+        "Greek"
+      ],
       "scriptsVerified": true
     }
   },
@@ -269,7 +314,9 @@
     "technical": {
       "weightsVerified": false,
       "variableVerified": false,
-      "scripts": ["Latin"],
+      "scripts": [
+        "Latin"
+      ],
       "scriptsVerified": true
     }
   },
@@ -293,6 +340,33 @@
     "license": {
       "status": "pending",
       "note": "Identity is primary-source verified; exact redistribution/self-hosting/download license terms remain unresolved and must stay pending."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scriptsVerified": false
+    }
+  },
+  "Pramit": {
+    "family": "Pramit",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://www.indiantypefoundry.com/fonts/pramit",
+      "designer": "Indian Type Foundry",
+      "publisher": "Indian Type Foundry",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://www.indiantypefoundry.com/fonts/pramit",
+        "capturedAt": "2026-08-10T23:20:00+03:00",
+        "facts": [
+          "Official Indian Type Foundry product page identifies Pramit as a current ITF font family."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "The recovered Open Source label is not accepted. Exact ITF product/EULA capability mapping remains pending."
     },
     "technical": {
       "weightsVerified": false,
@@ -327,7 +401,9 @@
       "weightsVerified": false,
       "variable": true,
       "variableVerified": true,
-      "scripts": ["Latin"],
+      "scripts": [
+        "Latin"
+      ],
       "scriptsVerified": true
     }
   },
@@ -357,7 +433,9 @@
     "technical": {
       "weightsVerified": false,
       "variableVerified": false,
-      "scripts": ["Latin"],
+      "scripts": [
+        "Latin"
+      ],
       "scriptsVerified": true
     }
   }

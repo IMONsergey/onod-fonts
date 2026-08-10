@@ -5,7 +5,7 @@ import { mockFonts } from '../src/app/data/mockFonts.ts';
 const relations = JSON.parse(readFileSync(resolve(process.cwd(), 'src/app/data/verified/family-relations.json'), 'utf8'));
 const catalog = new Set(mockFonts.map(font => font.name));
 const errors = [];
-const allowedKinds = new Set(['historical-successor', 'provider-rename', 'collection-member', 'catalog-correction']);
+const allowedKinds = new Set(['historical-successor', 'historical-removed', 'provider-rename', 'collection-member', 'catalog-correction']);
 const sha1 = value => /^[0-9a-f]{40}$/i.test(value || '');
 const httpUrl = value => {
   try {
@@ -16,6 +16,8 @@ const httpUrl = value => {
   }
 };
 const reviewedFacts = proof => Array.isArray(proof?.facts) && proof.facts.length > 0 && proof.facts.every(fact => typeof fact === 'string' && fact.trim());
+const validWeights = weights => Array.isArray(weights) && weights.length > 0 && weights.every(weight => Number.isFinite(Number(weight)) && Number(weight) >= 1 && Number(weight) <= 1000);
+const validScripts = scripts => Array.isArray(scripts) && scripts.length > 0 && scripts.every(script => typeof script === 'string' && script.trim());
 
 for (const [name, record] of Object.entries(relations)) {
   if (!catalog.has(name)) errors.push(`${name}: catalog family does not exist.`);
@@ -37,9 +39,9 @@ for (const [name, record] of Object.entries(relations)) {
     if (!httpUrl(canonical.sourceUrl)) errors.push(`${name}: canonical sourceUrl must be HTTP(S).`);
     if (typeof canonical.designer !== 'string' || !canonical.designer.trim()) errors.push(`${name}: canonical designer is required.`);
     if (typeof canonical.licenseId !== 'string' || !canonical.licenseId.trim()) errors.push(`${name}: canonical exact license id is required.`);
-    if (!Array.isArray(canonical.weights) || canonical.weights.length === 0 || canonical.weights.some(weight => !Number.isFinite(Number(weight)) || Number(weight) < 1 || Number(weight) > 1000)) errors.push(`${name}: canonical numeric weights are required.`);
+    if (!validWeights(canonical.weights)) errors.push(`${name}: canonical numeric weights are required.`);
     if (typeof canonical.variable !== 'boolean') errors.push(`${name}: canonical variable capability must be explicit.`);
-    if (!Array.isArray(canonical.scripts) || canonical.scripts.length === 0 || canonical.scripts.some(script => typeof script !== 'string' || !script.trim())) errors.push(`${name}: canonical scripts are required.`);
+    if (!validScripts(canonical.scripts)) errors.push(`${name}: canonical scripts are required.`);
 
     const proof = canonical.evidence;
     if (!proof || typeof proof !== 'object') errors.push(`${name}: canonical correction evidence is required.`);
@@ -80,10 +82,21 @@ for (const [name, record] of Object.entries(relations)) {
     if (successorProof && (typeof successorProof.repository !== 'string' || !/^[^/]+\/[^/]+$/.test(successorProof.repository))) errors.push(`${name}: successor evidence repository is invalid.`);
     if (!reviewedFacts(successorProof)) errors.push(`${name}: successor relation requires reviewed facts.`);
   }
+
+  if (record.relation === 'historical-removed') {
+    if (record.successor) errors.push(`${name}: historical-removed relation must not invent a successor.`);
+    if (!historical?.licenseId) errors.push(`${name}: historical-removed relation requires an exact historical license id.`);
+    if (!validWeights(historical?.weights)) errors.push(`${name}: historical-removed relation requires exact metadata-backed weights.`);
+    if (typeof historical?.variable !== 'boolean') errors.push(`${name}: historical-removed relation requires explicit variable capability.`);
+    if (!validScripts(historical?.scripts)) errors.push(`${name}: historical-removed relation requires metadata-backed scripts.`);
+    if (typeof proof?.metadataPath !== 'string' || !/^(ofl|apache|ufl)\/.+\/METADATA\.pb$/.test(proof.metadataPath)) errors.push(`${name}: historical-removed relation requires a valid metadataPath.`);
+    if (!sha1(proof?.metadataBlobSha)) errors.push(`${name}: historical-removed relation requires metadataBlobSha.`);
+  }
 }
 
 const corrections = Object.values(relations).filter(record => record.relation === 'catalog-correction').length;
-console.log(`Family relation evidence validation: ${Object.keys(relations).length} verified relations (${corrections} canonical corrections).`);
+const removed = Object.values(relations).filter(record => record.relation === 'historical-removed').length;
+console.log(`Family relation evidence validation: ${Object.keys(relations).length} verified relations (${corrections} canonical corrections, ${removed} historical removals).`);
 if (errors.length) {
   console.error(`Errors: ${errors.length}`);
   errors.forEach(error => console.error(`  ERROR ${error}`));

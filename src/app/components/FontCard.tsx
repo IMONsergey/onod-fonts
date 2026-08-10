@@ -44,10 +44,12 @@ export const FontCard: React.FC<FontCardProps> = memo(({
   const defaultWeight = effectiveWeights.includes("400") ? 400 : Number(effectiveWeights[0] || 400);
   const [localWeight, setLocalWeight] = useState(defaultWeight);
   const [cssCopied, setCssCopied] = useState(false);
+  const sourceAndLicenseVerified = trust.identityVerified && trust.licenseVerified;
+  const hasWeightControls = trust.weightsVerified && effectiveVariable && effectiveWeights.length > 1;
 
   const style = {
     fontFamily: font.cssStack,
-    fontWeight: effectiveVariable ? localWeight : defaultWeight,
+    fontWeight: hasWeightControls ? localWeight : defaultWeight,
     fontSize: `${fontSize}px`,
     letterSpacing: `${letterSpacing}em`,
   };
@@ -77,10 +79,11 @@ export const FontCard: React.FC<FontCardProps> = memo(({
   const MetadataBadges = ({ compact = false }: { compact?: boolean }) => (
     <div className="flex gap-1 items-center">
       {runtimeBadge && <span title={runtime.message} className={cn("font-mono uppercase border px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]", runtimeBadge.className)}>{runtimeBadge.label}</span>}
-      {trust.upstreamVerified && <span title={trust.verificationSource} className={cn("font-mono uppercase border border-emerald-300 text-emerald-700 bg-emerald-50 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>VERIFIED</span>}
-      {trust.confidence === "derived" && <span title={language === 'ru' ? 'Метаданные ещё не подтверждены по первичному источнику' : 'Metadata has not yet been verified against the upstream source'} className={cn("font-mono uppercase border border-amber-300 text-amber-700 bg-amber-50 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>META?</span>}
-      {effectiveLanguages.includes("Cyrillic") && <span className={cn("font-mono uppercase border border-neutral-300 px-1 pt-0.5", compact ? "text-[8px]" : "text-[9px]")}>{trust.confidence === "derived" ? "CYR?" : "CYR"}</span>}
-      {effectiveVariable && <span className={cn("font-mono uppercase bg-neutral-800 text-white px-1 pt-0.5", compact ? "text-[8px]" : "text-[9px]")}>VAR</span>}
+      {sourceAndLicenseVerified && <span title={trust.verificationSource} className={cn("font-mono uppercase border border-emerald-300 text-emerald-700 bg-emerald-50 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>VERIFIED</span>}
+      {!sourceAndLicenseVerified && <span title={language === 'ru' ? 'Источник или точная лицензия ещё не подтверждены первичным источником' : 'Source identity or exact license is not yet verified by primary evidence'} className={cn("font-mono uppercase border border-amber-300 text-amber-700 bg-amber-50 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>META?</span>}
+      {sourceAndLicenseVerified && !trust.weightsVerified && <span title={language === 'ru' ? 'Источник подтверждён, точные веса ещё проверяются' : 'Source is verified; exact weights are still pending'} className={cn("font-mono uppercase border border-amber-200 text-amber-700 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>WEIGHTS?</span>}
+      {effectiveLanguages.includes("Cyrillic") && <span className={cn("font-mono uppercase border border-neutral-300 px-1 pt-0.5", compact ? "text-[8px]" : "text-[9px]")}>{trust.scriptsVerified ? "CYR" : "CYR?"}</span>}
+      {effectiveVariable && <span title={trust.variableVerified ? undefined : 'Variable capability not verified'} className={cn("font-mono uppercase bg-neutral-800 text-white px-1 pt-0.5", compact ? "text-[8px]" : "text-[9px]")}>{trust.variableVerified ? "VAR" : "VAR?"}</span>}
     </div>
   );
 
@@ -99,13 +102,13 @@ export const FontCard: React.FC<FontCardProps> = memo(({
             <p className="font-mono text-[9px] text-neutral-400 uppercase tracking-wide mb-6">{font.source}</p>
 
             <div className={cn("space-y-6 transition-opacity duration-300", runtime.status === "error" ? "opacity-30" : "opacity-20 group-hover:opacity-100")}>
-              {effectiveVariable && (
+              {hasWeightControls && (
                 <div className="space-y-2">
                   <div className="flex justify-between font-mono text-[9px] uppercase"><span>Wt</span><span>{localWeight}</span></div>
                   <input type="range" min={Number(effectiveWeights[0] || 100)} max={Number(effectiveWeights[effectiveWeights.length - 1] || 900)} step="100" value={localWeight} disabled={runtime.status === "error"} onChange={(e) => setLocalWeight(Number(e.target.value))} aria-label={`${font.name} weight`} className="w-full h-px bg-black appearance-none cursor-pointer accent-black disabled:cursor-not-allowed" />
                 </div>
               )}
-              <div className="font-mono text-[9px] uppercase text-neutral-400">{trust.confidence === "derived" ? (language === 'ru' ? 'Метрики проверяются' : 'Metrics pending') : `${effectiveWeights.length} ${t('styles.available')}`}</div>
+              <div className="font-mono text-[9px] uppercase text-neutral-400">{trust.weightsVerified ? `${effectiveWeights.length} ${t('styles.available')}` : (language === 'ru' ? 'Точные веса проверяются' : 'Exact weights pending')}</div>
             </div>
           </div>
 
@@ -138,7 +141,7 @@ export const FontCard: React.FC<FontCardProps> = memo(({
 
       <div className="h-10 px-4 border-t border-neutral-100 flex justify-between items-center">
         <button type="button" onClick={(e) => { e.stopPropagation(); onToggleCompare(font.id); }} className="font-mono text-[10px] uppercase tracking-widest text-neutral-400 hover:text-black transition-colors flex items-center gap-2" aria-label={isCompared ? t('card.removeFromCompare') : t('card.addToCompare')}>{isCompared ? <Check className="w-3 h-3" /> : <Plus className="w-3 h-3" />}<span>{isCompared ? t('card.stacked') : t('card.stack')}</span></button>
-        <div className="flex items-center gap-2">{trust.confidence === "derived" ? <span className="font-mono text-[8px] text-amber-700 uppercase">META?</span> : <span className="font-mono text-[9px] text-neutral-400">{effectiveWeights.length}w</span>}</div>
+        <div className="flex items-center gap-2">{trust.weightsVerified ? <span className="font-mono text-[9px] text-neutral-400">{effectiveWeights.length}w</span> : <span className="font-mono text-[8px] text-amber-700 uppercase">WEIGHTS?</span>}</div>
       </div>
     </article>
   );

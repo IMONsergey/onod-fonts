@@ -1,6 +1,7 @@
 import type { Font } from "../data/mockFonts";
 import verifiedGoogleFontsJson from "../data/verified/.generated/google-fonts-runtime.json" with { type: "json" };
 import verifiedFontshareJson from "../data/verified/.generated/fontshare-runtime.json" with { type: "json" };
+import verifiedIndependentJson from "../data/verified/.generated/independent-runtime.json" with { type: "json" };
 import fontsharePoliciesJson from "../data/verified/fontshare-license-policies.json" with { type: "json" };
 import type { FontLicenseCapabilities } from "./fontSourcePolicy";
 
@@ -32,6 +33,24 @@ export interface VerifiedFontshareFont {
   sourceUrl: string;
 }
 
+export interface VerifiedIndependentFont {
+  family: string;
+  sourceType: "official-github";
+  repository: string;
+  sourceUrl: string;
+  designer: string;
+  licenseId: string;
+  technical: {
+    variable?: boolean;
+    weights?: number[];
+    axes?: Record<string, { min: number; max: number }>;
+    scripts?: string[];
+    weightsVerified: boolean;
+    variableVerified: boolean;
+    scriptsVerified: boolean;
+  };
+}
+
 interface RuntimeFontsharePolicy {
   label: string;
   capabilities: FontLicenseCapabilities;
@@ -39,16 +58,22 @@ interface RuntimeFontsharePolicy {
 
 export interface FontTrustReport {
   confidence: FontDataConfidence;
+  identityVerified: boolean;
+  licenseVerified: boolean;
+  weightsVerified: boolean;
+  variableVerified: boolean;
+  scriptsVerified: boolean;
   licenseLabel: string;
   warnings: string[];
   upstreamVerified: boolean;
   verificationSource?: string;
-  provider?: "Google Fonts" | "Fontshare";
+  provider?: "Google Fonts" | "Fontshare" | "Independent";
   licenseCapabilities?: FontLicenseCapabilities;
 }
 
 const verifiedGoogleFonts = verifiedGoogleFontsJson as Record<string, VerifiedGoogleFont>;
 const verifiedFontshare = verifiedFontshareJson as Record<string, VerifiedFontshareFont>;
+const verifiedIndependent = verifiedIndependentJson as Record<string, VerifiedIndependentFont>;
 const fontsharePolicies = fontsharePoliciesJson as Record<string, RuntimeFontsharePolicy>;
 
 const isGeneratedDescription = (font: Font) => {
@@ -68,11 +93,22 @@ export function getVerifiedFontshareFont(font: Font): VerifiedFontshareFont | un
   return candidate;
 }
 
+export function getVerifiedIndependentFont(font: Font): VerifiedIndependentFont | undefined {
+  const candidate = verifiedIndependent[font.name];
+  if (!candidate || candidate.family !== font.name) return undefined;
+  return candidate;
+}
+
 export function getFontTrustReport(font: Font): FontTrustReport {
   const google = getVerifiedGoogleFont(font);
   if (google) {
     return {
       confidence: "curated",
+      identityVerified: true,
+      licenseVerified: true,
+      weightsVerified: true,
+      variableVerified: true,
+      scriptsVerified: true,
       licenseLabel: google.license,
       warnings: [],
       upstreamVerified: true,
@@ -87,6 +123,11 @@ export function getFontTrustReport(font: Font): FontTrustReport {
     if (!policy) {
       return {
         confidence: "derived",
+        identityVerified: true,
+        licenseVerified: false,
+        weightsVerified: true,
+        variableVerified: true,
+        scriptsVerified: Boolean(fontshare.script),
         licenseLabel: "Verify at source",
         warnings: [`Fontshare provider license type '${fontshare.licenseType}' has no reviewed ONOD capability policy.`],
         upstreamVerified: false,
@@ -99,6 +140,11 @@ export function getFontTrustReport(font: Font): FontTrustReport {
     }
     return {
       confidence: "curated",
+      identityVerified: true,
+      licenseVerified: true,
+      weightsVerified: true,
+      variableVerified: true,
+      scriptsVerified: Boolean(fontshare.script),
       licenseLabel: policy.label,
       warnings,
       upstreamVerified: true,
@@ -108,25 +154,55 @@ export function getFontTrustReport(font: Font): FontTrustReport {
     };
   }
 
+  const independent = getVerifiedIndependentFont(font);
+  if (independent) {
+    const warnings: string[] = [];
+    if (!independent.technical.weightsVerified) warnings.push("Source identity and license are verified, but exact weight metadata is still pending technical evidence; ONOD keeps preview weights conservative.");
+    if (!independent.technical.variableVerified) warnings.push("Variable-font capability has not yet been independently verified for this family.");
+    if (!independent.technical.scriptsVerified) warnings.push("Script/language coverage is not yet independently verified for this family.");
+    return {
+      confidence: "curated",
+      identityVerified: true,
+      licenseVerified: true,
+      weightsVerified: independent.technical.weightsVerified,
+      variableVerified: independent.technical.variableVerified,
+      scriptsVerified: independent.technical.scriptsVerified,
+      licenseLabel: independent.licenseId,
+      warnings,
+      upstreamVerified: true,
+      verificationSource: independent.sourceUrl,
+      provider: "Independent",
+    };
+  }
+
   const confidence: FontDataConfidence = isGeneratedDescription(font) ? "derived" : "curated";
+  const identityVerified = confidence === "curated";
+  const licenseVerified = font.license !== "Open Source";
   const warnings: string[] = [];
-  if (confidence === "derived") warnings.push("Catalog metadata for this family was generated from a source manifest and has not yet been fully verified against the upstream font files.");
-  if (font.license === "Open Source") warnings.push("The exact upstream license identifier is not recorded yet. Verify the license at the source before redistribution or commercial delivery.");
+  if (!identityVerified) warnings.push("Catalog identity/source metadata was generated from a recovered source manifest and has not yet been verified against a primary source.");
+  if (!licenseVerified) warnings.push("The exact upstream license identifier is not recorded yet. Verify the license at the source before redistribution or commercial delivery.");
 
   return {
     confidence,
-    licenseLabel: font.license === "Open Source" ? "Verify at source" : font.license,
+    identityVerified,
+    licenseVerified,
+    weightsVerified: identityVerified,
+    variableVerified: identityVerified,
+    scriptsVerified: identityVerified,
+    licenseLabel: licenseVerified ? font.license : "Verify at source",
     warnings,
     upstreamVerified: false,
   };
 }
 
 export function isCatalogMetadataDerived(font: Font) {
-  return getFontTrustReport(font).confidence === "derived";
+  const trust = getFontTrustReport(font);
+  return !trust.identityVerified || !trust.licenseVerified;
 }
 
 export function hasTrustedMetricMetadata(font: Font) {
-  return Boolean(getVerifiedGoogleFont(font) || getVerifiedFontshareFont(font)) || !isCatalogMetadataDerived(font);
+  const trust = getFontTrustReport(font);
+  return trust.weightsVerified || trust.variableVerified;
 }
 
 const variableWeightSteps = (min: number, max: number) => {
@@ -153,7 +229,17 @@ export function getEffectiveWeights(font: Font) {
     return weights.length ? weights : ["400"];
   }
 
-  if (!hasTrustedMetricMetadata(font)) return ["400"];
+  const independent = getVerifiedIndependentFont(font);
+  if (independent) {
+    if (!independent.technical.weightsVerified) return ["400"];
+    const weightAxis = independent.technical.axes?.wght;
+    if (weightAxis) return variableWeightSteps(weightAxis.min, weightAxis.max);
+    const weights = Array.from(new Set(independent.technical.weights || [])).sort((a, b) => a - b).map(String);
+    return weights.length ? weights : ["400"];
+  }
+
+  const trust = getFontTrustReport(font);
+  if (!trust.weightsVerified) return ["400"];
   const weights = font.weights.filter(weight => /^\d+$/.test(weight));
   return weights.length ? weights : ["400"];
 }
@@ -163,7 +249,10 @@ export function isEffectivelyVariable(font: Font) {
   if (google) return Object.keys(google.axes).length > 0;
   const fontshare = getVerifiedFontshareFont(font);
   if (fontshare) return fontshare.variable || Object.keys(fontshare.axes).length > 0;
-  return hasTrustedMetricMetadata(font) && font.variable;
+  const independent = getVerifiedIndependentFont(font);
+  if (independent) return independent.technical.variableVerified ? Boolean(independent.technical.variable) : false;
+  const trust = getFontTrustReport(font);
+  return trust.variableVerified && font.variable;
 }
 
 const subsetToScript = (subset: string) => {
@@ -192,6 +281,9 @@ export function getEffectiveLanguages(font: Font) {
     return [script];
   }
 
+  const independent = getVerifiedIndependentFont(font);
+  if (independent?.technical.scriptsVerified && independent.technical.scripts?.length) return independent.technical.scripts;
+
   const languages = new Set(font.languages);
   const name = font.name.toLowerCase();
   if (name.startsWith("noto sans jp") || name.startsWith("noto serif jp")) languages.add("Japanese");
@@ -201,11 +293,11 @@ export function getEffectiveLanguages(font: Font) {
 }
 
 export function getEffectiveAuthor(font: Font) {
-  return getVerifiedGoogleFont(font)?.designer || getVerifiedFontshareFont(font)?.designer || font.author;
+  return getVerifiedGoogleFont(font)?.designer || getVerifiedFontshareFont(font)?.designer || getVerifiedIndependentFont(font)?.designer || font.author;
 }
 
 export function getEffectiveSourceUrl(font: Font) {
-  return getVerifiedGoogleFont(font)?.repositoryUrl || getVerifiedFontshareFont(font)?.sourceUrl || font.sourceUrl;
+  return getVerifiedGoogleFont(font)?.repositoryUrl || getVerifiedFontshareFont(font)?.sourceUrl || getVerifiedIndependentFont(font)?.sourceUrl || font.sourceUrl;
 }
 
 export function getEffectiveFontshareSlug(font: Font) {

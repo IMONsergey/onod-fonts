@@ -6,6 +6,7 @@ on:
       - feat/trust-engine
     paths:
       - scripts/sync-google-fonts.mjs
+      - .github/workflows/sync-google-fonts.yml
   workflow_dispatch:
 
 permissions:

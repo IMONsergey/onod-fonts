@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Font } from '../data/mockFonts';
 import { setFontRuntimeStatus } from '../lib/fontRuntime';
-import { getEffectiveFontshareSlug, getEffectiveLanguages, getEffectiveSourceLabel, getEffectiveWeights, isEffectivelyVariable } from '../lib/fontTrust';
+import { getEffectiveFamilyName, getEffectiveFontshareSlug, getEffectiveLanguages, getEffectiveSourceLabel, getEffectiveWeights, isEffectivelyVariable } from '../lib/fontTrust';
 import { getVerifiedOpenFontArtifact, type VerifiedOpenFontArtifact } from '../lib/fontArtifactRuntime';
 
 interface FontLoaderProps {
@@ -11,11 +11,7 @@ interface FontLoaderProps {
 const globalReadyIds = new Set<string>();
 const globalLoadPromises = new Map<string, Promise<void>>();
 const stylesheetId = (prefix: string, font: Font) => `${prefix}-${font.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
-
-const primaryFamily = (font: Font) => {
-  const first = font.cssStack.split(',')[0]?.trim();
-  return (first || font.name).replace(/^['"]|['"]$/g, '');
-};
+const primaryFamily = (font: Font) => getEffectiveFamilyName(font);
 
 const fontDescriptor = (font: Font) => {
   const weights = getEffectiveWeights(font).map(Number).filter(Number.isFinite);
@@ -39,7 +35,7 @@ const verifyFontFace = async (font: Font) => {
 
 const googleFontUrl = (font: Font) => {
   const weights = getEffectiveWeights(font).sort((a, b) => Number(a) - Number(b));
-  let family = font.name;
+  let family = getEffectiveFamilyName(font);
   if (isEffectivelyVariable(font) && weights.length > 1) family += `:wght@${weights[0]}..${weights.at(-1)}`;
   else family += `:wght@${weights.join(';')}`;
   return `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, '+')}&display=swap`;

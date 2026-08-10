@@ -15,11 +15,12 @@
     "fontshare:evidence:validate": "node --experimental-strip-types scripts/validate-fontshare-evidence.mjs --require-coverage",
     "independent:evidence:validate": "node --experimental-strip-types scripts/validate-independent-sources.mjs",
     "independent:web:evidence:validate": "node --experimental-strip-types scripts/validate-independent-web-sources.mjs",
+    "relations:evidence:validate": "node --experimental-strip-types scripts/validate-family-relations.mjs",
     "artifact:evidence:validate": "node --experimental-strip-types scripts/font-data/validate-open-artifacts.mjs && node --experimental-strip-types scripts/font-data/validate-open-artifacts-strict.mjs",
     "catalog:validate": "npm run metadata:runtime && node --experimental-strip-types scripts/validate-catalog.mjs",
     "build:validate": "node scripts/validate-build.mjs",
     "smoke:preview": "node scripts/smoke-preview.mjs",
-    "check": "npm run metadata:runtime && node --experimental-strip-types scripts/validate-fontshare-evidence.mjs --require-coverage && node --experimental-strip-types scripts/validate-independent-sources.mjs && node --experimental-strip-types scripts/validate-independent-web-sources.mjs && node --experimental-strip-types scripts/font-data/validate-open-artifacts.mjs && node --experimental-strip-types scripts/font-data/validate-open-artifacts-strict.mjs && node --experimental-strip-types scripts/validate-catalog.mjs && tsc --noEmit && vite build && node scripts/validate-build.mjs && node scripts/smoke-preview.mjs"
+    "check": "npm run metadata:runtime && node --experimental-strip-types scripts/validate-fontshare-evidence.mjs --require-coverage && node --experimental-strip-types scripts/validate-independent-sources.mjs && node --experimental-strip-types scripts/validate-independent-web-sources.mjs && node --experimental-strip-types scripts/validate-family-relations.mjs && node --experimental-strip-types scripts/font-data/validate-open-artifacts.mjs && node --experimental-strip-types scripts/font-data/validate-open-artifacts-strict.mjs && node --experimental-strip-types scripts/validate-catalog.mjs && tsc --noEmit && vite build && node scripts/validate-build.mjs && node scripts/smoke-preview.mjs"
   },
   "dependencies": {
     "clsx": "2.1.1",

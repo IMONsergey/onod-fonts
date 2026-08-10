@@ -1,4 +1,64 @@
 {
+  "Duplet": {
+    "family": "Duplet",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://www.indiantypefoundry.com/fonts/duplet/glyphs",
+      "designer": "Diana Ovezea, Rafał Buchner",
+      "publisher": "Indian Type Foundry",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://www.indiantypefoundry.com/fonts/duplet/glyphs",
+        "capturedAt": "2026-08-10T22:55:00+03:00",
+        "facts": [
+          "Official Indian Type Foundry page identifies Duplet as an Indian Type Foundry family designed by Diana Ovezea and Rafał Buchner.",
+          "Official page lists 14 styles across seven named weights with companion italics.",
+          "Official page describes the family as covering European languages written with the Latin script and exposes retail buying options."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "The official foundry sells Duplet under retail licensing. The recovered generic Open Source label is invalid; an exact ONOD capability policy remains pending until ITF license terms are normalized."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scripts": ["Latin"],
+      "scriptsVerified": true
+    }
+  },
+  "Gilam": {
+    "family": "Gilam",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://www.fontfabric.com/fonts/gilam/",
+      "designer": "Plamen Motev, Ivan Petrov",
+      "publisher": "Fontfabric",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://www.fontfabric.com/fonts/gilam/",
+        "capturedAt": "2026-08-10T22:55:00+03:00",
+        "facts": [
+          "Official Fontfabric page identifies Gilam as a Fontfabric family designed by Plamen Motev and Ivan Petrov.",
+          "Official page lists 18 font styles and paid Desktop/Web/App/Epub/Digital Ads licensing options.",
+          "Official page explicitly states support for Extended Latin, Cyrillic and Greek alphabets."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "Fontfabric exposes multiple paid license classes rather than a single open-source license id. Exact capability mapping stays pending until the applicable Fontfabric EULA is normalized."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scripts": ["Latin", "Cyrillic", "Greek"],
+      "scriptsVerified": true
+    }
+  },
   "Lausanne": {
     "family": "Lausanne",
     "identity": {

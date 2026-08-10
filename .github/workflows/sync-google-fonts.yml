@@ -37,16 +37,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node --experimental-strip-types scripts/sync-google-fonts.mjs
 
-      - name: Commit verified metadata overlays
+      - name: Commit verified metadata evidence
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if git diff --quiet -- src/app/data/verified/google-fonts.json src/app/data/verified/google-fonts-runtime.json; then
+          if git diff --quiet -- src/app/data/verified/google-fonts.json; then
             echo "Verified Google Fonts metadata is already current."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/app/data/verified/google-fonts.json src/app/data/verified/google-fonts-runtime.json
+          git add src/app/data/verified/google-fonts.json
           git commit -m "data: sync verified Google Fonts metadata"
           git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:${GITHUB_REF_NAME}

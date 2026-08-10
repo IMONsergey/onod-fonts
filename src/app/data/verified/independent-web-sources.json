@@ -149,6 +149,36 @@
       "scriptsVerified": true
     }
   },
+  "Gratimo Grotesk": {
+    "family": "Gratimo Grotesk",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://www.typemates.com/fonts/gratimo-grotesk",
+      "designer": "Jakob Runge, Mona Franz",
+      "publisher": "TypeMates",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://www.typemates.com/fonts/gratimo-grotesk",
+        "capturedAt": "2026-08-10T23:10:00+03:00",
+        "facts": [
+          "Official TypeMates page identifies Gratimo Grotesk and Jakob Runge / Mona Franz as designers.",
+          "Official page specifies 12 styles and six weights.",
+          "Official page states support for 270+ languages across Latin, Cyrillic and Greek."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "TypeMates commercial license/EULA capability policy is not yet normalized in ONOD."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scripts": ["Latin", "Cyrillic", "Greek"],
+      "scriptsVerified": true
+    }
+  },
   "Lausanne": {
     "family": "Lausanne",
     "identity": {
@@ -170,6 +200,42 @@
     "license": {
       "status": "pending",
       "note": "WELTKERN exposes commercial licensing, but the recovered generic Open Source label must not be replaced by a definitive ONOD license id until the exact family/license terms are normalized into a reviewed policy."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scriptsVerified": false
+    }
+  },
+  "Nacelle": {
+    "family": "Nacelle",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://www.dotcolon.net/fonts/nacelle/",
+      "designer": "Sora Sagano",
+      "publisher": "DOT COLON",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://www.dotcolon.net/fonts/nacelle/",
+        "capturedAt": "2026-08-10T23:10:00+03:00",
+        "facts": [
+          "Official DOT COLON Nacelle page identifies Nacelle Version 1.00 and its named styles.",
+          "Official DOT COLON site identifies Sora Sagano as Type Designer."
+        ]
+      }
+    },
+    "license": {
+      "status": "verified",
+      "id": "OFL-1.1",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://www.dotcolon.net/fonts/nacelle/",
+        "capturedAt": "2026-08-10T23:10:00+03:00",
+        "facts": [
+          "Official Nacelle page explicitly states that Nacelle is licensed under the SIL Open Font License, Version 1.1."
+        ]
+      }
     },
     "technical": {
       "weightsVerified": false,

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Font } from '../data/mockFonts';
 import { setFontRuntimeStatus } from '../lib/fontRuntime';
-import { getEffectiveLanguages, getEffectiveWeights, isEffectivelyVariable } from '../lib/fontTrust';
+import { getEffectiveFontshareSlug, getEffectiveLanguages, getEffectiveWeights, isEffectivelyVariable } from '../lib/fontTrust';
 
 interface FontLoaderProps {
   fonts: Font[];
@@ -11,7 +11,7 @@ const NON_GOOGLE_SOURCES = new Set([
   'Fontshare', 'Velvetyne', 'Collletttivo', 'Font Library', 'iA', 'GNU', 'DejaVu', 'Liberation', 'GitHub', 'GitHub Next',
 ]);
 
-const FONTSHARE_SLUGS: Record<string, string> = {
+const LEGACY_FONTSHARE_SLUGS: Record<string, string> = {
   'H.H. Samuel': 'hh-samuel',
   'Wotfard FS': 'wotfard',
   'Polaris FS': 'polaris',
@@ -106,7 +106,7 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
         continue;
       }
       if (font.source === 'Fontshare') {
-        const slug = FONTSHARE_SLUGS[font.name] || font.name.toLowerCase().replace(/\s+/g, '-');
+        const slug = getEffectiveFontshareSlug(font) || LEGACY_FONTSHARE_SLUGS[font.name] || font.name.toLowerCase().replace(/\s+/g, '-');
         addStylesheet(font, `https://api.fontshare.com/v2/css?f[]=${encodeURIComponent(slug)}@1&display=swap`, stylesheetId('fontshare', font));
         continue;
       }

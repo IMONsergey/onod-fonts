@@ -43,12 +43,12 @@ A family can be source/license verified while some technical fields remain pendi
 | H.H. Samuel | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Helixa | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Ladi | Fontshare | pending | pending | pending | pending | pending | Verify at source |
-| Lausanne | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Lausanne | Fontshare | verified | pending | pending | pending | pending | Verify at source |
 | Magro | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Mrow | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Nacelle | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | New Spirit | Fontshare | pending | pending | pending | pending | pending | Verify at source |
-| Nohemi | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Nohemi | Fontshare | verified | pending | pending | pending | pending | Verify at source |
 | Ozone | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Polaris FS | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Pramit | Fontshare | pending | pending | pending | pending | pending | Verify at source |

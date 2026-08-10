@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 
 const sources = JSON.parse(readFileSync(resolve(process.cwd(), 'src/app/data/verified/independent-sources.json'), 'utf8'));
 const artifacts = JSON.parse(readFileSync(resolve(process.cwd(), 'src/app/data/verified/artifacts/open-fonts.json'), 'utf8'));
+const reviewedAliases = JSON.parse(readFileSync(resolve(process.cwd(), 'src/app/data/verified/artifacts/family-aliases.json'), 'utf8'));
 const errors = [];
 
 const canonical = value => String(value || '')
@@ -20,6 +21,23 @@ const eligible = new Set(Object.entries(sources)
   .filter(([, record]) => record?.license?.status === 'verified' && record?.license?.id === 'OFL-1.1')
   .map(([name]) => name));
 
+const aliasUsage = new Set();
+for (const [family, aliases] of Object.entries(reviewedAliases)) {
+  if (!eligible.has(family)) errors.push(`alias:${family}: reviewed artifact alias exists for a family that is not eligible for OFL artifact inspection.`);
+  if (!Array.isArray(aliases) || aliases.length === 0) {
+    errors.push(`alias:${family}: aliases must be a non-empty array.`);
+    continue;
+  }
+  const seen = new Set();
+  for (const alias of aliases) {
+    if (typeof alias !== 'string' || !alias.trim()) errors.push(`alias:${family}: alias must be a non-empty string.`);
+    if (canonical(alias) === canonical(family)) errors.push(`alias:${family}: '${alias}' is redundant with the catalog family.`);
+    const key = canonical(alias);
+    if (seen.has(key)) errors.push(`alias:${family}: duplicate alias '${alias}'.`);
+    seen.add(key);
+  }
+}
+
 for (const [family, record] of Object.entries(artifacts)) {
   const source = sources[family];
   if (!eligible.has(family)) errors.push(`${family}: artifact evidence exists without a verified OFL-1.1 official-GitHub source policy.`);
@@ -34,9 +52,16 @@ for (const [family, record] of Object.entries(artifacts)) {
   if (!record.capturedAt || Number.isNaN(Date.parse(record.capturedAt))) errors.push(`${family}: capturedAt is invalid.`);
 
   const internalNames = [record.name?.typographicFamily, record.name?.family].filter(Boolean);
+  const accepted = [family, ...(reviewedAliases[family] || [])];
+  const acceptedByCanonical = new Map(accepted.map(value => [canonical(value), value]));
   if (internalNames.length === 0) errors.push(`${family}: no family identity found in name table.`);
-  else if (!internalNames.some(name => canonical(name) === canonical(family))) {
-    errors.push(`${family}: selected binary identifies as [${internalNames.join(' / ')}], not the catalog family.`);
+  else {
+    const matchedName = internalNames.find(name => acceptedByCanonical.has(canonical(name)));
+    if (!matchedName) {
+      errors.push(`${family}: selected binary identifies as [${internalNames.join(' / ')}], not the catalog family or a reviewed artifact alias.`);
+    } else if (canonical(matchedName) !== canonical(family)) {
+      aliasUsage.add(`${family}:${canonical(matchedName)}`);
+    }
   }
 
   if (!Number.isFinite(Number(record.head?.unitsPerEm)) || Number(record.head.unitsPerEm) <= 0) errors.push(`${family}: invalid head.unitsPerEm.`);
@@ -55,7 +80,13 @@ for (const [family, record] of Object.entries(artifacts)) {
   }
 }
 
-console.log(`Strict artifact validation: eligible=${eligible.size}; inspected=${Object.keys(artifacts).length}.`);
+for (const [family, aliases] of Object.entries(reviewedAliases)) {
+  for (const alias of aliases) {
+    if (!aliasUsage.has(`${family}:${canonical(alias)}`)) errors.push(`alias:${family}: reviewed alias '${alias}' does not match the currently selected artifact identity.`);
+  }
+}
+
+console.log(`Strict artifact validation: eligible=${eligible.size}; inspected=${Object.keys(artifacts).length}; reviewed aliases=${Object.values(reviewedAliases).reduce((sum, values) => sum + values.length, 0)}.`);
 if (errors.length) {
   console.error(`Errors: ${errors.length}`);
   errors.forEach(error => console.error(`  ERROR ${error}`));

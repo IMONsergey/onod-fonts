@@ -1,0 +1,57 @@
+{
+  "Lausanne": {
+    "family": "Lausanne",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://weltkern.com/typefaces/lausanne/",
+      "designer": "Nizar Kazan",
+      "publisher": "WELTKERN",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://weltkern.com/typefaces/lausanne/",
+        "capturedAt": "2026-08-10T20:44:00+03:00",
+        "facts": [
+          "Official WELTKERN typeface page identifies Lausanne as a current WELTKERN family.",
+          "Official WELTKERN licensing/credit material identifies TWK Lausanne as designed by Nizar Kazan and published by WELTKERN."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "WELTKERN exposes commercial licensing, but the recovered generic Open Source label must not be replaced by a definitive ONOD license id until the exact family/license terms are normalized into a reviewed policy."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scriptsVerified": false
+    }
+  },
+  "Nohemi": {
+    "family": "Nohemi",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://rajputrajesh-4489b.web.app/products/nohemi",
+      "designer": "Rajesh Rajput",
+      "publisher": "Rajesh Rajput",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://rajputrajesh-4489b.web.app/products/nohemi",
+        "capturedAt": "2026-08-10T20:44:00+03:00",
+        "facts": [
+          "Official designer product page identifies Nohemi as a Rajesh Rajput typeface."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "Identity is primary-source verified; exact redistribution/self-hosting/download license terms remain unresolved and must stay pending."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scriptsVerified": false
+    }
+  }
+}

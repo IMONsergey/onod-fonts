@@ -13,6 +13,15 @@ interface HeaderProps {
   compareCount: number;
 }
 
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',');
+
 export const Header: React.FC<HeaderProps> = ({
   activePage,
   setActivePage,
@@ -23,6 +32,8 @@ export const Header: React.FC<HeaderProps> = ({
   const { t, language, setLanguage } = useLanguage();
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
+  const mobileMenuRef = React.useRef<HTMLDivElement>(null);
+  const menuTriggerRef = React.useRef<HTMLButtonElement>(null);
 
   React.useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -33,14 +44,44 @@ export const Header: React.FC<HeaderProps> = ({
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
+    const frame = window.requestAnimationFrame(() => {
+      mobileMenuRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)?.focus();
+    });
+
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setIsMobileMenuOpen(false);
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setIsMobileMenuOpen(false);
+        return;
+      }
+
+      if (event.key !== 'Tab' || !mobileMenuRef.current) return;
+      const focusable = Array.from(mobileMenuRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
+        .filter(element => element.offsetParent !== null);
+      if (focusable.length === 0) {
+        event.preventDefault();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
+
     document.addEventListener('keydown', onKeyDown);
 
     return () => {
+      window.cancelAnimationFrame(frame);
       document.body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', onKeyDown);
+      window.requestAnimationFrame(() => menuTriggerRef.current?.focus());
     };
   }, [isMobileMenuOpen]);
 
@@ -148,6 +189,7 @@ export const Header: React.FC<HeaderProps> = ({
             {favoritesCount > 0 && <span className="absolute top-3 right-2.5 min-w-[16px] h-[16px] flex items-center justify-center px-1 text-[9px] rounded-full bg-neutral-800 text-white">{favoritesCount}</span>}
           </button>
           <button
+            ref={menuTriggerRef}
             type="button"
             className="px-5 text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50 transition-all flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-neutral-800"
             onClick={() => setIsMobileMenuOpen(open => !open)}
@@ -164,6 +206,7 @@ export const Header: React.FC<HeaderProps> = ({
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
+              ref={mobileMenuRef}
               id="onod-mobile-navigation"
               key="mobile-menu"
               initial={prefersReducedMotion ? false : { opacity: 0 }}

@@ -1,7 +1,7 @@
 import type { Font } from "../data/mockFonts";
 import relationsJson from "../data/verified/family-relations.json" with { type: "json" };
 
-export type FamilyRelationKind = "historical-successor" | "provider-rename" | "collection-member" | "catalog-correction";
+export type FamilyRelationKind = "historical-successor" | "historical-removed" | "provider-rename" | "collection-member" | "catalog-correction";
 
 interface BaseRelation {
   catalogFamily: string;
@@ -13,12 +13,16 @@ interface BaseRelation {
 }
 
 export interface HistoricalFamilyRelation extends BaseRelation {
-  relation: "historical-successor" | "provider-rename" | "collection-member";
+  relation: "historical-successor" | "historical-removed" | "provider-rename" | "collection-member";
+  loadReplacementAllowed: false;
   historical: {
     family: string;
     sourceUrl: string;
     designer: string;
     licenseId?: string;
+    weights?: number[];
+    variable?: boolean;
+    scripts?: string[];
   };
   successor?: {
     family: string;
@@ -52,7 +56,7 @@ export function getVerifiedFamilyRelation(font: Font): VerifiedFamilyRelation | 
 
 export function getHistoricalSourceRelation(font: Font): HistoricalFamilyRelation | undefined {
   const relation = getVerifiedFamilyRelation(font);
-  if (!relation || relation.relation !== "historical-successor") return undefined;
+  if (!relation || relation.relation === "catalog-correction") return undefined;
   return relation;
 }
 

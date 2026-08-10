@@ -3,18 +3,18 @@
 > Generated from the canonical runtime trust layer. Do not edit counts manually.
 
 Catalog families: **1346**
-Identity trust debt: **25**
-License trust debt: **36**
-Source/license union debt: **36**
-Source + license clear: **1310**
+Identity trust debt: **24**
+License trust debt: **35**
+Source/license union debt: **35**
+Source + license clear: **1311**
 
 Identity and license are independent facts. A family can have a verified primary source while its exact license remains pending; this state must not be collapsed back into “unverified source”.
 
 ## Field-level technical debt
 
-- exact weights pending: **38** families
-- variable capability pending: **37** families
-- script coverage pending: **29** families
+- exact weights pending: **37** families
+- variable capability pending: **36** families
+- script coverage pending: **28** families
 
 Technical debt is also independent from source/license trust. Inspected font binaries may clear technical fields without changing provider/legal facts.
 
@@ -23,7 +23,7 @@ Technical debt is also independent from source/license trust. Inspected font bin
 | Recovered source | Families pending |
 |---|---:|
 | Fontshare | 31 |
-| Google Fonts | 4 |
+| Google Fonts | 3 |
 | Uncut / Indie | 1 |
 
 ## Source/license verification queue
@@ -61,7 +61,6 @@ Technical debt is also independent from source/license trust. Inspected font bin
 | Thica | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Vercetti | Fontshare | verified | pending | pending | pending | verified | Verify at source |
 | Wotfard FS | Fontshare | pending | pending | pending | pending | pending | Verify at source |
-| Cederville Cursive | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
 | Manual | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
 | Name Sans | Google Fonts | pending | pending | pending | pending | pending | Verify at source |
 | Open Sans Condensed | Google Fonts | pending | pending | pending | pending | pending | Verify at source |

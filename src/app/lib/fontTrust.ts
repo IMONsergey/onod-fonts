@@ -3,8 +3,8 @@ import verifiedGoogleFontsJson from "../data/verified/.generated/google-fonts-ru
 import verifiedFontshareJson from "../data/verified/.generated/fontshare-runtime.json" with { type: "json" };
 import verifiedIndependentJson from "../data/verified/.generated/independent-runtime.json" with { type: "json" };
 import fontsharePoliciesJson from "../data/verified/fontshare-license-policies.json" with { type: "json" };
+import familyRelationsJson from "../data/verified/family-relations.json" with { type: "json" };
 import type { FontLicenseCapabilities } from "./fontSourcePolicy";
-import { getHistoricalSourceRelation } from "./fontRelations";
 
 export type FontDataConfidence = "curated" | "derived";
 
@@ -57,6 +57,25 @@ export interface VerifiedIndependentFont {
   };
 }
 
+interface RuntimeHistoricalRelation {
+  catalogFamily: string;
+  status: "verified";
+  relation: "historical-successor" | "provider-rename" | "collection-member";
+  provider: string;
+  historical: {
+    family: string;
+    sourceUrl: string;
+    designer: string;
+    licenseId?: string;
+  };
+  successor?: {
+    family: string;
+    sourceUrl: string;
+  };
+  loadReplacementAllowed: boolean;
+  note: string;
+}
+
 interface RuntimeFontsharePolicy {
   label: string;
   capabilities: FontLicenseCapabilities;
@@ -81,10 +100,17 @@ const verifiedGoogleFonts = verifiedGoogleFontsJson as Record<string, VerifiedGo
 const verifiedFontshare = verifiedFontshareJson as Record<string, VerifiedFontshareFont>;
 const verifiedIndependent = verifiedIndependentJson as Record<string, VerifiedIndependentFont>;
 const fontsharePolicies = fontsharePoliciesJson as Record<string, RuntimeFontsharePolicy>;
+const familyRelations = familyRelationsJson as Record<string, RuntimeHistoricalRelation>;
 
 const isGeneratedDescription = (font: Font) => {
   const description = font.description || "";
   return description.includes(" typeface by ") && description.includes(", available on ");
+};
+
+const getHistoricalSourceRelation = (font: Font): RuntimeHistoricalRelation | undefined => {
+  const relation = familyRelations[font.name];
+  if (!relation || relation.status !== "verified" || relation.catalogFamily !== font.name || relation.relation !== "historical-successor") return undefined;
+  return relation;
 };
 
 export function getVerifiedGoogleFont(font: Font): VerifiedGoogleFont | undefined {

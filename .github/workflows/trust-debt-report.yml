@@ -1,0 +1,53 @@
+name: Build trust debt report
+
+on:
+  push:
+    branches:
+      - feat/trust-engine
+    paths:
+      - scripts/build-trust-report.mjs
+      - .github/workflows/trust-debt-report.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  report:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v6
+        with:
+          ref: feat/trust-engine
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate compact runtime metadata
+        run: node scripts/build-runtime-metadata.mjs
+
+      - name: Generate trust debt report
+        run: node --experimental-strip-types scripts/build-trust-report.mjs
+
+      - name: Commit report
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet -- docs/TRUST-DEBT.md; then
+            echo "Trust debt report is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/TRUST-DEBT.md
+          git commit -m "docs: refresh trust debt report"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:feat/trust-engine

@@ -1,7 +1,8 @@
 import type { Font } from "../data/mockFonts";
 import verifiedGoogleFontsJson from "../data/verified/.generated/google-fonts-runtime.json" with { type: "json" };
 import verifiedFontshareJson from "../data/verified/.generated/fontshare-runtime.json" with { type: "json" };
-import { getFontshareLicensePolicy, type FontLicenseCapabilities } from "./fontSourcePolicy.ts";
+import fontsharePoliciesJson from "../data/verified/fontshare-license-policies.json" with { type: "json" };
+import type { FontLicenseCapabilities } from "./fontSourcePolicy";
 
 export type FontDataConfidence = "curated" | "derived";
 
@@ -31,6 +32,11 @@ export interface VerifiedFontshareFont {
   sourceUrl: string;
 }
 
+interface RuntimeFontsharePolicy {
+  label: string;
+  capabilities: FontLicenseCapabilities;
+}
+
 export interface FontTrustReport {
   confidence: FontDataConfidence;
   licenseLabel: string;
@@ -43,6 +49,7 @@ export interface FontTrustReport {
 
 const verifiedGoogleFonts = verifiedGoogleFontsJson as Record<string, VerifiedGoogleFont>;
 const verifiedFontshare = verifiedFontshareJson as Record<string, VerifiedFontshareFont>;
+const fontsharePolicies = fontsharePoliciesJson as Record<string, RuntimeFontsharePolicy>;
 
 const isGeneratedDescription = (font: Font) => {
   const description = font.description || "";
@@ -76,7 +83,16 @@ export function getFontTrustReport(font: Font): FontTrustReport {
 
   const fontshare = getVerifiedFontshareFont(font);
   if (fontshare) {
-    const policy = getFontshareLicensePolicy(fontshare.licenseType);
+    const policy = fontsharePolicies[fontshare.licenseType];
+    if (!policy) {
+      return {
+        confidence: "derived",
+        licenseLabel: "Verify at source",
+        warnings: [`Fontshare provider license type '${fontshare.licenseType}' has no reviewed ONOD capability policy.`],
+        upstreamVerified: false,
+      };
+    }
+
     const warnings: string[] = [];
     if (policy.capabilities.redistribution !== "allowed" || policy.capabilities.binaryInspection !== "allowed") {
       warnings.push("This family is verified through Fontshare, but provider-hosted use does not imply permission for ONOD to mirror, redistribute, self-host, modify, or inspect the font binary. Use source-sensitive actions according to the provider license policy.");

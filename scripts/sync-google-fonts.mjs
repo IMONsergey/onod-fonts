@@ -6,7 +6,9 @@ const token = process.env.GITHUB_TOKEN;
 if (!token) throw new Error('GITHUB_TOKEN is required for Google Fonts metadata sync.');
 
 const target = resolve(process.cwd(), 'src/app/data/verified/google-fonts.json');
+const aliasesPath = resolve(process.cwd(), 'src/app/data/verified/google-fonts-aliases.json');
 const previous = JSON.parse(readFileSync(target, 'utf8'));
+const reviewedAliases = JSON.parse(readFileSync(aliasesPath, 'utf8'));
 
 const NON_GOOGLE_SOURCES = new Set([
   'Fontshare', 'Velvetyne', 'Collletttivo', 'Font Library', 'iA', 'GNU', 'DejaVu', 'Liberation', 'GitHub', 'GitHub Next',
@@ -23,6 +25,9 @@ const slugify = value => value
   .replace(/\p{Diacritic}/gu, '')
   .toLowerCase()
   .replace(/[^a-z0-9]/g, '');
+
+const isReviewedIdentity = (catalogName, upstreamName) =>
+  upstreamName === catalogName || reviewedAliases[catalogName] === upstreamName;
 
 const allQuoted = (text, key) => Array.from(text.matchAll(new RegExp(`^${key}:\\s*"([^"]*)"`, 'gm')), match => match[1]);
 const firstQuoted = (text, key) => allQuoted(text, key)[0] || '';
@@ -90,10 +95,9 @@ async function fetchFamily(font) {
     const parsed = parseMetadata(text, metadataPath, payload.sha);
     if (!parsed.family || !parsed.license) throw new Error(`${font.name}: incomplete METADATA.pb at ${metadataPath}`);
 
-    // Slug equality is only discovery. Verification requires exact family identity.
-    // If upstream uses a different family string, keep the catalog record unverified
-    // until an explicit alias map is reviewed and versioned.
-    if (parsed.family !== font.name) return { collision: parsed };
+    // Slug equality is discovery only. Promotion to verified requires either
+    // exact identity or a reviewed mapping stored in google-fonts-aliases.json.
+    if (!isReviewedIdentity(font.name, parsed.family)) return { collision: parsed };
     return { metadata: parsed };
   }
   return null;
@@ -146,16 +150,17 @@ if (success < minimumCoverage && Object.keys(previous).length === 0) {
 const candidateNames = new Set(candidates.map(font => font.name));
 const next = {};
 for (const [name, metadata] of Object.entries(previous)) {
-  if (candidateNames.has(name) && metadata.family === name) next[name] = metadata;
+  if (candidateNames.has(name) && isReviewedIdentity(name, metadata.family)) next[name] = metadata;
 }
 Object.assign(next, fetched);
 
 const ordered = Object.fromEntries(Object.entries(next).sort(([a], [b]) => a.localeCompare(b)));
 writeFileSync(target, `${JSON.stringify(ordered, null, 2)}\n`);
 
-console.log(`Google Fonts metadata sync complete: ${success}/${candidates.length} refreshed; ${Object.keys(ordered).length} versioned verified records total.`);
+const activeReviewedAliases = Object.entries(reviewedAliases).filter(([name, upstream]) => ordered[name]?.family === upstream).length;
+console.log(`Google Fonts metadata sync complete: ${success}/${candidates.length} refreshed; ${Object.keys(ordered).length} versioned evidence records total (${activeReviewedAliases} reviewed aliases).`);
 console.log(`Not found in google/fonts by normalized family slug: ${misses.length}.`);
-console.log(`Rejected exact-name collisions: ${collisions.length}.`);
+console.log(`Rejected unreviewed family collisions: ${collisions.length}.`);
 if (misses.length) console.log(`Sample misses: ${misses.slice(0, 40).join(', ')}`);
 if (collisions.length) collisions.slice(0, 20).forEach(item => console.warn(`  COLLISION ${item}`));
 if (failures.length) failures.slice(0, 10).forEach(item => console.warn(`  FAILURE ${item}`));

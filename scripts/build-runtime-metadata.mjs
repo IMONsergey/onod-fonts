@@ -77,15 +77,19 @@ const fontshareRuntime = Object.fromEntries(Object.entries(fontshareEvidence)
   }]));
 
 const independentRuntime = Object.fromEntries(Object.entries(independentEvidence)
-  .filter(([name, metadata]) => metadata?.family === name)
+  .filter(([name, metadata]) => metadata?.family === name && metadata?.identity?.status === 'verified')
   .sort(([a], [b]) => a.localeCompare(b))
   .map(([name, metadata]) => [name, {
     family: name,
-    sourceType: metadata.sourceType,
-    repository: metadata.repository,
-    sourceUrl: metadata.sourceUrl,
-    designer: metadata.designer,
-    licenseId: metadata.licenseId,
+    identity: {
+      sourceType: metadata.identity.sourceType,
+      ...(metadata.identity.repository ? { repository: metadata.identity.repository } : {}),
+      sourceUrl: metadata.identity.sourceUrl,
+      designer: metadata.identity.designer,
+    },
+    license: metadata.license?.status === 'verified'
+      ? { status: 'verified', id: metadata.license.id }
+      : { status: 'pending' },
     technical: {
       ...(metadata.technical?.variable !== undefined ? { variable: Boolean(metadata.technical.variable) } : {}),
       ...(Array.isArray(metadata.technical?.weights) ? { weights: metadata.technical.weights } : {}),
@@ -114,7 +118,8 @@ const fontshareStat = payloadStat(fontshareEvidence, fontshareRuntime);
 const independentStat = payloadStat(independentEvidence, independentRuntime);
 const googleAliasCount = Object.keys(googleAliases).filter(name => googleEvidence[name]?.family === googleAliases[name]).length;
 const fontshareAliasCount = Object.keys(fontshareAliases).filter(name => fontshareEvidence[name]?.family === fontshareAliases[name]).length;
+const independentLicenseVerified = Object.values(independentRuntime).filter(record => record.license?.status === 'verified').length;
 
 console.log(`Generated compact Google Fonts runtime metadata: ${Object.keys(googleRuntime).length} families (${googleAliasCount} reviewed aliases), ${googleStat.runtimeBytes} bytes (${googleStat.reduction}% smaller than evidence payload).`);
 console.log(`Generated compact Fontshare runtime metadata: ${Object.keys(fontshareRuntime).length} families (${fontshareAliasCount} reviewed aliases), ${fontshareStat.runtimeBytes} bytes (${fontshareStat.reduction}% smaller than evidence payload).`);
-console.log(`Generated compact independent-source runtime metadata: ${Object.keys(independentRuntime).length} families, ${independentStat.runtimeBytes} bytes (${independentStat.reduction}% smaller than evidence payload).`);
+console.log(`Generated compact independent-source runtime metadata: ${Object.keys(independentRuntime).length} identities / ${independentLicenseVerified} verified licenses, ${independentStat.runtimeBytes} bytes (${independentStat.reduction}% smaller than evidence payload).`);

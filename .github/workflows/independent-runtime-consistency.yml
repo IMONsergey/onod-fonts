@@ -1,0 +1,50 @@
+name: Independent runtime consistency
+
+on:
+  push:
+    branches:
+      - main
+      - feat/font-data-engine
+    paths:
+      - src/app/data/verified/independent-sources.json
+      - src/app/data/verified/independent-web-sources.json
+      - src/app/data/verified/independent-web-sources-*.json
+      - src/app/data/verified/artifacts/open-fonts.json
+      - scripts/build-runtime-metadata.mjs
+      - scripts/merge-independent-web-evidence.mjs
+      - scripts/validate-independent-runtime-consistency.mjs
+      - .github/workflows/independent-runtime-consistency.yml
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: onod-fonts-independent-runtime-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  consistency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate runtime metadata
+        run: npm run metadata:runtime
+
+      - name: Validate canonical independent projection
+        run: node --experimental-strip-types scripts/validate-independent-runtime-consistency.mjs

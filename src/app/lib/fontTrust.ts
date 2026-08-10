@@ -4,6 +4,7 @@ import verifiedFontshareJson from "../data/verified/.generated/fontshare-runtime
 import verifiedIndependentJson from "../data/verified/.generated/independent-runtime.json" with { type: "json" };
 import fontsharePoliciesJson from "../data/verified/fontshare-license-policies.json" with { type: "json" };
 import type { FontLicenseCapabilities } from "./fontSourcePolicy";
+import { getHistoricalSourceRelation } from "./fontRelations";
 
 export type FontDataConfidence = "curated" | "derived";
 
@@ -72,7 +73,7 @@ export interface FontTrustReport {
   warnings: string[];
   upstreamVerified: boolean;
   verificationSource?: string;
-  provider?: "Google Fonts" | "Fontshare" | "Independent";
+  provider?: "Google Fonts" | "Fontshare" | "Independent" | "Historical";
   licenseCapabilities?: FontLicenseCapabilities;
 }
 
@@ -184,6 +185,28 @@ export function getFontTrustReport(font: Font): FontTrustReport {
     };
   }
 
+  const historical = getHistoricalSourceRelation(font);
+  if (historical) {
+    const licenseVerified = Boolean(historical.historical.licenseId);
+    const successor = historical.successor?.family;
+    return {
+      confidence: licenseVerified ? "curated" : "derived",
+      identityVerified: true,
+      licenseVerified,
+      weightsVerified: false,
+      variableVerified: false,
+      scriptsVerified: false,
+      licenseLabel: historical.historical.licenseId || "Verify at source",
+      warnings: [
+        `This recovered family is verified as a historical ${historical.provider} identity. Technical metadata is intentionally conservative until a historical font artifact is inspected.`,
+        ...(successor ? [`The project later continues as ${successor}. ONOD does not silently substitute the successor when the catalog asks for ${font.name}.`] : []),
+      ],
+      upstreamVerified: licenseVerified,
+      verificationSource: historical.historical.sourceUrl,
+      provider: "Historical",
+    };
+  }
+
   const confidence: FontDataConfidence = isGeneratedDescription(font) ? "derived" : "curated";
   const identityVerified = confidence === "curated";
   const licenseVerified = font.license !== "Open Source";
@@ -285,13 +308,22 @@ export function getEffectiveLanguages(font: Font) {
   }
 
   const fontshare = getVerifiedFontshareFont(font);
-  if (fontshare?.script) {
+  if (fontshare) {
+    if (!fontshare.script) return [];
     const script = subsetToScript(fontshare.script) || fontshare.script;
     return [script];
   }
 
   const independent = getVerifiedIndependentFont(font);
-  if (independent?.technical.scriptsVerified && independent.technical.scripts?.length) return independent.technical.scripts;
+  if (independent) {
+    if (independent.technical.scriptsVerified && independent.technical.scripts?.length) return independent.technical.scripts;
+    return [];
+  }
+
+  if (getHistoricalSourceRelation(font)) return [];
+
+  const trust = getFontTrustReport(font);
+  if (!trust.scriptsVerified) return [];
 
   const languages = new Set(font.languages);
   const name = font.name.toLowerCase();
@@ -302,17 +334,27 @@ export function getEffectiveLanguages(font: Font) {
 }
 
 export function getEffectiveAuthor(font: Font) {
-  return getVerifiedGoogleFont(font)?.designer || getVerifiedFontshareFont(font)?.designer || getVerifiedIndependentFont(font)?.identity.designer || font.author;
+  return getVerifiedGoogleFont(font)?.designer
+    || getVerifiedFontshareFont(font)?.designer
+    || getVerifiedIndependentFont(font)?.identity.designer
+    || getHistoricalSourceRelation(font)?.historical.designer
+    || font.author;
 }
 
 export function getEffectiveSourceUrl(font: Font) {
-  return getVerifiedGoogleFont(font)?.repositoryUrl || getVerifiedFontshareFont(font)?.sourceUrl || getVerifiedIndependentFont(font)?.identity.sourceUrl || font.sourceUrl;
+  return getVerifiedGoogleFont(font)?.repositoryUrl
+    || getVerifiedFontshareFont(font)?.sourceUrl
+    || getVerifiedIndependentFont(font)?.identity.sourceUrl
+    || getHistoricalSourceRelation(font)?.historical.sourceUrl
+    || font.sourceUrl;
 }
 
 export function getEffectiveSourceLabel(font: Font) {
   if (getVerifiedGoogleFont(font)) return "Google Fonts";
   if (getVerifiedFontshareFont(font)) return "Fontshare";
   if (getVerifiedIndependentFont(font)) return "Independent";
+  const historical = getHistoricalSourceRelation(font);
+  if (historical) return `${historical.provider} (historical)`;
   return font.source;
 }
 

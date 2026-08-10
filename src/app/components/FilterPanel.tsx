@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { useLanguage } from "@/lib/i18n";
 import { mockFonts } from "@/data/mockFonts";
 import { cn } from "@/lib/utils";
+import { getEffectiveLanguages, getEffectiveWeights, isEffectivelyVariable } from "@/lib/fontTrust";
 
 export interface FilterState {
   search: string;
@@ -32,14 +33,17 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters })
     const categoryCounts: Record<string, number> = {};
     const languageCounts: Record<string, number> = {};
     const licenseCounts: Record<string, number> = {};
+    const weightCounts: Record<number, number> = {};
     let variableCount = 0;
 
     mockFonts.forEach(font => {
       sourceCounts[font.source] = (sourceCounts[font.source] || 0) + 1;
       font.categories.forEach(category => { categoryCounts[category] = (categoryCounts[category] || 0) + 1; });
-      font.languages.forEach(script => { languageCounts[script] = (languageCounts[script] || 0) + 1; });
+      getEffectiveLanguages(font).forEach(script => { languageCounts[script] = (languageCounts[script] || 0) + 1; });
       licenseCounts[font.license] = (licenseCounts[font.license] || 0) + 1;
-      if (font.variable) variableCount += 1;
+      const weightCount = getEffectiveWeights(font).length;
+      weightCounts[weightCount] = (weightCounts[weightCount] || 0) + 1;
+      if (isEffectivelyVariable(font)) variableCount += 1;
     });
 
     const MIN_SOURCE_COUNT = 10;
@@ -64,6 +68,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters })
         categories: categoryCounts,
         languages: languageCounts,
         licenses: licenseCounts,
+        weights: weightCounts,
         variable: variableCount,
         otherTotal: other.reduce((sum, source) => sum + sourceCounts[source], 0),
       },
@@ -100,6 +105,16 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters })
     );
   };
 
+  const minWeightOptions = [
+    { value: undefined, label: t('filters.anyWeights') },
+    { value: 3, label: "3+" },
+    { value: 5, label: "5+" },
+    { value: 7, label: "7+" },
+    { value: 9, label: "9 (Full)" },
+  ];
+
+  const countAtLeastWeights = (minimum: number) => mockFonts.reduce((count, font) => count + (getEffectiveWeights(font).length >= minimum ? 1 : 0), 0);
+
   return (
     <div className="h-full w-full flex-shrink-0 bg-white p-6 overflow-y-auto font-sans">
       <div className="mb-8 flex items-center justify-between pb-4 border-b border-neutral-200">
@@ -112,6 +127,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters })
           <Label htmlFor="var-mode" className="font-mono text-xs uppercase font-medium text-black cursor-pointer select-none">{t('filters.variable')}<span className="ml-2 text-[9px] text-neutral-400" style={{ fontWeight: 400 }}>{fontCounts.variable}</span></Label>
           <Switch id="var-mode" checked={filters.variableOnly} onCheckedChange={checked => updateFilter("variableOnly", checked)} className="data-[state=checked]:bg-neutral-800 border border-neutral-300" />
         </div>
+        <p className="-mt-6 font-mono text-[8px] leading-relaxed text-neutral-400">{language === 'ru' ? 'Счётчик учитывает только гарнитуры с подтверждёнными метриками variable-оси.' : 'Count includes only families whose variable-axis metadata is treated as verified.'}</p>
 
         <section className="space-y-4">
           <h3 className="font-mono text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{t('filters.platform')}</h3>
@@ -140,7 +156,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters })
 
         <section className="space-y-4">
           <h3 className="font-mono text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{t('filters.minWeights')}</h3>
-          <div className="space-y-2">{[{ value: undefined, label: t('filters.anyWeights') }, { value: 3, label: "3+" }, { value: 5, label: "5+" }, { value: 7, label: "7+" }, { value: 9, label: "9 (Full)" }].map(option => <button type="button" key={option.value ?? 'any'} onClick={() => updateFilter("minWeights", option.value)} className={cn("w-full text-left px-3 py-1.5 font-mono text-xs uppercase transition-colors", filters.minWeights === option.value ? "bg-neutral-800 text-white" : "text-neutral-600 hover:bg-neutral-100")}>{option.label}</button>)}</div>
+          <div className="space-y-2">{minWeightOptions.map(option => <button type="button" key={option.value ?? 'any'} onClick={() => updateFilter("minWeights", option.value)} className={cn("w-full flex items-center justify-between px-3 py-1.5 font-mono text-xs uppercase transition-colors", filters.minWeights === option.value ? "bg-neutral-800 text-white" : "text-neutral-600 hover:bg-neutral-100")}><span>{option.label}</span>{option.value && <span className={cn("text-[9px]", filters.minWeights === option.value ? "text-neutral-300" : "text-neutral-400")}>{countAtLeastWeights(option.value)}</span>}</button>)}</div>
         </section>
       </div>
     </div>

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { mockFonts } from '../src/app/data/mockFonts.ts';
 import { getEffectiveLanguages, getEffectiveWeights, getFontTrustReport, getVerifiedGoogleFont, isEffectivelyVariable } from '../src/app/lib/fontTrust.ts';
 
@@ -6,6 +8,8 @@ const warnings = [];
 const seenIds = new Set();
 const seenNames = new Set();
 const allowedCategories = new Set(['sans-serif', 'serif', 'display', 'handwriting', 'monospaced']);
+const evidencePath = resolve(process.cwd(), 'src/app/data/verified/google-fonts.json');
+const googleEvidence = JSON.parse(readFileSync(evidencePath, 'utf8'));
 
 const isHttpUrl = value => {
   try {
@@ -53,7 +57,7 @@ if (!Array.isArray(mockFonts)) {
     const trust = getFontTrustReport(font);
     const effectiveWeights = getEffectiveWeights(font);
     const effectiveLanguages = getEffectiveLanguages(font);
-    const upstream = getVerifiedGoogleFont(font);
+    const runtimeUpstream = getVerifiedGoogleFont(font);
 
     if (trust.confidence === 'derived') {
       addWarning(font, 'metadata is generated/derived and requires upstream verification.');
@@ -64,14 +68,32 @@ if (!Array.isArray(mockFonts)) {
     if (trust.licenseLabel === 'Verify at source') addWarning(font, 'generic license label requires exact upstream license enrichment.');
     if (effectiveLanguages.length === 0) addError(font, 'effective language list must not be empty.');
 
-    if (upstream) {
-      if (!upstream.family || upstream.family !== font.name) addError(font, 'upstream verification family name does not match catalog name.');
-      if (!upstream.license || upstream.license === 'Open Source') addError(font, 'upstream verification must contain an exact license identifier.');
-      if (!/^(ofl|apache|ufl)\/.+\/METADATA\.pb$/.test(upstream.metadataPath)) addError(font, `invalid upstream metadata path: ${upstream.metadataPath}`);
-      if (!/^[0-9a-f]{40}$/i.test(upstream.metadataSha)) addError(font, `invalid upstream metadata blob SHA: ${upstream.metadataSha}`);
-      if (upstream.repositoryUrl && !isHttpUrl(upstream.repositoryUrl)) addError(font, `invalid upstream repository URL: ${upstream.repositoryUrl}`);
+    if (runtimeUpstream) {
+      if (runtimeUpstream.family !== font.name) addError(font, 'runtime upstream family name does not match catalog name.');
+      if (!runtimeUpstream.license || runtimeUpstream.license === 'Open Source') addError(font, 'runtime upstream metadata must contain an exact license identifier.');
+      if (!/^(ofl|apache|ufl)\/.+\/METADATA\.pb$/.test(runtimeUpstream.metadataPath)) addError(font, `invalid runtime upstream metadata path: ${runtimeUpstream.metadataPath}`);
+      if (runtimeUpstream.repositoryUrl && !isHttpUrl(runtimeUpstream.repositoryUrl)) addError(font, `invalid runtime upstream repository URL: ${runtimeUpstream.repositoryUrl}`);
     }
   }
+}
+
+const catalogNames = new Set(mockFonts.map(font => font.name));
+let validEvidenceRecords = 0;
+for (const [name, evidence] of Object.entries(googleEvidence)) {
+  if (!evidence || typeof evidence !== 'object') {
+    errors.push(`evidence:${name}: record must be an object.`);
+    continue;
+  }
+  if (evidence.family !== name) errors.push(`evidence:${name}: family must exactly match evidence key.`);
+  if (!catalogNames.has(name)) warnings.push(`evidence:${name}: verified family is not present in the current catalog.`);
+  if (!evidence.license || evidence.license === 'Open Source') errors.push(`evidence:${name}: exact upstream license is required.`);
+  if (!/^(ofl|apache|ufl)\/.+\/METADATA\.pb$/.test(evidence.metadataPath || '')) errors.push(`evidence:${name}: invalid metadata path: ${evidence.metadataPath}`);
+  if (!/^[0-9a-f]{40}$/i.test(evidence.metadataSha || '')) errors.push(`evidence:${name}: invalid metadata blob SHA: ${evidence.metadataSha}`);
+  if (evidence.repositoryUrl && !isHttpUrl(evidence.repositoryUrl)) errors.push(`evidence:${name}: invalid repository URL: ${evidence.repositoryUrl}`);
+  if (!Array.isArray(evidence.subsets)) errors.push(`evidence:${name}: subsets must be an array.`);
+  if (!Array.isArray(evidence.weights)) errors.push(`evidence:${name}: weights must be an array.`);
+  if (!evidence.axes || typeof evidence.axes !== 'object' || Array.isArray(evidence.axes)) errors.push(`evidence:${name}: axes must be an object.`);
+  validEvidenceRecords += 1;
 }
 
 const findByName = name => mockFonts.find(font => font.name === name);
@@ -83,10 +105,11 @@ for (const [name, script] of [['Noto Sans JP', 'Japanese'], ['Noto Serif JP', 'J
 const derivedWarnings = warnings.filter(item => item.includes('generated/derived')).length;
 const genericLicenseWarnings = warnings.filter(item => item.includes('generic license')).length;
 const verifiedVariable = mockFonts.filter(isEffectivelyVariable).length;
-const upstreamVerified = mockFonts.filter(font => getFontTrustReport(font).upstreamVerified).length;
+const runtimeVerified = mockFonts.filter(font => getFontTrustReport(font).upstreamVerified).length;
 
 console.log(`Catalog validation: ${mockFonts.length} families, ${seenIds.size} unique ids, ${seenNames.size} unique names.`);
-console.log(`Upstream verification: ${upstreamVerified} families backed by versioned Google Fonts METADATA.pb.`);
+console.log(`Canonical evidence: ${validEvidenceRecords} Google Fonts METADATA.pb records with path/SHA provenance.`);
+console.log(`Runtime verification: ${runtimeVerified} catalog families backed by compact generated metadata.`);
 console.log(`Runtime trust policy: ${verifiedVariable} verified variable families; remaining derived records are constrained to Regular 400.`);
 console.log(`Trust debt: ${derivedWarnings} derived metadata records, ${genericLicenseWarnings} generic license labels.`);
 
@@ -98,8 +121,9 @@ if (warnings.length) {
 
 if (errors.length) {
   console.error(`Errors: ${errors.length}`);
-  errors.forEach(item => console.error(`  ERROR ${item}`));
+  errors.slice(0, 100).forEach(item => console.error(`  ERROR ${item}`));
+  if (errors.length > 100) console.error(`  ... ${errors.length - 100} more errors omitted`);
   process.exit(1);
 }
 
-console.log('Catalog structural and trust-policy validation passed.');
+console.log('Catalog structural, evidence and runtime trust-policy validation passed.');

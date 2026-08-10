@@ -22,219 +22,126 @@ interface FilterPanelProps {
   setFilters: React.Dispatch<React.SetStateAction<FilterState>>;
 }
 
-export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters }) => {
-  const { t } = useLanguage();
+const safeId = (prefix: string, value: string) => `${prefix}-${value.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
-  // Dynamic Source Calculation
-  const { mainSources, otherSources, fontCounts } = useMemo(() => {
-      const activeFonts = mockFonts;
-      const counts: Record<string, number> = {};
-      activeFonts.forEach(f => {
-          counts[f.source] = (counts[f.source] || 0) + 1;
-      });
-      
-      const MIN_COUNT = 10;
-      const main = Object.keys(counts).filter(s => counts[s] >= MIN_COUNT);
-      const other = Object.keys(counts).filter(s => counts[s] < MIN_COUNT);
-      
-      // Also count categories and languages
-      const catCounts: Record<string, number> = {};
-      const langCounts: Record<string, number> = {};
-      let variableCount = 0;
-      activeFonts.forEach(f => {
-          f.categories.forEach(c => { catCounts[c] = (catCounts[c] || 0) + 1; });
-          f.languages.forEach(l => { langCounts[l] = (langCounts[l] || 0) + 1; });
-          if (f.variable) variableCount++;
-      });
-      
-      return { 
-          mainSources: main, 
-          otherSources: other, 
-          fontCounts: { sources: counts, categories: catCounts, languages: langCounts, variable: variableCount, otherTotal: other.reduce((sum, s) => sum + counts[s], 0) } 
-      };
+export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters }) => {
+  const { t, language } = useLanguage();
+
+  const { mainSources, otherSources, categories, languages, licenses, fontCounts } = useMemo(() => {
+    const sourceCounts: Record<string, number> = {};
+    const categoryCounts: Record<string, number> = {};
+    const languageCounts: Record<string, number> = {};
+    const licenseCounts: Record<string, number> = {};
+    let variableCount = 0;
+
+    mockFonts.forEach(font => {
+      sourceCounts[font.source] = (sourceCounts[font.source] || 0) + 1;
+      font.categories.forEach(category => { categoryCounts[category] = (categoryCounts[category] || 0) + 1; });
+      font.languages.forEach(script => { languageCounts[script] = (languageCounts[script] || 0) + 1; });
+      licenseCounts[font.license] = (licenseCounts[font.license] || 0) + 1;
+      if (font.variable) variableCount += 1;
+    });
+
+    const MIN_SOURCE_COUNT = 10;
+    const main = Object.keys(sourceCounts).filter(source => sourceCounts[source] >= MIN_SOURCE_COUNT).sort((a, b) => sourceCounts[b] - sourceCounts[a] || a.localeCompare(b));
+    const other = Object.keys(sourceCounts).filter(source => sourceCounts[source] < MIN_SOURCE_COUNT).sort((a, b) => a.localeCompare(b));
+    const categoryOrder = ["sans-serif", "serif", "display", "handwriting", "monospaced"];
+    const categoryList = categoryOrder.filter(category => categoryCounts[category]);
+    const languageList = Object.keys(languageCounts).sort((a, b) => {
+      const priority = (value: string) => value === "Latin" ? 0 : value === "Cyrillic" ? 1 : 2;
+      return priority(a) - priority(b) || languageCounts[b] - languageCounts[a] || a.localeCompare(b);
+    });
+    const licenseList = Object.keys(licenseCounts).sort((a, b) => licenseCounts[b] - licenseCounts[a] || a.localeCompare(b));
+
+    return {
+      mainSources: main,
+      otherSources: other,
+      categories: categoryList,
+      languages: languageList,
+      licenses: licenseList,
+      fontCounts: {
+        sources: sourceCounts,
+        categories: categoryCounts,
+        languages: languageCounts,
+        licenses: licenseCounts,
+        variable: variableCount,
+        otherTotal: other.reduce((sum, source) => sum + sourceCounts[source], 0),
+      },
+    };
   }, []);
 
-  const updateFilter = (key: keyof FilterState, value: any) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+  const updateFilter = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
   };
 
   const toggleArrayFilter = (key: "categories" | "languages" | "licenses" | "sources", value: string) => {
-    setFilters((prev) => {
+    setFilters(prev => {
       const current = prev[key];
-      const updated = current.includes(value)
-        ? current.filter((item) => item !== value)
-        : [...current, value];
-      return { ...prev, [key]: updated };
+      return { ...prev, [key]: current.includes(value) ? current.filter(item => item !== value) : [...current, value] };
     });
   };
 
-  // Logic for "Other" group
-  // We consider "Other" selected if AT LEAST ONE of the other sources is selected. 
-  // But for a clean toggle behavior:
-  // - If unchecked: select ALL other sources
-  // - If checked (even partially): deselect ALL other sources
-  const isOtherSelected = otherSources.some(s => filters.sources.includes(s));
-  
+  const isOtherSelected = otherSources.some(source => filters.sources.includes(source));
   const toggleOther = () => {
-      if (isOtherSelected) {
-          // Deselect all
-          const newSources = filters.sources.filter(s => !otherSources.includes(s));
-          updateFilter("sources", newSources);
-      } else {
-          // Select all
-          const newSources = Array.from(new Set([...filters.sources, ...otherSources]));
-          updateFilter("sources", newSources);
-      }
+    if (isOtherSelected) updateFilter("sources", filters.sources.filter(source => !otherSources.includes(source)));
+    else updateFilter("sources", Array.from(new Set([...filters.sources, ...otherSources])));
   };
 
-  const resetFilters = () => {
-    setFilters({
-      search: "",
-      categories: [],
-      languages: [],
-      variableOnly: false,
-      licenses: [],
-      sources: [],
-      minWeights: undefined,
-    });
-  };
+  const resetFilters = () => setFilters({ search: "", categories: [], languages: [], variableOnly: false, licenses: [], sources: [], minWeights: undefined });
 
-  const categories = ["sans-serif", "serif", "display", "handwriting", "monospaced"];
-  const languages = ["Cyrillic", "Latin"];
+  const FilterCheckbox = ({ group, value, checked, count, onChange }: { group: string; value: string; checked: boolean; count: number; onChange: () => void }) => {
+    const id = safeId(group, value);
+    return (
+      <div className="flex items-center space-x-3 group min-w-0">
+        <Checkbox id={id} checked={checked} onCheckedChange={onChange} className="h-3 w-3 border-neutral-400 rounded-none data-[state=checked]:bg-neutral-800 data-[state=checked]:text-white" />
+        <Label htmlFor={id} className="font-mono text-xs text-neutral-600 uppercase cursor-pointer group-hover:text-black transition-colors select-none truncate flex-grow">{value}</Label>
+        <span className="font-mono text-[9px] text-neutral-400 shrink-0">{count}</span>
+      </div>
+    );
+  };
 
   return (
     <div className="h-full w-full flex-shrink-0 bg-white p-6 overflow-y-auto font-sans">
       <div className="mb-8 flex items-center justify-between pb-4 border-b border-neutral-200">
         <h2 className="text-xs font-mono font-bold text-black uppercase tracking-widest">{t('filters.title')}</h2>
-        <button 
-            onClick={resetFilters} 
-            className="text-[10px] font-mono font-bold text-neutral-400 hover:text-black flex items-center gap-1.5 transition-colors uppercase"
-        >
-          <RotateCcw className="w-3 h-3" /> {t('filters.reset')}
-        </button>
+        <button type="button" onClick={resetFilters} className="text-[10px] font-mono font-bold text-neutral-400 hover:text-black flex items-center gap-1.5 transition-colors uppercase"><RotateCcw className="w-3 h-3" /> {t('filters.reset')}</button>
       </div>
 
       <div className="space-y-8">
-        {/* Variable Toggle */}
         <div className="flex items-center justify-between py-2">
-            <Label htmlFor="var-mode" className="font-mono text-xs uppercase font-medium text-black cursor-pointer select-none">
-                {t('filters.variable')}
-                <span className="ml-2 text-[9px] text-neutral-400" style={{ fontWeight: 400 }}>{fontCounts.variable}</span>
-            </Label>
-            <Switch 
-                id="var-mode" 
-                checked={filters.variableOnly} 
-                onCheckedChange={(c) => updateFilter("variableOnly", c)}
-                className="data-[state=checked]:bg-neutral-800 border border-neutral-300"
-            />
+          <Label htmlFor="var-mode" className="font-mono text-xs uppercase font-medium text-black cursor-pointer select-none">{t('filters.variable')}<span className="ml-2 text-[9px] text-neutral-400" style={{ fontWeight: 400 }}>{fontCounts.variable}</span></Label>
+          <Switch id="var-mode" checked={filters.variableOnly} onCheckedChange={checked => updateFilter("variableOnly", checked)} className="data-[state=checked]:bg-neutral-800 border border-neutral-300" />
         </div>
 
-        <div className="space-y-8">
-            {/* Sources */}
-            <div className="space-y-4">
-                <h3 className="font-mono text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{t('filters.platform')}</h3>
-                <div className="space-y-2">
-                    {mainSources.map((src) => (
-                        <div key={src} className="flex items-center space-x-3 group">
-                            <Checkbox 
-                                id={src} 
-                                checked={filters.sources.includes(src)}
-                                onCheckedChange={() => toggleArrayFilter("sources", src)}
-                                className="h-3 w-3 border-neutral-400 rounded-none data-[state=checked]:bg-neutral-800 data-[state=checked]:text-white"
-                            />
-                            <Label htmlFor={src} className="font-mono text-xs text-neutral-600 uppercase cursor-pointer group-hover:text-black transition-colors select-none truncate flex-grow">{src}</Label>
-                            <span className="font-mono text-[9px] text-neutral-400 shrink-0">{fontCounts.sources[src]}</span>
-                        </div>
-                    ))}
+        <section className="space-y-4">
+          <h3 className="font-mono text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{t('filters.platform')}</h3>
+          <div className="space-y-2">
+            {mainSources.map(source => <FilterCheckbox key={source} group="source" value={source} checked={filters.sources.includes(source)} count={fontCounts.sources[source]} onChange={() => toggleArrayFilter("sources", source)} />)}
+            {otherSources.length > 0 && <div className="flex items-center space-x-3 group pt-2 border-t border-dashed border-neutral-200 mt-2"><Checkbox id="source-other" checked={isOtherSelected} onCheckedChange={toggleOther} className="h-3 w-3 border-neutral-400 rounded-none data-[state=checked]:bg-neutral-800 data-[state=checked]:text-white" /><Label htmlFor="source-other" className="font-mono text-xs text-neutral-600 uppercase cursor-pointer group-hover:text-black transition-colors select-none truncate flex-grow">{language === 'ru' ? 'Другие источники' : 'Other sources'}</Label><span className="font-mono text-[9px] text-neutral-400 shrink-0">{fontCounts.otherTotal}</span></div>}
+          </div>
+          <p className="pt-2 border-t border-dashed border-neutral-200 font-mono text-[9px] text-neutral-400 uppercase leading-normal">{t('filters.platform.note')}</p>
+        </section>
 
-                    {/* Other Group */}
-                    {otherSources.length > 0 && (
-                        <div className="flex items-center space-x-3 group pt-2 border-t border-dashed border-neutral-200 mt-2">
-                            <Checkbox 
-                                id="source-other" 
-                                checked={isOtherSelected}
-                                onCheckedChange={toggleOther}
-                                className="h-3 w-3 border-neutral-400 rounded-none data-[state=checked]:bg-neutral-800 data-[state=checked]:text-white"
-                            />
-                            <Label htmlFor="source-other" className="font-mono text-xs text-neutral-600 uppercase cursor-pointer group-hover:text-black transition-colors select-none truncate flex-grow">
-                                {t('filters.other')}
-                            </Label>
-                            <span className="font-mono text-[9px] text-neutral-400 shrink-0">{fontCounts.otherTotal}</span>
-                        </div>
-                    )}
-                </div>
-                <div className="pt-2 border-t border-dashed border-neutral-200">
-                    <p className="font-mono text-[9px] text-neutral-400 uppercase leading-normal">
-                        {t('filters.platform.note')}
-                    </p>
-                </div>
-            </div>
-            
-            {/* Categories */}
-            <div className="space-y-4">
-                <h3 className="font-mono text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{t('filters.categories')}</h3>
-                <div className="space-y-2">
-                    {categories.map((cat) => (
-                        <div key={cat} className="flex items-center space-x-3 group">
-                            <Checkbox 
-                                id={cat} 
-                                checked={filters.categories.includes(cat)}
-                                onCheckedChange={() => toggleArrayFilter("categories", cat)}
-                                className="h-3 w-3 border-neutral-400 rounded-none data-[state=checked]:bg-neutral-800 data-[state=checked]:text-white"
-                            />
-                            <Label htmlFor={cat} className="font-mono text-xs text-neutral-600 uppercase cursor-pointer group-hover:text-black transition-colors select-none flex-grow">{cat}</Label>
-                            <span className="font-mono text-[9px] text-neutral-400 shrink-0">{fontCounts.categories[cat] || 0}</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
+        <section className="space-y-4">
+          <h3 className="font-mono text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{t('filters.categories')}</h3>
+          <div className="space-y-2">{categories.map(category => <FilterCheckbox key={category} group="category" value={category} checked={filters.categories.includes(category)} count={fontCounts.categories[category] || 0} onChange={() => toggleArrayFilter("categories", category)} />)}</div>
+        </section>
 
-            {/* Languages */}
-            <div className="space-y-4">
-                <h3 className="font-mono text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{t('filters.languages')}</h3>
-                <div className="space-y-2">
-                    {languages.map((lang) => (
-                        <div key={lang} className="flex items-center space-x-3 group">
-                            <Checkbox 
-                                id={lang} 
-                                checked={filters.languages.includes(lang)}
-                                onCheckedChange={() => toggleArrayFilter("languages", lang)}
-                                className="h-3 w-3 border-neutral-400 rounded-none data-[state=checked]:bg-neutral-800 data-[state=checked]:text-white"
-                            />
-                            <Label htmlFor={lang} className="font-mono text-xs text-neutral-600 uppercase cursor-pointer group-hover:text-black transition-colors select-none flex-grow">{lang}</Label>
-                            <span className="font-mono text-[9px] text-neutral-400 shrink-0">{fontCounts.languages[lang] || 0}</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
+        <section className="space-y-4">
+          <h3 className="font-mono text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{t('filters.languages')}</h3>
+          <div className="space-y-2">{languages.map(script => <FilterCheckbox key={script} group="script" value={script} checked={filters.languages.includes(script)} count={fontCounts.languages[script] || 0} onChange={() => toggleArrayFilter("languages", script)} />)}</div>
+        </section>
 
-            {/* Minimum Weights */}
-            <div className="space-y-4">
-                <h3 className="font-mono text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{t('filters.minWeights')}</h3>
-                <div className="space-y-2">
-                    {[
-                        { value: undefined, label: t('filters.anyWeights') },
-                        { value: 3, label: "3+" },
-                        { value: 5, label: "5+" },
-                        { value: 7, label: "7+" },
-                        { value: 9, label: "9 (Full)" },
-                    ].map((opt) => (
-                        <button
-                            key={opt.value ?? 'any'}
-                            onClick={() => updateFilter("minWeights", opt.value)}
-                            className={cn(
-                                "w-full text-left px-3 py-1.5 font-mono text-xs uppercase transition-colors",
-                                filters.minWeights === opt.value
-                                    ? "bg-neutral-800 text-white"
-                                    : "text-neutral-600 hover:bg-neutral-100"
-                            )}
-                        >
-                            {opt.label}
-                        </button>
-                    ))}
-                </div>
-            </div>
-        </div>
+        <section className="space-y-4">
+          <h3 className="font-mono text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{language === 'ru' ? 'Лицензия' : 'License'}</h3>
+          <div className="space-y-2">{licenses.map(license => <FilterCheckbox key={license} group="license" value={license} checked={filters.licenses.includes(license)} count={fontCounts.licenses[license] || 0} onChange={() => toggleArrayFilter("licenses", license)} />)}</div>
+          {fontCounts.licenses["Open Source"] > 0 && <p className="font-mono text-[8px] text-amber-700 leading-relaxed border border-amber-200 bg-amber-50 p-2">{language === 'ru' ? 'OPEN SOURCE — временная общая метка. Точный идентификатор лицензии для этих записей ещё проверяется по первоисточнику.' : 'OPEN SOURCE is a temporary generic label. Exact license identifiers for these records are still being verified upstream.'}</p>}
+        </section>
+
+        <section className="space-y-4">
+          <h3 className="font-mono text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{t('filters.minWeights')}</h3>
+          <div className="space-y-2">{[{ value: undefined, label: t('filters.anyWeights') }, { value: 3, label: "3+" }, { value: 5, label: "5+" }, { value: 7, label: "7+" }, { value: 9, label: "9 (Full)" }].map(option => <button type="button" key={option.value ?? 'any'} onClick={() => updateFilter("minWeights", option.value)} className={cn("w-full text-left px-3 py-1.5 font-mono text-xs uppercase transition-colors", filters.minWeights === option.value ? "bg-neutral-800 text-white" : "text-neutral-600 hover:bg-neutral-100")}>{option.label}</button>)}</div>
+        </section>
       </div>
     </div>
   );

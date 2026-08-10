@@ -1,5 +1,5 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { resolve } from 'node:path';
 
 const generatedDir = resolve(process.cwd(), 'src/app/data/verified/.generated');
 
@@ -14,6 +14,10 @@ const fontshareAliasesSource = resolve(process.cwd(), 'src/app/data/verified/fon
 const fontshareTarget = resolve(generatedDir, 'fontshare-runtime.json');
 const fontshareEvidence = JSON.parse(readFileSync(fontshareSource, 'utf8'));
 const fontshareAliases = JSON.parse(readFileSync(fontshareAliasesSource, 'utf8'));
+
+const independentSource = resolve(process.cwd(), 'src/app/data/verified/independent-sources.json');
+const independentTarget = resolve(generatedDir, 'independent-runtime.json');
+const independentEvidence = JSON.parse(readFileSync(independentSource, 'utf8'));
 
 const isReviewedIdentity = (catalogName, metadata, aliases) =>
   metadata?.family === catalogName || aliases[catalogName] === metadata?.family;
@@ -72,19 +76,45 @@ const fontshareRuntime = Object.fromEntries(Object.entries(fontshareEvidence)
     sourceUrl: metadata.sourceUrl,
   }]));
 
+const independentRuntime = Object.fromEntries(Object.entries(independentEvidence)
+  .filter(([name, metadata]) => metadata?.family === name)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([name, metadata]) => [name, {
+    family: name,
+    sourceType: metadata.sourceType,
+    repository: metadata.repository,
+    sourceUrl: metadata.sourceUrl,
+    designer: metadata.designer,
+    licenseId: metadata.licenseId,
+    technical: {
+      ...(metadata.technical?.variable !== undefined ? { variable: Boolean(metadata.technical.variable) } : {}),
+      ...(Array.isArray(metadata.technical?.weights) ? { weights: metadata.technical.weights } : {}),
+      ...(metadata.technical?.axes ? { axes: metadata.technical.axes } : {}),
+      ...(Array.isArray(metadata.technical?.scripts) ? { scripts: metadata.technical.scripts } : {}),
+      weightsVerified: Boolean(metadata.technical?.weightsVerified),
+      variableVerified: Boolean(metadata.technical?.variableVerified),
+      scriptsVerified: Boolean(metadata.technical?.scriptsVerified),
+    },
+  }]));
+
 mkdirSync(generatedDir, { recursive: true });
 writeFileSync(googleTarget, `${JSON.stringify(googleRuntime)}\n`);
 writeFileSync(fontshareTarget, `${JSON.stringify(fontshareRuntime)}\n`);
+writeFileSync(independentTarget, `${JSON.stringify(independentRuntime)}\n`);
 
-const googleEvidenceBytes = Buffer.byteLength(JSON.stringify(googleEvidence));
-const googleRuntimeBytes = Buffer.byteLength(JSON.stringify(googleRuntime));
-const googleReduction = googleEvidenceBytes ? Math.round((1 - googleRuntimeBytes / googleEvidenceBytes) * 100) : 0;
+const payloadStat = (evidence, runtime) => {
+  const evidenceBytes = Buffer.byteLength(JSON.stringify(evidence));
+  const runtimeBytes = Buffer.byteLength(JSON.stringify(runtime));
+  const reduction = evidenceBytes ? Math.round((1 - runtimeBytes / evidenceBytes) * 100) : 0;
+  return { runtimeBytes, reduction };
+};
+
+const googleStat = payloadStat(googleEvidence, googleRuntime);
+const fontshareStat = payloadStat(fontshareEvidence, fontshareRuntime);
+const independentStat = payloadStat(independentEvidence, independentRuntime);
 const googleAliasCount = Object.keys(googleAliases).filter(name => googleEvidence[name]?.family === googleAliases[name]).length;
-
-const fontshareEvidenceBytes = Buffer.byteLength(JSON.stringify(fontshareEvidence));
-const fontshareRuntimeBytes = Buffer.byteLength(JSON.stringify(fontshareRuntime));
-const fontshareReduction = fontshareEvidenceBytes ? Math.round((1 - fontshareRuntimeBytes / fontshareEvidenceBytes) * 100) : 0;
 const fontshareAliasCount = Object.keys(fontshareAliases).filter(name => fontshareEvidence[name]?.family === fontshareAliases[name]).length;
 
-console.log(`Generated compact Google Fonts runtime metadata: ${Object.keys(googleRuntime).length} families (${googleAliasCount} reviewed aliases), ${googleRuntimeBytes} bytes (${googleReduction}% smaller than evidence payload).`);
-console.log(`Generated compact Fontshare runtime metadata: ${Object.keys(fontshareRuntime).length} families (${fontshareAliasCount} reviewed aliases), ${fontshareRuntimeBytes} bytes (${fontshareReduction}% smaller than evidence payload).`);
+console.log(`Generated compact Google Fonts runtime metadata: ${Object.keys(googleRuntime).length} families (${googleAliasCount} reviewed aliases), ${googleStat.runtimeBytes} bytes (${googleStat.reduction}% smaller than evidence payload).`);
+console.log(`Generated compact Fontshare runtime metadata: ${Object.keys(fontshareRuntime).length} families (${fontshareAliasCount} reviewed aliases), ${fontshareStat.runtimeBytes} bytes (${fontshareStat.reduction}% smaller than evidence payload).`);
+console.log(`Generated compact independent-source runtime metadata: ${Object.keys(independentRuntime).length} families, ${independentStat.runtimeBytes} bytes (${independentStat.reduction}% smaller than evidence payload).`);

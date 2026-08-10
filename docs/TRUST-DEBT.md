@@ -3,10 +3,10 @@
 > Generated from the canonical runtime trust layer. Do not edit counts manually.
 
 Catalog families: **1346**
-Identity trust debt: **27**
-License trust debt: **37**
-Source/license union debt: **37**
-Source + license clear: **1309**
+Identity trust debt: **25**
+License trust debt: **36**
+Source/license union debt: **36**
+Source + license clear: **1310**
 
 Identity and license are independent facts. A family can have a verified primary source while its exact license remains pending; this state must not be collapsed back into “unverified source”.
 
@@ -14,7 +14,7 @@ Identity and license are independent facts. A family can have a verified primary
 
 - exact weights pending: **38** families
 - variable capability pending: **37** families
-- script coverage pending: **30** families
+- script coverage pending: **29** families
 
 Technical debt is also independent from source/license trust. Inspected font binaries may clear technical fields without changing provider/legal facts.
 
@@ -22,7 +22,7 @@ Technical debt is also independent from source/license trust. Inspected font bin
 
 | Recovered source | Families pending |
 |---|---:|
-| Fontshare | 32 |
+| Fontshare | 31 |
 | Google Fonts | 4 |
 | Uncut / Indie | 1 |
 
@@ -43,14 +43,13 @@ Technical debt is also independent from source/license trust. Inspected font bin
 | Duplet | Fontshare | verified | pending | pending | pending | verified | Verify at source |
 | Fokkol | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Gilam | Fontshare | verified | pending | pending | pending | verified | Verify at source |
-| Gratimo Grotesk | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Gratimo Grotesk | Fontshare | verified | pending | pending | pending | verified | Verify at source |
 | H.H. Samuel | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Helixa | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Ladi | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Lausanne | Fontshare | verified | pending | pending | pending | pending | Verify at source |
 | Magro | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Mrow | Fontshare | pending | pending | pending | pending | pending | Verify at source |
-| Nacelle | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | New Spirit | Fontshare | verified | pending | pending | pending | verified | Verify at source |
 | Nohemi | Fontshare | verified | pending | pending | pending | pending | Verify at source |
 | Ozone | Fontshare | pending | pending | pending | pending | pending | Verify at source |
@@ -77,6 +76,7 @@ Technical debt is also independent from source/license trust. Inspected font bin
 | Bw Nista | Independent | https://brandingwithtype.com/typefaces/bw-nista-collection | pending |
 | Duplet | Independent | https://www.indiantypefoundry.com/fonts/duplet/glyphs | pending |
 | Gilam | Independent | https://www.fontfabric.com/fonts/gilam/ | pending |
+| Gratimo Grotesk | Independent | https://www.typemates.com/fonts/gratimo-grotesk | pending |
 | Lausanne | Independent | https://weltkern.com/typefaces/lausanne/ | pending |
 | New Spirit | Independent | https://newlyn.com/fonts/new-spirit/ | pending |
 | Nohemi | Independent | https://rajputrajesh-4489b.web.app/products/nohemi | pending |
@@ -87,5 +87,6 @@ Technical debt is also independent from source/license trust. Inspected font bin
 
 | Family | Provider | Weights | Variable | Scripts |
 |---|---|---|---|---|
+| Nacelle | Independent | pending | pending | pending |
 | Source Sans Pro | Historical | pending | pending | pending |
 

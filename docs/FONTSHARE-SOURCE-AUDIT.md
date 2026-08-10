@@ -5,8 +5,8 @@
 Recovered Fontshare-tagged families: **82**
 Current exact/reviewed Fontshare evidence: **45**
 Legacy/unmatched against current Fontshare API: **37**
-Legacy records already re-sourced to another primary source: **15**
-Legacy source-identity queue still unresolved: **22**
+Legacy records already re-sourced to another primary source: **17**
+Legacy source-identity queue still unresolved: **20**
 
 ## Interpretation
 
@@ -26,8 +26,10 @@ Legacy source-identity queue still unresolved: **22**
 | Cal Sans | Mark Davis | https://github.com/calcom/sans | OFL-1.1 |
 | Duplet | Indian Type Foundry | https://www.indiantypefoundry.com/fonts/duplet/glyphs | License pending |
 | Gilam | Fontfabric | https://www.fontfabric.com/fonts/gilam/ | License pending |
+| Gratimo Grotesk | TypeMates | https://www.typemates.com/fonts/gratimo-grotesk | License pending |
 | Hauora | WCYS & Co. | https://github.com/WCYS-Co/Hauora-Sans | OFL-1.1 |
 | Lausanne | WELTKERN | https://weltkern.com/typefaces/lausanne/ | License pending |
+| Nacelle | DOT COLON | https://www.dotcolon.net/fonts/nacelle/ | OFL-1.1 |
 | New Spirit | Newlyn | https://newlyn.com/fonts/new-spirit/ | License pending |
 | Nohemi | Rajesh Rajput | https://rajputrajesh-4489b.web.app/products/nohemi | License pending |
 | Overused Grotesk | Bao Nguyen / RandomMaerks | https://github.com/RandomMaerks/Overused-Grotesk | OFL-1.1 |
@@ -47,13 +49,11 @@ Legacy source-identity queue still unresolved: **22**
 | Deng | Indian Type Foundry | https://www.fontshare.com/fonts/deng | Open Source | Re-source from primary evidence |
 | Dodi | Indian Type Foundry | https://www.fontshare.com/fonts/dodi | Open Source | Re-source from primary evidence |
 | Fokkol | Indian Type Foundry | https://www.fontshare.com/fonts/fokkol | Open Source | Re-source from primary evidence |
-| Gratimo Grotesk | Indian Type Foundry | https://www.fontshare.com/fonts/gratimo-grotesk | Open Source | Re-source from primary evidence |
 | H.H. Samuel | Indian Type Foundry | https://www.fontshare.com/fonts/h.h.-samuel | Open Source | Re-source from primary evidence |
 | Helixa | Indian Type Foundry | https://www.fontshare.com/fonts/helixa | Open Source | Re-source from primary evidence |
 | Ladi | Indian Type Foundry | https://www.fontshare.com/fonts/ladi | Open Source | Re-source from primary evidence |
 | Magro | Indian Type Foundry | https://www.fontshare.com/fonts/magro | Open Source | Re-source from primary evidence |
 | Mrow | Indian Type Foundry | https://www.fontshare.com/fonts/mrow | Open Source | Re-source from primary evidence |
-| Nacelle | Indian Type Foundry | https://www.fontshare.com/fonts/nacelle | Open Source | Re-source from primary evidence |
 | Ozone | Indian Type Foundry | https://www.fontshare.com/fonts/ozone | Open Source | Re-source from primary evidence |
 | Polaris FS | Indian Type Foundry | https://www.fontshare.com/fonts/polaris-fs | Open Source | Re-source from primary evidence |
 | Pramit | Indian Type Foundry | https://www.fontshare.com/fonts/pramit | Open Source | Re-source from primary evidence |

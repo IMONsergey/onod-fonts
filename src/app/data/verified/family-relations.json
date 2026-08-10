@@ -1,4 +1,30 @@
 {
+  "Cederville Cursive": {
+    "catalogFamily": "Cederville Cursive",
+    "status": "verified",
+    "relation": "catalog-correction",
+    "provider": "Google Fonts",
+    "canonical": {
+      "family": "Cedarville Cursive",
+      "sourceUrl": "https://fonts.google.com/specimen/Cedarville+Cursive",
+      "designer": "Kimberly Geswein",
+      "licenseId": "OFL-1.1",
+      "weights": [400],
+      "variable": false,
+      "scripts": ["Latin"],
+      "evidence": {
+        "repository": "google/fonts",
+        "path": "ofl/cedarvillecursive/METADATA.pb",
+        "blobSha": "0a537ff7b9badfe4737f5f70663449a5f7e157f7",
+        "facts": [
+          "Official Google Fonts METADATA.pb identifies the current family as Cedarville Cursive, designed by Kimberly Geswein, licensed OFL, with one normal 400 face.",
+          "The recovered ONOD catalog spelling Cederville Cursive differs from the canonical Google family only by the incorrect vowel in Cedarville."
+        ]
+      }
+    },
+    "loadReplacementAllowed": true,
+    "note": "This is a reviewed catalog spelling correction, not a historical successor or similarity match. The recovered stable font ID may render the canonical Cedarville Cursive family."
+  },
   "Source Sans Pro": {
     "catalogFamily": "Source Sans Pro",
     "status": "verified",

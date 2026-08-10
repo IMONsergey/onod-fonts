@@ -1,13 +1,19 @@
 import type { Font } from "../data/mockFonts";
 import relationsJson from "../data/verified/family-relations.json" with { type: "json" };
 
-export type FamilyRelationKind = "historical-successor" | "provider-rename" | "collection-member";
+export type FamilyRelationKind = "historical-successor" | "provider-rename" | "collection-member" | "catalog-correction";
 
-export interface VerifiedFamilyRelation {
+interface BaseRelation {
   catalogFamily: string;
   status: "verified";
   relation: FamilyRelationKind;
   provider: string;
+  loadReplacementAllowed: boolean;
+  note: string;
+}
+
+export interface HistoricalFamilyRelation extends BaseRelation {
+  relation: "historical-successor" | "provider-rename" | "collection-member";
   historical: {
     family: string;
     sourceUrl: string;
@@ -18,11 +24,25 @@ export interface VerifiedFamilyRelation {
     family: string;
     sourceUrl: string;
   };
-  loadReplacementAllowed: boolean;
-  note: string;
 }
 
-const relations = relationsJson as Record<string, VerifiedFamilyRelation>;
+export interface CatalogCorrectionRelation extends BaseRelation {
+  relation: "catalog-correction";
+  loadReplacementAllowed: true;
+  canonical: {
+    family: string;
+    sourceUrl: string;
+    designer: string;
+    licenseId: string;
+    weights: number[];
+    variable: boolean;
+    scripts: string[];
+  };
+}
+
+export type VerifiedFamilyRelation = HistoricalFamilyRelation | CatalogCorrectionRelation;
+
+const relations = relationsJson as unknown as Record<string, VerifiedFamilyRelation>;
 
 export function getVerifiedFamilyRelation(font: Font): VerifiedFamilyRelation | undefined {
   const relation = relations[font.name];
@@ -30,8 +50,14 @@ export function getVerifiedFamilyRelation(font: Font): VerifiedFamilyRelation | 
   return relation;
 }
 
-export function getHistoricalSourceRelation(font: Font): VerifiedFamilyRelation | undefined {
+export function getHistoricalSourceRelation(font: Font): HistoricalFamilyRelation | undefined {
   const relation = getVerifiedFamilyRelation(font);
   if (!relation || relation.relation !== "historical-successor") return undefined;
+  return relation;
+}
+
+export function getCatalogCorrection(font: Font): CatalogCorrectionRelation | undefined {
+  const relation = getVerifiedFamilyRelation(font);
+  if (!relation || relation.relation !== "catalog-correction" || relation.loadReplacementAllowed !== true) return undefined;
   return relation;
 }

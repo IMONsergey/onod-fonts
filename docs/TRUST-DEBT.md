@@ -8,9 +8,9 @@ Source/license clear: **1308**
 
 ## Field-level technical debt
 
-- exact weights pending: **41** families
-- variable capability pending: **39** families
-- script/language metadata pending: **40** families
+- exact weights pending: **38** families
+- variable capability pending: **38** families
+- script/language metadata pending: **38** families
 
 A family can be source/license verified while some technical fields remain pending. Technical debt must stay conservative at runtime; it must not be converted back into source/license debt merely to preserve a single all-or-nothing status.
 
@@ -69,7 +69,4 @@ A family can be source/license verified while some technical fields remain pendi
 
 | Family | Provider | Weights | Variable | Scripts |
 |---|---|---|---|---|
-| Cal Sans | Independent | pending | verified | pending |
-| Hauora | Independent | pending | verified | verified |
-| Uncut Sans | Independent | pending | pending | pending |
 

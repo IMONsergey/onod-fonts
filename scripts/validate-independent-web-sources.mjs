@@ -15,7 +15,10 @@ const allowedHosts = new Set([
   'filipposfragkogiannis.com', 'www.filipposfragkogiannis.com',
   'newlyn.com', 'www.newlyn.com',
   'brandingwithtype.com', 'www.brandingwithtype.com',
+  'dotcolon.net', 'www.dotcolon.net',
+  'typemates.com', 'www.typemates.com',
 ]);
+const allowedVerifiedLicenses = new Set(['OFL-1.1']);
 
 const parseUrl = value => {
   try {
@@ -24,6 +27,17 @@ const parseUrl = value => {
   } catch {
     return null;
   }
+};
+
+const validateWebProof = (name, label, proof) => {
+  if (!proof || proof.kind !== 'official-web') {
+    errors.push(`${name}: ${label} evidence kind must be official-web.`);
+    return;
+  }
+  const proofUrl = parseUrl(proof.url);
+  if (!proofUrl || !allowedHosts.has(proofUrl.hostname)) errors.push(`${name}: ${label} evidence URL must be an approved primary-source host.`);
+  if (!proof.capturedAt || Number.isNaN(Date.parse(proof.capturedAt))) errors.push(`${name}: ${label} capturedAt must be a valid timestamp.`);
+  if (!Array.isArray(proof.facts) || proof.facts.length === 0 || proof.facts.some(fact => typeof fact !== 'string' || !fact.trim())) errors.push(`${name}: ${label} evidence needs at least one reviewed primary-source fact.`);
 };
 
 for (const [name, record] of Object.entries(records)) {
@@ -37,18 +51,19 @@ for (const [name, record] of Object.entries(records)) {
 
   const sourceUrl = parseUrl(identity?.sourceUrl);
   if (!sourceUrl || !allowedHosts.has(sourceUrl.hostname)) errors.push(`${name}: sourceUrl must be an approved primary-source host.`);
-
-  const proof = identity?.evidence;
-  if (!proof || proof.kind !== 'official-web') errors.push(`${name}: identity evidence kind must be official-web.`);
-  const proofUrl = parseUrl(proof?.url);
-  if (!proofUrl || !allowedHosts.has(proofUrl.hostname)) errors.push(`${name}: evidence URL must be an approved primary-source host.`);
-  if (identity?.sourceUrl !== proof?.url) errors.push(`${name}: identity sourceUrl and evidence URL must match exactly.`);
-  if (!proof?.capturedAt || Number.isNaN(Date.parse(proof.capturedAt))) errors.push(`${name}: capturedAt must be a valid timestamp.`);
-  if (!Array.isArray(proof?.facts) || proof.facts.length === 0 || proof.facts.some(fact => typeof fact !== 'string' || !fact.trim())) errors.push(`${name}: at least one reviewed primary-source fact is required.`);
+  validateWebProof(name, 'identity', identity?.evidence);
+  if (identity?.sourceUrl !== identity?.evidence?.url) errors.push(`${name}: identity sourceUrl and evidence URL must match exactly.`);
 
   const license = record?.license;
-  if (!license || license.status !== 'pending') errors.push(`${name}: official-web records require license.status=pending until an exact ONOD license policy is normalized.`);
-  if (license?.id) errors.push(`${name}: pending license must not expose a definitive id.`);
+  if (!license || !['pending', 'verified'].includes(license.status)) errors.push(`${name}: license.status must be pending or verified.`);
+  if (license?.status === 'pending') {
+    if (license?.id) errors.push(`${name}: pending license must not expose a definitive id.`);
+    if (license?.evidence) errors.push(`${name}: pending license must not carry canonical verified evidence.`);
+  }
+  if (license?.status === 'verified') {
+    if (!allowedVerifiedLicenses.has(license?.id)) errors.push(`${name}: verified web license '${license?.id}' has no reviewed ONOD policy.`);
+    validateWebProof(name, 'license', license?.evidence);
+  }
 
   const technical = record?.technical || {};
   for (const flag of ['weightsVerified', 'variableVerified', 'scriptsVerified']) {
@@ -71,10 +86,12 @@ for (const [name, record] of Object.entries(records)) {
 
 const scriptVerified = Object.values(records).filter(record => record?.technical?.scriptsVerified).length;
 const variableVerified = Object.values(records).filter(record => record?.technical?.variableVerified).length;
-console.log(`Independent web identity evidence: ${Object.keys(records).length} families; license pending=${Object.keys(records).length}; script-verified=${scriptVerified}; variable-verified=${variableVerified}.`);
+const verifiedLicenses = Object.values(records).filter(record => record?.license?.status === 'verified').length;
+const pendingLicenses = Object.values(records).filter(record => record?.license?.status === 'pending').length;
+console.log(`Independent web evidence: ${Object.keys(records).length} identities; verified licenses=${verifiedLicenses}; pending licenses=${pendingLicenses}; script-verified=${scriptVerified}; variable-verified=${variableVerified}.`);
 if (errors.length) {
   console.error(`Errors: ${errors.length}`);
   errors.forEach(error => console.error(`  ERROR ${error}`));
   process.exit(1);
 }
-console.log('Independent web identity/field evidence validation passed.');
+console.log('Independent web identity/license/field evidence validation passed.');

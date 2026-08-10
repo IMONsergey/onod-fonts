@@ -1,5 +1,5 @@
 import type { Font } from "../data/mockFonts";
-import verifiedGoogleFontsJson from "../data/verified/google-fonts.json" with { type: "json" };
+import verifiedGoogleFontsJson from "../data/verified/.generated/google-fonts-runtime.json" with { type: "json" };
 
 export type FontDataConfidence = "curated" | "derived";
 
@@ -7,14 +7,11 @@ interface VerifiedGoogleFont {
   family: string;
   designer: string;
   license: string;
-  categories: string[];
   subsets: string[];
   axes: Record<string, { min: number; max: number }>;
   weights: number[];
-  styles: string[];
   repositoryUrl?: string;
   metadataPath: string;
-  metadataSha: string;
 }
 
 export interface FontTrustReport {

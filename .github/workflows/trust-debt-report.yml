@@ -4,12 +4,16 @@ on:
   push:
     branches:
       - main
-      - feat/trust-engine
+      - feat/font-data-engine
     paths:
       - src/app/data/mockFonts.ts
       - src/app/data/verified/google-fonts.json
       - src/app/data/verified/google-fonts-aliases.json
+      - src/app/data/verified/fontshare.json
+      - src/app/data/verified/fontshare-aliases.json
+      - src/app/data/verified/fontshare-license-policies.json
       - src/app/lib/fontTrust.ts
+      - src/app/lib/fontSourcePolicy.ts
       - scripts/build-runtime-metadata.mjs
       - scripts/build-trust-report.mjs
       - .github/workflows/trust-debt-report.yml

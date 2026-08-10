@@ -36,12 +36,17 @@ npm run preview
 
 ## GitHub Pages
 
-Production is published from the `gh-pages` branch root. The branch contains a
-runner-independent static fallback so the public catalog remains deployable even
-when the React build workflow is unavailable.
+Production is deployed automatically from `main` by `.github/workflows/deploy-pages.yml`.
+The workflow installs dependencies with `npm ci`, runs the full `npm run check` quality gate,
+builds the Vite application, preserves a SPA `404.html`, adds `.nojekyll`, and publishes the
+resulting `dist/` directory to the `gh-pages` branch root.
 
-The production Vite base path is `/onod-fonts/`. A future automated React deploy
-must preserve `dist/404.html` so direct React Router routes resolve on GitHub Pages.
+GitHub Pages remains configured to serve the root of `gh-pages`. The production Vite base path
+is `/onod-fonts/`, so generated JS/CSS assets resolve correctly at the project Pages URL.
+Do not maintain a separate hand-written fallback page in `gh-pages`; production output must come
+from the canonical React/Vite application in `main`.
+
+Public site: https://imonsergey.github.io/onod-fonts/
 
 ## Standalone migration
 

@@ -1,4 +1,3 @@
-@import './invert.css';
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -143,3 +142,12 @@
 
 html { font-size: var(--font-size); }
 @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

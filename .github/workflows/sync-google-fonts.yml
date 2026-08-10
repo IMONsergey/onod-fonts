@@ -1,0 +1,59 @@
+name: Sync verified Google Fonts metadata
+
+on:
+  push:
+    branches:
+      - main
+      - feat/trust-engine
+    paths:
+      - scripts/sync-google-fonts.mjs
+      - src/app/data/verified/google-fonts-aliases.json
+      - .github/workflows/sync-google-fonts.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: onod-fonts-google-metadata-sync-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Fetch authoritative Google Fonts metadata
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node --experimental-strip-types scripts/sync-google-fonts.mjs
+
+      - name: Validate refreshed evidence before commit
+        run: |
+          node scripts/build-runtime-metadata.mjs
+          node --experimental-strip-types scripts/validate-catalog.mjs
+
+      - name: Commit verified metadata evidence
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet -- src/app/data/verified/google-fonts.json; then
+            echo "Verified Google Fonts metadata is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/app/data/verified/google-fonts.json
+          git commit -m "data: sync verified Google Fonts metadata"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:${GITHUB_REF_NAME}

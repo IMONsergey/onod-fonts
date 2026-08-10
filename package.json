@@ -4,11 +4,18 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "metadata:runtime": "node scripts/build-runtime-metadata.mjs",
+    "predev": "npm run metadata:runtime",
     "dev": "vite",
+    "pretypecheck": "npm run metadata:runtime",
+    "typecheck": "tsc --noEmit",
+    "prebuild": "npm run metadata:runtime",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "npm run typecheck && npm run build",
-    "typecheck": "tsc --noEmit"
+    "catalog:validate": "npm run metadata:runtime && node --experimental-strip-types scripts/validate-catalog.mjs",
+    "build:validate": "node scripts/validate-build.mjs",
+    "smoke:preview": "node scripts/smoke-preview.mjs",
+    "check": "npm run metadata:runtime && node --experimental-strip-types scripts/validate-catalog.mjs && tsc --noEmit && vite build && node scripts/validate-build.mjs && node scripts/smoke-preview.mjs"
   },
   "dependencies": {
     "clsx": "2.1.1",

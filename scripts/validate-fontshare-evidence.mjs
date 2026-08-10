@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { mockFonts } from '../src/app/data/mockFonts.ts';
+import { hasReviewedFontshareLicensePolicy } from '../src/app/lib/fontSourcePolicy.ts';
 
 const MIN_BOOTSTRAP_EVIDENCE = 40;
 const evidence = JSON.parse(readFileSync(resolve(process.cwd(), 'src/app/data/verified/fontshare.json'), 'utf8'));
@@ -43,6 +44,7 @@ for (const [catalogName, record] of Object.entries(evidence)) {
 
   if (typeof record.slug !== 'string' || !record.slug) errors.push(`evidence:${catalogName}: missing slug.`);
   if (typeof record.licenseType !== 'string' || !record.licenseType) errors.push(`evidence:${catalogName}: missing licenseType.`);
+  else if (!hasReviewedFontshareLicensePolicy(record.licenseType)) errors.push(`evidence:${catalogName}: provider license type '${record.licenseType}' has no reviewed ONOD capability policy.`);
   if (!isHttpUrl(record.sourceUrl) || !record.sourceUrl.startsWith('https://fontshare.com/fonts/')) errors.push(`evidence:${catalogName}: invalid primary source URL ${record.sourceUrl}.`);
   if (!/^[0-9a-f]{64}$/i.test(record.sourceHash || '')) errors.push(`evidence:${catalogName}: invalid SHA-256 sourceHash.`);
   if (!record.capturedAt || Number.isNaN(Date.parse(record.capturedAt))) errors.push(`evidence:${catalogName}: invalid capturedAt timestamp.`);
@@ -103,4 +105,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log('Fontshare primary-source evidence validation passed.');
+console.log('Fontshare primary-source evidence and license-policy validation passed.');

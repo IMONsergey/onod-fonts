@@ -26,6 +26,7 @@ export interface FontTrustReport {
 }
 
 const verifiedGoogleFonts = verifiedGoogleFontsJson as Record<string, VerifiedGoogleFont>;
+const canonicalFamilyName = (value: string) => value.normalize("NFKD").replace(/\p{Diacritic}/gu, "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
 const isGeneratedDescription = (font: Font) => {
   const description = font.description || "";
@@ -33,7 +34,9 @@ const isGeneratedDescription = (font: Font) => {
 };
 
 export function getVerifiedGoogleFont(font: Font): VerifiedGoogleFont | undefined {
-  return verifiedGoogleFonts[font.name];
+  const candidate = verifiedGoogleFonts[font.name];
+  if (!candidate) return undefined;
+  return canonicalFamilyName(candidate.family) === canonicalFamilyName(font.name) ? candidate : undefined;
 }
 
 export function getFontTrustReport(font: Font): FontTrustReport {
@@ -50,7 +53,6 @@ export function getFontTrustReport(font: Font): FontTrustReport {
 
   const confidence: FontDataConfidence = isGeneratedDescription(font) ? "derived" : "curated";
   const warnings: string[] = [];
-
   if (confidence === "derived") warnings.push("Catalog metadata for this family was generated from a source manifest and has not yet been fully verified against the upstream font files.");
   if (font.license === "Open Source") warnings.push("The exact upstream license identifier is not recorded yet. Verify the license at the source before redistribution or commercial delivery.");
 

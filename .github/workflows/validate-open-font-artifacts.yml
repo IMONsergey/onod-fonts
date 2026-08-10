@@ -1,0 +1,36 @@
+name: Validate open font artifact evidence
+
+on:
+  push:
+    branches:
+      - main
+      - feat/font-data-engine
+    paths:
+      - src/app/data/verified/independent-sources.json
+      - src/app/data/verified/artifacts/open-fonts.json
+      - scripts/font-data/validate-open-artifacts.mjs
+      - .github/workflows/validate-open-font-artifacts.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - src/app/data/verified/independent-sources.json
+      - src/app/data/verified/artifacts/open-fonts.json
+      - scripts/font-data/validate-open-artifacts.mjs
+      - .github/workflows/validate-open-font-artifacts.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node --experimental-strip-types scripts/font-data/validate-open-artifacts.mjs

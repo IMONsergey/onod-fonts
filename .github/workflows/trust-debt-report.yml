@@ -52,7 +52,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if git diff --quiet -- docs/TRUST-DEBT.md; then
+          if [ -z "$(git status --porcelain -- docs/TRUST-DEBT.md)" ]; then
             echo "Trust debt report is already current."
             exit 0
           fi

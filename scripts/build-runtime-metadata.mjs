@@ -15,9 +15,14 @@ const fontshareTarget = resolve(generatedDir, 'fontshare-runtime.json');
 const fontshareEvidence = JSON.parse(readFileSync(fontshareSource, 'utf8'));
 const fontshareAliases = JSON.parse(readFileSync(fontshareAliasesSource, 'utf8'));
 
-const independentSource = resolve(process.cwd(), 'src/app/data/verified/independent-sources.json');
+const independentRepoSource = resolve(process.cwd(), 'src/app/data/verified/independent-sources.json');
+const independentWebSource = resolve(process.cwd(), 'src/app/data/verified/independent-web-sources.json');
 const independentTarget = resolve(generatedDir, 'independent-runtime.json');
-const independentEvidence = JSON.parse(readFileSync(independentSource, 'utf8'));
+const independentRepoEvidence = JSON.parse(readFileSync(independentRepoSource, 'utf8'));
+const independentWebEvidence = JSON.parse(readFileSync(independentWebSource, 'utf8'));
+const independentCollisions = Object.keys(independentWebEvidence).filter(name => Object.prototype.hasOwnProperty.call(independentRepoEvidence, name));
+if (independentCollisions.length) throw new Error(`Independent evidence identity collision: ${independentCollisions.join(', ')}`);
+const independentEvidence = { ...independentRepoEvidence, ...independentWebEvidence };
 
 const isReviewedIdentity = (catalogName, metadata, aliases) =>
   metadata?.family === catalogName || aliases[catalogName] === metadata?.family;
@@ -86,6 +91,7 @@ const independentRuntime = Object.fromEntries(Object.entries(independentEvidence
       ...(metadata.identity.repository ? { repository: metadata.identity.repository } : {}),
       sourceUrl: metadata.identity.sourceUrl,
       designer: metadata.identity.designer,
+      ...(metadata.identity.publisher ? { publisher: metadata.identity.publisher } : {}),
     },
     license: metadata.license?.status === 'verified'
       ? { status: 'verified', id: metadata.license.id }

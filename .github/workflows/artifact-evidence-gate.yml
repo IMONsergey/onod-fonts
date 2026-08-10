@@ -1,0 +1,55 @@
+name: Open artifact evidence gate
+
+on:
+  push:
+    branches:
+      - main
+      - feat/font-data-engine
+    paths:
+      - src/app/data/verified/artifacts/open-fonts.json
+      - scripts/font-data/inspect-sfnt.mjs
+      - scripts/font-data/validate-open-artifacts-strict.mjs
+      - scripts/font-data/build-artifact-report.mjs
+      - .github/workflows/artifact-evidence-gate.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: onod-fonts-artifact-evidence-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-and-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Require real artifact coverage
+        run: |
+          node -e "const fs=require('fs');const x=JSON.parse(fs.readFileSync('src/app/data/verified/artifacts/open-fonts.json','utf8'));const n=Object.keys(x).length;console.log('artifact evidence count='+n);if(n<3)process.exit(1)"
+      - name: Validate artifact-internal identity and SFNT integrity
+        run: node --experimental-strip-types scripts/font-data/validate-open-artifacts-strict.mjs
+      - name: Generate artifact report
+        run: node scripts/font-data/build-artifact-report.mjs
+      - name: Commit report if changed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$(git status --porcelain -- docs/ARTIFACT-INSPECTION.md)" ]; then
+            echo "Artifact report is current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/ARTIFACT-INSPECTION.md
+          git commit -m "docs: refresh open artifact inspection report"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:${GITHUB_REF_NAME}

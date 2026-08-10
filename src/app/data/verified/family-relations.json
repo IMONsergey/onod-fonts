@@ -25,6 +25,36 @@
     "loadReplacementAllowed": true,
     "note": "This is a reviewed catalog spelling correction, not a historical successor or similarity match. The recovered stable font ID may render the canonical Cedarville Cursive family."
   },
+  "Open Sans Condensed": {
+    "catalogFamily": "Open Sans Condensed",
+    "status": "verified",
+    "relation": "historical-removed",
+    "provider": "Google Fonts",
+    "historical": {
+      "family": "Open Sans Condensed",
+      "sourceUrl": "https://github.com/google/fonts/commit/42fa6aedff8c20a9516b130182ba260a8ff3decb",
+      "designer": "Steve Matteson",
+      "licenseId": "Apache-2.0",
+      "weights": [300, 700],
+      "variable": false,
+      "scripts": ["Latin", "Cyrillic", "Greek", "Vietnamese"],
+      "evidence": {
+        "repository": "google/fonts",
+        "commitSha": "42fa6aedff8c20a9516b130182ba260a8ff3decb",
+        "metadataPath": "apache/opensanscondensed/METADATA.pb",
+        "metadataBlobSha": "eaca62d13ebea6639e3239cd98c7b1ca990d0f81",
+        "licensePath": "apache/opensanscondensed/LICENSE.txt",
+        "licenseBlobSha": "75b52484ea471f882c29e02693b4f02dba175b5e",
+        "facts": [
+          "The official google/fonts removal commit deletes Open Sans Condensed from the catalog and shows the prior METADATA.pb with exact family identity Open Sans Condensed, designer Steve Matteson and license APACHE2.",
+          "The prior METADATA.pb records normal 300, italic 300 and normal 700 faces and Latin, Cyrillic, Greek and Vietnamese subsets.",
+          "The historical LICENSE.txt blob is Apache License 2.0."
+        ]
+      }
+    },
+    "loadReplacementAllowed": false,
+    "note": "Open Sans Condensed is a verified historical Google Fonts family removed from the catalog on 2024-09-24. ONOD may preserve its historical identity and technical metadata but must not silently substitute another Open Sans family for rendering."
+  },
   "Source Sans Pro": {
     "catalogFamily": "Source Sans Pro",
     "status": "verified",

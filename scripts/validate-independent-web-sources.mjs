@@ -10,6 +10,9 @@ const allowedHosts = new Set([
   'rajputrajesh-4489b.web.app',
   'indiantypefoundry.com', 'www.indiantypefoundry.com',
   'fontfabric.com', 'www.fontfabric.com',
+  'displaay.net', 'www.displaay.net',
+  'atipofoundry.com', 'www.atipofoundry.com',
+  'filipposfragkogiannis.com', 'www.filipposfragkogiannis.com',
 ]);
 
 const parseUrl = value => {
@@ -65,7 +68,8 @@ for (const [name, record] of Object.entries(records)) {
 }
 
 const scriptVerified = Object.values(records).filter(record => record?.technical?.scriptsVerified).length;
-console.log(`Independent web identity evidence: ${Object.keys(records).length} families; license pending=${Object.keys(records).length}; script-verified=${scriptVerified}.`);
+const variableVerified = Object.values(records).filter(record => record?.technical?.variableVerified).length;
+console.log(`Independent web identity evidence: ${Object.keys(records).length} families; license pending=${Object.keys(records).length}; script-verified=${scriptVerified}; variable-verified=${variableVerified}.`);
 if (errors.length) {
   console.error(`Errors: ${errors.length}`);
   errors.forEach(error => console.error(`  ERROR ${error}`));

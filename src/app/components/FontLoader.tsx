@@ -8,16 +8,7 @@ interface FontLoaderProps {
 }
 
 const NON_GOOGLE_SOURCES = new Set([
-  'Fontshare',
-  'Velvetyne',
-  'Collletttivo',
-  'Font Library',
-  'iA',
-  'GNU',
-  'DejaVu',
-  'Liberation',
-  'GitHub',
-  'GitHub Next',
+  'Fontshare', 'Velvetyne', 'Collletttivo', 'Font Library', 'iA', 'GNU', 'DejaVu', 'Liberation', 'GitHub', 'GitHub Next',
 ]);
 
 const FONTSHARE_SLUGS: Record<string, string> = {
@@ -27,9 +18,7 @@ const FONTSHARE_SLUGS: Record<string, string> = {
   'Bw Seido': 'bw-seido-raw',
 };
 
-const globalRequestedIds = new Set<string>();
 const globalReadyIds = new Set<string>();
-
 const stylesheetId = (prefix: string, font: Font) => `${prefix}-${font.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 
 const primaryFamily = (font: Font) => {
@@ -38,21 +27,17 @@ const primaryFamily = (font: Font) => {
 };
 
 const fontDescriptor = (font: Font) => {
-  const effectiveWeights = getEffectiveWeights(font).map(weight => Number(weight)).filter(weight => Number.isFinite(weight));
-  const preferredWeight = effectiveWeights.includes(400) ? 400 : effectiveWeights[0] || 400;
-  return `${preferredWeight} 16px "${primaryFamily(font).replace(/"/g, '\\"')}"`;
+  const weights = getEffectiveWeights(font).map(Number).filter(Number.isFinite);
+  const weight = weights.includes(400) ? 400 : weights[0] || 400;
+  return `${weight} 16px "${primaryFamily(font).replace(/"/g, '\\"')}"`;
 };
 
 const verifyFontFace = async (font: Font) => {
-  if (!document.fonts) {
-    setFontRuntimeStatus(font.id, 'ready');
-    return;
-  }
+  if (!document.fonts) return setFontRuntimeStatus(font.id, 'ready');
 
   try {
     const descriptor = fontDescriptor(font);
-    const languages = getEffectiveLanguages(font);
-    const sample = languages.includes('Cyrillic') ? 'Hamburgefontsiv Привет' : 'Hamburgefontsiv';
+    const sample = getEffectiveLanguages(font).includes('Cyrillic') ? 'Hamburgefontsiv Привет' : 'Hamburgefontsiv';
     await document.fonts.load(descriptor, sample);
     const ready = document.fonts.check(descriptor, sample);
     setFontRuntimeStatus(font.id, ready ? 'ready' : 'error', ready ? undefined : 'Font face was not registered; preview is using fallback.');
@@ -63,12 +48,10 @@ const verifyFontFace = async (font: Font) => {
 
 const googleFontUrl = (font: Font) => {
   const weights = getEffectiveWeights(font).sort((a, b) => Number(a) - Number(b));
-  let familySpec = font.name;
-
-  if (isEffectivelyVariable(font) && weights.length >= 2) familySpec += `:wght@${weights[0]}..${weights[weights.length - 1]}`;
-  else familySpec += `:wght@${weights.join(';')}`;
-
-  return `https://fonts.googleapis.com/css2?family=${encodeURIComponent(familySpec).replace(/%20/g, '+')}&display=swap`;
+  let family = font.name;
+  if (isEffectivelyVariable(font) && weights.length > 1) family += `:wght@${weights[0]}..${weights.at(-1)}`;
+  else family += `:wght@${weights.join(';')}`;
+  return `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, '+')}&display=swap`;
 };
 
 export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
@@ -84,15 +67,22 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
       const existing = document.getElementById(id) as HTMLLinkElement | null;
       if (existing) {
         setFontRuntimeStatus(font.id, 'loading');
-        const verify = () => void verifyFontFace(font);
-        existing.addEventListener('load', verify, { once: true });
-        existing.addEventListener('error', () => setFontRuntimeStatus(font.id, 'error', `Stylesheet failed to load: ${url}`), { once: true });
+        if (existing.sheet) {
+          globalReadyIds.add(id);
+          void verifyFontFace(font);
+          return;
+        }
+        const onLoad = () => {
+          globalReadyIds.add(id);
+          void verifyFontFace(font);
+        };
+        const onError = () => setFontRuntimeStatus(font.id, 'error', `Stylesheet failed to load: ${url}`);
+        existing.addEventListener('load', onLoad, { once: true });
+        existing.addEventListener('error', onError, { once: true });
         return;
       }
 
       setFontRuntimeStatus(font.id, 'loading');
-      globalRequestedIds.add(id);
-
       const link = document.createElement('link');
       link.id = id;
       link.rel = 'stylesheet';
@@ -103,7 +93,6 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
         void verifyFontFace(font);
       };
       link.onerror = () => {
-        globalRequestedIds.delete(id);
         globalReadyIds.delete(id);
         setFontRuntimeStatus(font.id, 'error', `Stylesheet failed to load: ${url}`);
         link.remove();
@@ -116,18 +105,15 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
         addStylesheet(font, font.customCssUrl, stylesheetId('custom', font));
         continue;
       }
-
       if (font.source === 'Fontshare') {
         const slug = FONTSHARE_SLUGS[font.name] || font.name.toLowerCase().replace(/\s+/g, '-');
         addStylesheet(font, `https://api.fontshare.com/v2/css?f[]=${encodeURIComponent(slug)}@1&display=swap`, stylesheetId('fontshare', font));
         continue;
       }
-
       if (!NON_GOOGLE_SOURCES.has(font.source)) {
         addStylesheet(font, googleFontUrl(font), stylesheetId('google', font));
         continue;
       }
-
       setFontRuntimeStatus(font.id, 'error', `No font loading strategy for source: ${font.source}`);
     }
   }, [fonts]);

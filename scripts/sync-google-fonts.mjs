@@ -89,6 +89,10 @@ async function fetchFamily(font) {
     const text = Buffer.from(payload.content.replace(/\n/g, ''), 'base64').toString('utf8');
     const parsed = parseMetadata(text, metadataPath, payload.sha);
     if (!parsed.family || !parsed.license) throw new Error(`${font.name}: incomplete METADATA.pb at ${metadataPath}`);
+
+    // Slug equality is only discovery. Verification requires exact family identity.
+    // If upstream uses a different family string, keep the catalog record unverified
+    // until an explicit alias map is reviewed and versioned.
     if (parsed.family !== font.name) return { collision: parsed };
     return { metadata: parsed };
   }

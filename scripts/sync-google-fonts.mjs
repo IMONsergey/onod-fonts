@@ -18,13 +18,12 @@ const candidates = mockFonts.filter(font =>
   !NON_GOOGLE_SOURCES.has(font.source),
 );
 
-const canonicalFamilyName = value => value
+const slugify = value => value
   .normalize('NFKD')
   .replace(/\p{Diacritic}/gu, '')
   .toLowerCase()
   .replace(/[^a-z0-9]/g, '');
 
-const slugify = canonicalFamilyName;
 const allQuoted = (text, key) => Array.from(text.matchAll(new RegExp(`^${key}:\\s*"([^"]*)"`, 'gm')), match => match[1]);
 const firstQuoted = (text, key) => allQuoted(text, key)[0] || '';
 const firstNumber = (text, key) => {
@@ -90,7 +89,7 @@ async function fetchFamily(font) {
     const text = Buffer.from(payload.content.replace(/\n/g, ''), 'base64').toString('utf8');
     const parsed = parseMetadata(text, metadataPath, payload.sha);
     if (!parsed.family || !parsed.license) throw new Error(`${font.name}: incomplete METADATA.pb at ${metadataPath}`);
-    if (canonicalFamilyName(parsed.family) !== canonicalFamilyName(font.name)) return { collision: parsed };
+    if (parsed.family !== font.name) return { collision: parsed };
     return { metadata: parsed };
   }
   return null;
@@ -143,7 +142,7 @@ if (success < minimumCoverage && Object.keys(previous).length === 0) {
 const candidateNames = new Set(candidates.map(font => font.name));
 const next = {};
 for (const [name, metadata] of Object.entries(previous)) {
-  if (candidateNames.has(name) && canonicalFamilyName(metadata.family || '') === canonicalFamilyName(name)) next[name] = metadata;
+  if (candidateNames.has(name) && metadata.family === name) next[name] = metadata;
 }
 Object.assign(next, fetched);
 
@@ -152,7 +151,7 @@ writeFileSync(target, `${JSON.stringify(ordered, null, 2)}\n`);
 
 console.log(`Google Fonts metadata sync complete: ${success}/${candidates.length} refreshed; ${Object.keys(ordered).length} versioned verified records total.`);
 console.log(`Not found in google/fonts by normalized family slug: ${misses.length}.`);
-console.log(`Rejected canonical-name collisions: ${collisions.length}.`);
+console.log(`Rejected exact-name collisions: ${collisions.length}.`);
 if (misses.length) console.log(`Sample misses: ${misses.slice(0, 40).join(', ')}`);
 if (collisions.length) collisions.slice(0, 20).forEach(item => console.warn(`  COLLISION ${item}`));
 if (failures.length) failures.slice(0, 10).forEach(item => console.warn(`  FAILURE ${item}`));

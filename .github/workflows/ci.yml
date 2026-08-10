@@ -35,5 +35,20 @@ jobs:
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
 
+      - name: Font Data Engine primary-source probe
+        if: github.head_ref == 'feat/font-data-engine'
+        run: |
+          node --experimental-strip-types scripts/sync-fontshare.mjs
+          node --experimental-strip-types scripts/validate-fontshare-evidence.mjs --require-coverage
+
+      - name: Upload Fontshare evidence probe
+        if: github.head_ref == 'feat/font-data-engine'
+        uses: actions/upload-artifact@v4
+        with:
+          name: fontshare-evidence-probe
+          path: src/app/data/verified/fontshare.json
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Typecheck and production build
         run: npm run check

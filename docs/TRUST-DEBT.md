@@ -3,7 +3,7 @@
 > Generated from the canonical runtime trust layer. Do not edit counts manually.
 
 Catalog families: **1346**
-Identity trust debt: **23**
+Identity trust debt: **21**
 License trust debt: **34**
 Source/license union debt: **34**
 Source + license clear: **1312**
@@ -14,7 +14,7 @@ Identity and license are independent facts. A family can have a verified primary
 
 - exact weights pending: **36** families
 - variable capability pending: **35** families
-- script coverage pending: **27** families
+- script coverage pending: **26** families
 
 Technical debt is also independent from source/license trust. Inspected font binaries may clear technical fields without changing provider/legal facts.
 
@@ -31,7 +31,7 @@ Technical debt is also independent from source/license trust. Inspected font bin
 | Family | Recovered source | Identity | License | Weights | Variable | Scripts | Current label |
 |---|---|---|---|---|---|---|---|
 | Barbara | Fontshare | pending | pending | pending | pending | pending | Verify at source |
-| Bromine | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Bromine | Fontshare | verified | pending | pending | pending | pending | Verify at source |
 | Bw Gradual | Fontshare | verified | pending | pending | pending | verified | Verify at source |
 | Bw Modelica | Fontshare | verified | pending | pending | pending | verified | Verify at source |
 | Bw Nista | Fontshare | verified | pending | pending | pending | verified | Verify at source |
@@ -54,7 +54,7 @@ Technical debt is also independent from source/license trust. Inspected font bin
 | Nohemi | Fontshare | verified | pending | pending | pending | pending | Verify at source |
 | Ozone | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Polaris FS | Fontshare | pending | pending | pending | pending | pending | Verify at source |
-| Pramit | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Pramit | Fontshare | verified | pending | pending | pending | pending | Verify at source |
 | Saans | Fontshare | verified | pending | pending | verified | verified | Verify at source |
 | Strawford | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Sudo | Fontshare | pending | pending | pending | pending | pending | Verify at source |
@@ -69,6 +69,7 @@ Technical debt is also independent from source/license trust. Inspected font bin
 
 | Family | Provider | Primary source | License status |
 |---|---|---|---|
+| Bromine | Independent | https://www.indiantypefoundry.com/fonts/bromine | pending |
 | Bw Gradual | Independent | https://brandingwithtype.com/typefaces/bw-gradual | pending |
 | Bw Modelica | Independent | https://brandingwithtype.com/typefaces/bw-modelica | pending |
 | Bw Nista | Independent | https://brandingwithtype.com/typefaces/bw-nista-collection | pending |
@@ -78,6 +79,7 @@ Technical debt is also independent from source/license trust. Inspected font bin
 | Lausanne | Independent | https://weltkern.com/typefaces/lausanne/ | pending |
 | New Spirit | Independent | https://newlyn.com/fonts/new-spirit/ | pending |
 | Nohemi | Independent | https://rajputrajesh-4489b.web.app/products/nohemi | pending |
+| Pramit | Independent | https://www.indiantypefoundry.com/fonts/pramit | pending |
 | Saans | Independent | https://displaay.net/typeface/saans | pending |
 | Vercetti | Independent | https://filipposfragkogiannis.com/fonts/vercetti-regular/ | pending |
 
@@ -86,5 +88,5 @@ Technical debt is also independent from source/license trust. Inspected font bin
 | Family | Provider | Weights | Variable | Scripts |
 |---|---|---|---|---|
 | Nacelle | Independent | pending | pending | pending |
-| Source Sans Pro | Historical | pending | pending | pending |
+| Source Sans Pro | Historical | pending | pending | verified |
 

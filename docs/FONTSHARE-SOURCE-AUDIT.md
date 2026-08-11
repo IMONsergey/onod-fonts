@@ -5,8 +5,8 @@
 Recovered Fontshare-tagged families: **82**
 Current exact/reviewed Fontshare evidence: **45**
 Legacy/unmatched against current Fontshare API: **37**
-Legacy records already re-sourced to another primary source: **17**
-Legacy source-identity queue still unresolved: **20**
+Legacy records already re-sourced to another primary source: **19**
+Legacy source-identity queue still unresolved: **18**
 
 ## Interpretation
 
@@ -20,6 +20,7 @@ Legacy source-identity queue still unresolved: **20**
 | Family | Canonical source | Primary URL | License state |
 |---|---|---|---|
 | Aspekta | Ivo Dolenc | https://github.com/ivodolenc/aspekta | OFL-1.1 |
+| Bromine | Indian Type Foundry | https://www.indiantypefoundry.com/fonts/bromine | License pending |
 | Bw Gradual | Branding with Type | https://brandingwithtype.com/typefaces/bw-gradual | License pending |
 | Bw Modelica | Branding with Type | https://brandingwithtype.com/typefaces/bw-modelica | License pending |
 | Bw Nista | Branding with Type | https://brandingwithtype.com/typefaces/bw-nista-collection | License pending |
@@ -33,6 +34,7 @@ Legacy source-identity queue still unresolved: **20**
 | New Spirit | Newlyn | https://newlyn.com/fonts/new-spirit/ | License pending |
 | Nohemi | Rajesh Rajput | https://rajputrajesh-4489b.web.app/products/nohemi | License pending |
 | Overused Grotesk | Bao Nguyen / RandomMaerks | https://github.com/RandomMaerks/Overused-Grotesk | OFL-1.1 |
+| Pramit | Indian Type Foundry | https://www.indiantypefoundry.com/fonts/pramit | License pending |
 | Saans | Displaay Type Foundry | https://displaay.net/typeface/saans | License pending |
 | Uncut Sans | Kasper Nordkvist | https://github.com/kaspernordkvist/uncut_sans | OFL-1.1 |
 | Vercetti | Filippos Fragkogiannis | https://filipposfragkogiannis.com/fonts/vercetti-regular/ | License pending |
@@ -42,7 +44,6 @@ Legacy source-identity queue still unresolved: **20**
 | Family | Recovered author | Recovered source URL | Raw license | Status |
 |---|---|---|---|---|
 | Barbara | Indian Type Foundry | https://www.fontshare.com/fonts/barbara | Open Source | Re-source from primary evidence |
-| Bromine | Indian Type Foundry | https://www.fontshare.com/fonts/bromine | Open Source | Re-source from primary evidence |
 | Bw Seido | Indian Type Foundry | https://www.fontshare.com/fonts/bw-seido | Open Source | Re-source from primary evidence |
 | Canchal | Indian Type Foundry | https://www.fontshare.com/fonts/canchal | Open Source | Re-source from primary evidence |
 | Cassandra | Indian Type Foundry | https://www.fontshare.com/fonts/cassandra | Open Source | Re-source from primary evidence |
@@ -56,7 +57,6 @@ Legacy source-identity queue still unresolved: **20**
 | Mrow | Indian Type Foundry | https://www.fontshare.com/fonts/mrow | Open Source | Re-source from primary evidence |
 | Ozone | Indian Type Foundry | https://www.fontshare.com/fonts/ozone | Open Source | Re-source from primary evidence |
 | Polaris FS | Indian Type Foundry | https://www.fontshare.com/fonts/polaris-fs | Open Source | Re-source from primary evidence |
-| Pramit | Indian Type Foundry | https://www.fontshare.com/fonts/pramit | Open Source | Re-source from primary evidence |
 | Strawford | Indian Type Foundry | https://www.fontshare.com/fonts/strawford | Open Source | Re-source from primary evidence |
 | Sudo | Indian Type Foundry | https://www.fontshare.com/fonts/sudo | Open Source | Re-source from primary evidence |
 | Thica | Indian Type Foundry | https://www.fontshare.com/fonts/thica | Open Source | Re-source from primary evidence |

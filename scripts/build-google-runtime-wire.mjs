@@ -38,8 +38,8 @@ const reviewed = Object.entries(evidence)
   .sort(([a], [b]) => a.localeCompare(b));
 
 // Compatibility runtime keeps the public shape consumed by fontTrust while
-// removing browser-irrelevant repetition. Exact path/SHA provenance stays in
-// canonical google-fonts.json and its build-time validators.
+// removing browser-irrelevant repetition. Exact path provenance remains because
+// the runtime-vs-canonical validator treats it as part of the trust contract.
 const compatibilityRuntime = Object.fromEntries(reviewed.map(([name, metadata]) => [name, {
   family: name,
   ...(metadata.family !== name ? { upstreamFamily: metadata.family } : {}),
@@ -49,7 +49,7 @@ const compatibilityRuntime = Object.fromEntries(reviewed.map(([name, metadata]) 
   axes: compactAxisObject(metadata.axes),
   weights: Array.from(new Set((metadata.weights || []).map(Number).filter(Number.isFinite))).sort((a, b) => a - b),
   ...(metadata.repositoryUrl ? { repositoryUrl: metadata.repositoryUrl } : {}),
-  metadataPath: 'google/fonts',
+  metadataPath: metadata.metadataPath,
 }]));
 
 // Short-key wire is generated alongside compatibility data as the next

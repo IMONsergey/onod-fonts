@@ -92,18 +92,27 @@ function assert(condition, message) {
 async function semanticSmoke(session) {
   const issues = await execute(session, `
     const visible = element => !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
-    const unnamedButtons = [...document.querySelectorAll('button')]
+    const unnamed = [...document.querySelectorAll('button')]
       .filter(visible)
-      .filter(button => !button.getAttribute('aria-label') && !button.getAttribute('title') && !button.textContent.trim())
-      .length;
+      .filter(button => !button.getAttribute('aria-label') && !button.getAttribute('aria-labelledby') && !button.getAttribute('title') && !button.textContent.trim());
     const imagesWithoutAlt = [...document.querySelectorAll('img')]
       .filter(visible)
-      .filter(img => !img.hasAttribute('alt'))
-      .length;
-    return { unnamedButtons, imagesWithoutAlt };
+      .filter(img => !img.hasAttribute('alt'));
+    return {
+      unnamedButtons: unnamed.length,
+      unnamedButtonSamples: unnamed.slice(0, 8).map(button => ({
+        id: button.id,
+        role: button.getAttribute('role'),
+        slot: button.getAttribute('data-slot'),
+        className: button.className,
+        html: button.outerHTML.slice(0, 300),
+      })),
+      imagesWithoutAlt: imagesWithoutAlt.length,
+      imageSamples: imagesWithoutAlt.slice(0, 5).map(img => img.outerHTML.slice(0, 300)),
+    };
   `);
-  assert(issues.unnamedButtons === 0, `Visible unnamed buttons: ${issues.unnamedButtons}`);
-  assert(issues.imagesWithoutAlt === 0, `Visible images without alt: ${issues.imagesWithoutAlt}`);
+  assert(issues.unnamedButtons === 0, `Visible unnamed buttons: ${issues.unnamedButtons}; samples=${JSON.stringify(issues.unnamedButtonSamples)}`);
+  assert(issues.imagesWithoutAlt === 0, `Visible images without alt: ${issues.imagesWithoutAlt}; samples=${JSON.stringify(issues.imageSamples)}`);
 }
 
 async function desktopFlow(session) {

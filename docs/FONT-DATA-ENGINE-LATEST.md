@@ -4,6 +4,21 @@ Updated: 2026-08-11
 
 This is the short authoritative handoff for PR #16. Read it with `PROJECT-CONTEXT.md`, Issue #15 and generated `TRUST-DEBT.md`. Repository state and newer generated reports always win over this narrative.
 
+## Release decision
+
+**PR #16 is approved for merge by its release policy.**
+
+Final human-authored release head before this approval: `77b54c7abfb767a6f50c7d99c66ddcc4e2bee0b3`.
+
+All PR checks passed:
+
+- ONOD Fonts CI #240 — success;
+- Independent runtime consistency #18 — success;
+- Validate independent web identity evidence #104 — success;
+- Validate open font artifact evidence #89 — success.
+
+The final CI confirms production dependency audit, canonical/runtime evidence consistency, family relation validation, open + historical artifact validation, field-level catalog trust, TypeScript, Vite production build, GitHub Pages bundle validation and direct-route/built-asset smoke.
+
 ## Current measured trust state
 
 Generated report after the reviewed Bw Seido collection relation:
@@ -16,6 +31,7 @@ Generated report after the reviewed Bw Seido collection relation:
 - exact weights pending: **36**
 - variable capability pending: **35**
 - script coverage pending: **25**
+- verified variable families exposed at runtime: **61**
 
 The phase started at 88 source/license-trust-debt families. Remaining ambiguous identity/license work is intentionally preserved as explicit debt rather than cleared through fuzzy matching. Follow-up curation is tracked in Issue #17.
 
@@ -57,7 +73,7 @@ Canonical registry: `src/app/data/verified/family-relations.json`.
 ## Evidence ingestion and consistency
 
 - Temporary `independent-web-sources-*.json` shards can be reviewed/merged collision-safely into canonical web evidence.
-- Pramit and Bromine were integrated through this path and now reach compact browser runtime as identity-verified / license-pending records.
+- Pramit and Bromine were integrated through this path and reach compact browser runtime as identity-verified / license-pending records.
 - `scripts/validate-independent-runtime-consistency.mjs` blocks evidence that fails to reach runtime.
 - Generated trust/source reports follow canonical evidence changes.
 
@@ -78,15 +94,9 @@ Current artifact systems retain provenance while keeping binaries out of the rep
 
 FFL/proprietary binaries are not inspected unless a reviewed capability policy permits it.
 
-## Last decisive green checkpoints
-
-Human head `879fed648b828de90178822fe8433d36f2e0b62e` / CI #233 proved historical runtime promotion and reported source/license debt 34, weights 36, variable 35, scripts 26.
-
-The subsequent Bw Seido relation tree also passed the full release gate and reduced generated identity debt to 20 and script debt to 25 without changing license/weights/variable debt.
-
 ## Mandatory release gate
 
-The final PR #16 human-authored head must pass:
+PR #16 passed the required gate:
 
 1. production dependency audit;
 2. compact metadata generation;
@@ -102,7 +112,7 @@ The final PR #16 human-authored head must pass:
 12. GitHub Pages base/bundle validation;
 13. direct-route + built-asset production smoke.
 
-Known non-blocking performance debt remains visible: initial JS is ~930 kB minified / ~242 kB gzip. Do not suppress the warning; Browser QA/Performance is the next product engineering phase after this merge.
+Known non-blocking performance debt remains visible: initial JS is ~932 kB minified / ~242 kB gzip. Do not suppress the warning; Browser QA/Performance is the next product engineering phase after this merge.
 
 ## Post-merge boundary
 

@@ -3,7 +3,7 @@
 > Generated from the canonical runtime trust layer. Do not edit counts manually.
 
 Catalog families: **1346**
-Identity trust debt: **21**
+Identity trust debt: **20**
 License trust debt: **34**
 Source/license union debt: **34**
 Source + license clear: **1312**
@@ -14,7 +14,7 @@ Identity and license are independent facts. A family can have a verified primary
 
 - exact weights pending: **36** families
 - variable capability pending: **35** families
-- script coverage pending: **26** families
+- script coverage pending: **25** families
 
 Technical debt is also independent from source/license trust. Inspected font binaries may clear technical fields without changing provider/legal facts.
 
@@ -35,7 +35,7 @@ Technical debt is also independent from source/license trust. Inspected font bin
 | Bw Gradual | Fontshare | verified | pending | pending | pending | verified | Verify at source |
 | Bw Modelica | Fontshare | verified | pending | pending | pending | verified | Verify at source |
 | Bw Nista | Fontshare | verified | pending | pending | pending | verified | Verify at source |
-| Bw Seido | Fontshare | pending | pending | pending | pending | pending | Verify at source |
+| Bw Seido | Fontshare | verified | pending | pending | pending | verified | Verify at source |
 | Canchal | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Cassandra | Fontshare | pending | pending | pending | pending | pending | Verify at source |
 | Deng | Fontshare | pending | pending | pending | pending | pending | Verify at source |
@@ -73,6 +73,7 @@ Technical debt is also independent from source/license trust. Inspected font bin
 | Bw Gradual | Independent | https://brandingwithtype.com/typefaces/bw-gradual | pending |
 | Bw Modelica | Independent | https://brandingwithtype.com/typefaces/bw-modelica | pending |
 | Bw Nista | Independent | https://brandingwithtype.com/typefaces/bw-nista-collection | pending |
+| Bw Seido | Collection | https://brandingwithtype.com/typefaces/bw-seido-collection | pending |
 | Duplet | Independent | https://www.indiantypefoundry.com/fonts/duplet/glyphs | pending |
 | Gilam | Independent | https://www.fontfabric.com/fonts/gilam/ | pending |
 | Gratimo Grotesk | Independent | https://www.typemates.com/fonts/gratimo-grotesk | pending |

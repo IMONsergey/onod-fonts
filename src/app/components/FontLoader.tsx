@@ -9,12 +9,39 @@ interface FontLoaderProps {
 }
 
 type RuntimeArtifact = VerifiedOpenFontArtifact | VerifiedHistoricalFontArtifact;
+type QueueTask = {
+  run: () => Promise<void>;
+  resolve: () => void;
+  reject: (error: unknown) => void;
+};
+
+const MAX_CONCURRENT_FONT_LOADS = 4;
+let activeFontLoads = 0;
+const pendingFontLoads: QueueTask[] = [];
 
 const globalReadyIds = new Set<string>();
 const globalLoadPromises = new Map<string, Promise<void>>();
 const stylesheetId = (prefix: string, font: Font) => `${prefix}-${font.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 const primaryFamily = (font: Font) => getEffectiveFamilyName(font);
 const normalizeFamilyName = (value: string) => value.trim().replace(/^['"]|['"]$/g, '').toLowerCase();
+
+const pumpFontLoadQueue = () => {
+  while (activeFontLoads < MAX_CONCURRENT_FONT_LOADS && pendingFontLoads.length > 0) {
+    const task = pendingFontLoads.shift()!;
+    activeFontLoads += 1;
+    void task.run()
+      .then(task.resolve, task.reject)
+      .finally(() => {
+        activeFontLoads -= 1;
+        pumpFontLoadQueue();
+      });
+  }
+};
+
+const enqueueFontLoad = (run: () => Promise<void>) => new Promise<void>((resolve, reject) => {
+  pendingFontLoads.push({ run, resolve, reject });
+  pumpFontLoadQueue();
+});
 
 const fontDescriptor = (font: Font) => {
   const weights = getEffectiveWeights(font).map(Number).filter(Number.isFinite);
@@ -65,6 +92,17 @@ const artifactWeightDescriptor = (font: Font, artifact: RuntimeArtifact) => {
   return String(weights.includes(400) ? 400 : weights[0] || 400);
 };
 
+const waitForStylesheet = (link: HTMLLinkElement, url: string) => new Promise<void>((resolve, reject) => {
+  if (link.sheet) {
+    resolve();
+    return;
+  }
+  const onLoad = () => resolve();
+  const onError = () => reject(new Error(`Stylesheet failed to load: ${url}`));
+  link.addEventListener('load', onLoad, { once: true });
+  link.addEventListener('error', onError, { once: true });
+});
+
 export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
   useEffect(() => {
     if (!fonts?.length) return;
@@ -75,40 +113,42 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
         return;
       }
 
-      const existing = document.getElementById(id) as HTMLLinkElement | null;
-      if (existing) {
+      const existingPromise = globalLoadPromises.get(id);
+      if (existingPromise) {
         setFontRuntimeStatus(font.id, 'loading');
-        if (existing.sheet) {
-          globalReadyIds.add(id);
-          void verifyFontFace(font);
-          return;
-        }
-        const onLoad = () => {
-          globalReadyIds.add(id);
-          void verifyFontFace(font);
-        };
-        const onError = () => setFontRuntimeStatus(font.id, 'error', `Stylesheet failed to load: ${url}`);
-        existing.addEventListener('load', onLoad, { once: true });
-        existing.addEventListener('error', onError, { once: true });
         return;
       }
 
       setFontRuntimeStatus(font.id, 'loading');
-      const link = document.createElement('link');
-      link.id = id;
-      link.rel = 'stylesheet';
-      link.href = url;
-      link.dataset.fontId = font.id;
-      link.onload = () => {
-        globalReadyIds.add(id);
-        void verifyFontFace(font);
-      };
-      link.onerror = () => {
-        globalReadyIds.delete(id);
-        setFontRuntimeStatus(font.id, 'error', `Stylesheet failed to load: ${url}`);
-        link.remove();
-      };
-      document.head.appendChild(link);
+      const promise = enqueueFontLoad(async () => {
+        let link = document.getElementById(id) as HTMLLinkElement | null;
+        let created = false;
+        if (!link) {
+          link = document.createElement('link');
+          link.id = id;
+          link.rel = 'stylesheet';
+          link.href = url;
+          link.dataset.fontId = font.id;
+          document.head.appendChild(link);
+          created = true;
+        }
+
+        try {
+          await waitForStylesheet(link, url);
+          globalReadyIds.add(id);
+          await verifyFontFace(font);
+        } catch (error) {
+          globalReadyIds.delete(id);
+          setFontRuntimeStatus(font.id, 'error', error instanceof Error ? error.message : `Stylesheet failed to load: ${url}`);
+          if (created) link.remove();
+          throw error;
+        }
+      }).finally(() => {
+        globalLoadPromises.delete(id);
+      });
+
+      globalLoadPromises.set(id, promise);
+      void promise.catch(() => {});
     };
 
     const addArtifactFace = (font: Font, artifact: RuntimeArtifact, kind: 'current' | 'historical') => {
@@ -121,7 +161,6 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
       const existingPromise = globalLoadPromises.get(id);
       if (existingPromise) {
         setFontRuntimeStatus(font.id, 'loading');
-        void existingPromise.then(() => verifyFontFace(font));
         return;
       }
 
@@ -131,7 +170,7 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
       }
 
       setFontRuntimeStatus(font.id, 'loading');
-      const promise = (async () => {
+      const promise = enqueueFontLoad(async () => {
         try {
           const face = new FontFace(
             primaryFamily(font),
@@ -145,11 +184,14 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
         } catch (error) {
           globalReadyIds.delete(id);
           setFontRuntimeStatus(font.id, 'error', error instanceof Error ? error.message : `Verified ${kind} artifact failed to load: ${artifact.sourceUrl}`);
-        } finally {
-          globalLoadPromises.delete(id);
+          throw error;
         }
-      })();
+      }).finally(() => {
+        globalLoadPromises.delete(id);
+      });
+
       globalLoadPromises.set(id, promise);
+      void promise.catch(() => {});
     };
 
     for (const font of fonts) {

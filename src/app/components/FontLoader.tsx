@@ -2,11 +2,13 @@ import React, { useEffect } from 'react';
 import { Font } from '../data/mockFonts';
 import { setFontRuntimeStatus } from '../lib/fontRuntime';
 import { getEffectiveFamilyName, getEffectiveFontshareSlug, getEffectiveLanguages, getEffectiveSourceLabel, getEffectiveWeights, isEffectivelyVariable } from '../lib/fontTrust';
-import { getVerifiedOpenFontArtifact, type VerifiedOpenFontArtifact } from '../lib/fontArtifactRuntime';
+import { getVerifiedHistoricalFontArtifact, getVerifiedOpenFontArtifact, type VerifiedHistoricalFontArtifact, type VerifiedOpenFontArtifact } from '../lib/fontArtifactRuntime';
 
 interface FontLoaderProps {
   fonts: Font[];
 }
+
+type RuntimeArtifact = VerifiedOpenFontArtifact | VerifiedHistoricalFontArtifact;
 
 const globalReadyIds = new Set<string>();
 const globalLoadPromises = new Map<string, Promise<void>>();
@@ -41,9 +43,10 @@ const googleFontUrl = (font: Font) => {
   return `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, '+')}&display=swap`;
 };
 
-const artifactWeightDescriptor = (font: Font, artifact: VerifiedOpenFontArtifact) => {
+const artifactWeightDescriptor = (font: Font, artifact: RuntimeArtifact) => {
   const axis = artifact.axes.wght;
   if (axis) return `${axis.min} ${axis.max}`;
+  if ('weightClass' in artifact) return String(artifact.weightClass);
   const weights = getEffectiveWeights(font).map(Number).filter(Number.isFinite);
   return String(weights.includes(400) ? 400 : weights[0] || 400);
 };
@@ -94,8 +97,8 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
       document.head.appendChild(link);
     };
 
-    const addArtifactFace = (font: Font, artifact: VerifiedOpenFontArtifact) => {
-      const id = stylesheetId(`artifact-${artifact.sha256.slice(0, 12)}`, font);
+    const addArtifactFace = (font: Font, artifact: RuntimeArtifact, kind: 'current' | 'historical') => {
+      const id = stylesheetId(`${kind}-artifact-${artifact.sha256.slice(0, 12)}`, font);
       if (globalReadyIds.has(id)) {
         void verifyFontFace(font);
         return;
@@ -127,7 +130,7 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
           await verifyFontFace(font);
         } catch (error) {
           globalReadyIds.delete(id);
-          setFontRuntimeStatus(font.id, 'error', error instanceof Error ? error.message : `Verified artifact failed to load: ${artifact.sourceUrl}`);
+          setFontRuntimeStatus(font.id, 'error', error instanceof Error ? error.message : `Verified ${kind} artifact failed to load: ${artifact.sourceUrl}`);
         } finally {
           globalLoadPromises.delete(id);
         }
@@ -145,7 +148,13 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
 
       const artifact = getVerifiedOpenFontArtifact(font);
       if (artifact) {
-        addArtifactFace(font, artifact);
+        addArtifactFace(font, artifact, 'current');
+        continue;
+      }
+
+      const historicalArtifact = getVerifiedHistoricalFontArtifact(font);
+      if (historicalArtifact) {
+        addArtifactFace(font, historicalArtifact, 'historical');
         continue;
       }
 

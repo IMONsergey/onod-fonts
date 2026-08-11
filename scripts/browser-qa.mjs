@@ -89,12 +89,23 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-async function semanticSmoke(session) {
+async function semanticSmoke(session, pageLabel = 'page') {
   const issues = await execute(session, `
     const visible = element => !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
+    const hasExplicitName = element => {
+      if (element.getAttribute('aria-label')?.trim()) return true;
+      if (element.getAttribute('aria-labelledby')?.trim()) return true;
+      if (element.getAttribute('title')?.trim()) return true;
+      if ('labels' in element && element.labels && [...element.labels].some(label => label.textContent?.trim())) return true;
+      return false;
+    };
     const unnamed = [...document.querySelectorAll('button')]
       .filter(visible)
-      .filter(button => !button.getAttribute('aria-label') && !button.getAttribute('aria-labelledby') && !button.getAttribute('title') && !button.textContent.trim());
+      .filter(button => !hasExplicitName(button) && !button.textContent.trim());
+    const unnamedControls = [...document.querySelectorAll('input, select, textarea')]
+      .filter(visible)
+      .filter(control => control.getAttribute('type') !== 'hidden')
+      .filter(control => !hasExplicitName(control));
     const imagesWithoutAlt = [...document.querySelectorAll('img')]
       .filter(visible)
       .filter(img => !img.hasAttribute('alt'));
@@ -107,18 +118,27 @@ async function semanticSmoke(session) {
         className: button.className,
         html: button.outerHTML.slice(0, 300),
       })),
+      unnamedControls: unnamedControls.length,
+      unnamedControlSamples: unnamedControls.slice(0, 8).map(control => ({
+        tag: control.tagName,
+        type: control.getAttribute('type'),
+        id: control.id,
+        placeholder: control.getAttribute('placeholder'),
+        html: control.outerHTML.slice(0, 300),
+      })),
       imagesWithoutAlt: imagesWithoutAlt.length,
       imageSamples: imagesWithoutAlt.slice(0, 5).map(img => img.outerHTML.slice(0, 300)),
     };
   `);
-  assert(issues.unnamedButtons === 0, `Visible unnamed buttons: ${issues.unnamedButtons}; samples=${JSON.stringify(issues.unnamedButtonSamples)}`);
-  assert(issues.imagesWithoutAlt === 0, `Visible images without alt: ${issues.imagesWithoutAlt}; samples=${JSON.stringify(issues.imageSamples)}`);
+  assert(issues.unnamedButtons === 0, `${pageLabel}: visible unnamed buttons: ${issues.unnamedButtons}; samples=${JSON.stringify(issues.unnamedButtonSamples)}`);
+  assert(issues.unnamedControls === 0, `${pageLabel}: visible form controls without explicit accessible names: ${issues.unnamedControls}; samples=${JSON.stringify(issues.unnamedControlSamples)}`);
+  assert(issues.imagesWithoutAlt === 0, `${pageLabel}: visible images without alt: ${issues.imagesWithoutAlt}; samples=${JSON.stringify(issues.imageSamples)}`);
 }
 
 async function desktopFlow(session) {
   await navigate(session, BASE_URL);
   await waitFor(session, 'catalog cards', `return document.querySelectorAll('article').length >= 1`);
-  await semanticSmoke(session);
+  await semanticSmoke(session, 'Catalog');
 
   assert(await setInput(session, 'input[type="search"]', 'Inter'), 'Could not set catalog search');
   await waitFor(session, 'catalog q URL state', `return new URL(location.href).searchParams.get('q') === 'Inter'`);
@@ -135,6 +155,7 @@ async function desktopFlow(session) {
   `);
   assert(clicked, 'Could not open font details from catalog');
   await waitFor(session, 'details route', `return location.pathname !== '/onod-fonts/' && !!document.querySelector('main textarea')`);
+  await semanticSmoke(session, 'Font details');
 
   const backClicked = await execute(session, `
     const button = document.querySelector('main .sticky button');
@@ -164,6 +185,10 @@ async function desktopFlow(session) {
   const favoritesAfterReload = await execute(session, `return localStorage.getItem('font-catalog-favorites')`);
   assert(favoritesBeforeReload === favoritesAfterReload, 'Favorites changed across reload');
 
+  await navigate(session, new URL('favorites', BASE_URL).toString());
+  await waitFor(session, 'Favorites route', `return location.pathname.endsWith('/favorites') && document.querySelectorAll('article').length >= 1`);
+  await semanticSmoke(session, 'Favorites');
+
   const workbenchUrl = new URL('compare', BASE_URL);
   workbenchUrl.searchParams.set('fonts', 'gh-mona,gh-hubot');
   workbenchUrl.searchParams.set('heading', 'gh-mona');
@@ -185,6 +210,7 @@ async function desktopFlow(session) {
   assert(workbench.base === '18', `Workbench base mismatch: ${workbench.base}`);
   assert(workbench.ratio === '1.333', `Workbench ratio mismatch: ${workbench.ratio}`);
   assert(workbench.content === 'Browser QA', `Workbench content mismatch: ${workbench.content}`);
+  await semanticSmoke(session, 'Workbench');
 
   await navigate(session, `${BASE_URL}?q=${encodeURIComponent('Cederville Cursive')}`);
   await waitFor(session, 'canonical correction search result', `return document.querySelectorAll('article').length >= 1`);
@@ -235,14 +261,14 @@ async function mobileFlow(session) {
   await execute(session, `document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); return true;`);
   await waitFor(session, 'mobile dialog close', `return !document.querySelector('[role="dialog"][aria-label="Navigation"]')`);
   await waitFor(session, 'focus restored to menu trigger', `return document.activeElement?.getAttribute('aria-label') === 'Open navigation menu'`);
-  await semanticSmoke(session);
+  await semanticSmoke(session, 'Mobile catalog');
 }
 
 const session = await createSession();
 try {
   console.log(`Browser QA base: ${BASE_URL}`);
   await desktopFlow(session);
-  console.log('✓ desktop catalog/workbench/canonical/historical flows');
+  console.log('✓ desktop catalog/favorites/workbench/canonical/historical flows');
   await failureFlow(session);
   console.log('✓ explicit font fallback under blocked provider network');
   await mobileFlow(session);

@@ -8,16 +8,16 @@ This is the short authoritative handoff for PR #16. Read it with `PROJECT-CONTEX
 
 **PR #16 is approved for merge by its release policy.**
 
-Validated branch tree immediately before release: `fbed9048b3cef6f68e04c5ed128feacc80fa6104`.
+Do not pin the branch head SHA inside this file: editing that value creates a new head. The source of truth for the exact merge candidate is the PR head and its GitHub Actions checks.
 
-All PR checks passed on that tree:
+At release review all required PR checks were green:
 
-- ONOD Fonts CI #245 — success;
-- Independent runtime consistency #23 — success;
-- Validate independent web identity evidence #109 — success;
-- Validate open font artifact evidence #94 — success.
+- ONOD Fonts CI;
+- Independent runtime consistency;
+- Validate independent web identity evidence;
+- Validate open font artifact evidence.
 
-The final CI confirms production dependency audit, canonical/runtime evidence consistency, family relation validation, open + historical artifact validation, field-level catalog trust, TypeScript, Vite production build, GitHub Pages bundle validation and direct-route/built-asset smoke.
+The release gate confirms production dependency audit, canonical/runtime evidence consistency, family relation validation, open + historical artifact validation, field-level catalog trust, TypeScript, Vite production build, GitHub Pages bundle validation and direct-route/built-asset smoke.
 
 ## Current measured trust state
 
@@ -94,7 +94,7 @@ FFL/proprietary binaries are not inspected unless a reviewed capability policy p
 
 ## Mandatory release gate
 
-PR #16 passed the required gate on `fbed9048b3cef6f68e04c5ed128feacc80fa6104`:
+PR #16 requires:
 
 1. production dependency audit;
 2. compact metadata generation;

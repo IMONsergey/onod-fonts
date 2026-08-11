@@ -1,0 +1,55 @@
+name: Sync Fontshare primary-source evidence
+
+on:
+  push:
+    branches:
+      - feat/font-data-engine
+    paths:
+      - scripts/sync-fontshare.mjs
+      - scripts/validate-fontshare-evidence.mjs
+      - src/app/data/verified/fontshare-aliases.json
+      - .github/workflows/sync-fontshare.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: onod-fonts-fontshare-evidence-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Fetch official Fontshare API evidence
+        run: node --experimental-strip-types scripts/sync-fontshare.mjs
+
+      - name: Validate evidence before commit
+        run: node --experimental-strip-types scripts/validate-fontshare-evidence.mjs --require-coverage
+
+      - name: Commit refreshed evidence
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet -- src/app/data/verified/fontshare.json; then
+            echo "Fontshare evidence is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/app/data/verified/fontshare.json
+          git commit -m "data: sync Fontshare primary-source evidence"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:${GITHUB_REF_NAME}

@@ -1,0 +1,2983 @@
+{
+  "Aspekta": {
+    "family": "Aspekta",
+    "repository": "ivodolenc/aspekta",
+    "ref": "main",
+    "path": "packages/fonts/variable/AspektaVF.ttf",
+    "gitBlobSha": "c3dc2f8a7cc39b970545f361a06db008d2881f95",
+    "sourceUrl": "https://raw.githubusercontent.com/ivodolenc/aspekta/main/packages/fonts/variable/AspektaVF.ttf",
+    "licenseId": "OFL-1.1",
+    "sha256": "aca4bea0033de37093916756e44cfa4e823a928316905732ecc03a070d218dda",
+    "size": 69480,
+    "sfntFormat": "ttf-sfnt",
+    "tables": [
+      {
+        "tag": "cmap",
+        "checksum": "0x81dae9f1",
+        "length": 1428
+      },
+      {
+        "tag": "fvar",
+        "checksum": "0x7e8a6994",
+        "length": 46
+      },
+      {
+        "tag": "GDEF",
+        "checksum": "0x1177206d",
+        "length": 576
+      },
+      {
+        "tag": "glyf",
+        "checksum": "0x201afaf9",
+        "length": 22448
+      },
+      {
+        "tag": "GPOS",
+        "checksum": "0x797d2618",
+        "length": 3844
+      },
+      {
+        "tag": "GSUB",
+        "checksum": "0x70d0f80d",
+        "length": 1860
+      },
+      {
+        "tag": "gvar",
+        "checksum": "0x8443ab60",
+        "length": 31060
+      },
+      {
+        "tag": "head",
+        "checksum": "0x26cf2812",
+        "length": 54
+      },
+      {
+        "tag": "hhea",
+        "checksum": "0x08d90412",
+        "length": 36
+      },
+      {
+        "tag": "hmtx",
+        "checksum": "0xec9f3d53",
+        "length": 1892
+      },
+      {
+        "tag": "loca",
+        "checksum": "0x43f159da",
+        "length": 948
+      },
+      {
+        "tag": "maxp",
+        "checksum": "0x05f100bd",
+        "length": 32
+      },
+      {
+        "tag": "name",
+        "checksum": "0xbeec384f",
+        "length": 1300
+      },
+      {
+        "tag": "OS/2",
+        "checksum": "0x8a99486c",
+        "length": 96
+      },
+      {
+        "tag": "post",
+        "checksum": "0x069e35a4",
+        "length": 3519
+      },
+      {
+        "tag": "STAT",
+        "checksum": "0xe4a8cb0f",
+        "length": 68
+      }
+    ],
+    "name": {
+      "copyright": "Copyright © 2025 Ivo Dolenc",
+      "family": "Aspekta Variable",
+      "subfamily": "Regular",
+      "uniqueId": "2.100;UKWN;AspektaVariable-Regular",
+      "fullName": "Aspekta Variable",
+      "version": "Version 2.100",
+      "postScriptName": "AspektaVariable-Regular",
+      "licenseDescription": "SIL Open Font License (OFL), Version 1.1",
+      "licenseInfoUrl": "https://openfontlicense.org",
+      "typographicFamily": "Aspekta Variable",
+      "typographicSubfamily": "Regular",
+      "format": 0
+    },
+    "head": {
+      "unitsPerEm": 1000,
+      "xMin": -82,
+      "yMin": -236,
+      "xMax": 1244,
+      "yMax": 932,
+      "macStyle": 0,
+      "indexToLocFormat": 0
+    },
+    "hhea": {
+      "ascender": 1100,
+      "descender": -330,
+      "lineGap": 0,
+      "advanceWidthMax": 1266,
+      "minLeftSideBearing": -82,
+      "minRightSideBearing": -368,
+      "xMaxExtent": 1244,
+      "numberOfHMetrics": 473
+    },
+    "maxp": {
+      "numGlyphs": 473
+    },
+    "os2": {
+      "version": 4,
+      "xAvgCharWidth": 570,
+      "weightClass": 400,
+      "widthClass": 5,
+      "fsType": 0,
+      "vendorId": "UKWN",
+      "fsSelection": 192,
+      "firstCharIndex": 32,
+      "lastCharIndex": 9679,
+      "typoAscender": 1100,
+      "typoDescender": -330,
+      "typoLineGap": 0,
+      "winAscent": 1100,
+      "winDescent": 330,
+      "codePageRange1": 536871059,
+      "codePageRange2": 0,
+      "xHeight": 520,
+      "capHeight": 720,
+      "defaultChar": 0,
+      "breakChar": 32,
+      "maxContext": 3
+    },
+    "fvar": {
+      "axes": [
+        {
+          "tag": "wght",
+          "min": 100,
+          "default": 400,
+          "max": 900,
+          "flags": 0,
+          "nameId": 256
+        }
+      ],
+      "instanceCount": 1,
+      "instanceSize": 10
+    },
+    "cmap": {
+      "codepointCount": 387,
+      "minCodepoint": 32,
+      "maxCodepoint": 9679,
+      "formats": [
+        4
+      ],
+      "encodings": [
+        {
+          "platformID": 0,
+          "encodingID": 3,
+          "format": 4
+        },
+        {
+          "platformID": 3,
+          "encodingID": 1,
+          "format": 4
+        }
+      ],
+      "ranges": [
+        [
+          32,
+          93
+        ],
+        [
+          95,
+          125
+        ],
+        [
+          160,
+          163
+        ],
+        [
+          165,
+          165
+        ],
+        [
+          168,
+          169
+        ],
+        [
+          174,
+          174
+        ],
+        [
+          176,
+          176
+        ],
+        [
+          180,
+          180
+        ],
+        [
+          183,
+          184
+        ],
+        [
+          191,
+          207
+        ],
+        [
+          209,
+          221
+        ],
+        [
+          223,
+          239
+        ],
+        [
+          241,
+          253
+        ],
+        [
+          255,
+          255
+        ],
+        [
+          258,
+          273
+        ],
+        [
+          276,
+          289
+        ],
+        [
+          292,
+          293
+        ],
+        [
+          296,
+          297
+        ],
+        [
+          300,
+          305
+        ],
+        [
+          308,
+          309
+        ],
+        [
+          313,
+          314
+        ],
+        [
+          317,
+          318
+        ],
+        [
+          321,
+          324
+        ],
+        [
+          327,
+          328
+        ],
+        [
+          334,
+          335
+        ],
+        [
+          340,
+          341
+        ],
+        [
+          344,
+          357
+        ],
+        [
+          360,
+          361
+        ],
+        [
+          364,
+          367
+        ],
+        [
+          370,
+          382
+        ],
+        [
+          461,
+          468
+        ],
+        [
+          486,
+          491
+        ],
+        [
+          500,
+          501
+        ],
+        [
+          504,
+          505
+        ],
+        [
+          550,
+          553
+        ],
+        [
+          558,
+          559
+        ],
+        [
+          567,
+          567
+        ],
+        [
+          710,
+          711
+        ],
+        [
+          728,
+          732
+        ],
+        [
+          768,
+          771
+        ],
+        [
+          774,
+          776
+        ],
+        [
+          778,
+          778
+        ],
+        [
+          780,
+          780
+        ],
+        [
+          803,
+          803
+        ],
+        [
+          807,
+          808
+        ],
+        [
+          7682,
+          7683
+        ],
+        [
+          7690,
+          7691
+        ],
+        [
+          7710,
+          7711
+        ],
+        [
+          7714,
+          7715
+        ],
+        [
+          7720,
+          7721
+        ],
+        [
+          7728,
+          7729
+        ],
+        [
+          7742,
+          7745
+        ],
+        [
+          7748,
+          7749
+        ],
+        [
+          7766,
+          7769
+        ],
+        [
+          7776,
+          7777
+        ],
+        [
+          7786,
+          7787
+        ],
+        [
+          7804,
+          7805
+        ],
+        [
+          7808,
+          7815
+        ],
+        [
+          7818,
+          7819
+        ],
+        [
+          7822,
+          7823
+        ],
+        [
+          7868,
+          7869
+        ],
+        [
+          7922,
+          7923
+        ],
+        [
+          7928,
+          7929
+        ],
+        [
+          8211,
+          8212
+        ],
+        [
+          8216,
+          8218
+        ],
+        [
+          8220,
+          8222
+        ],
+        [
+          8224,
+          8225
+        ],
+        [
+          8230,
+          8230
+        ],
+        [
+          8240,
+          8240
+        ],
+        [
+          8364,
+          8364
+        ],
+        [
+          8383,
+          8383
+        ],
+        [
+          8471,
+          8471
+        ],
+        [
+          8480,
+          8480
+        ],
+        [
+          8482,
+          8482
+        ],
+        [
+          8592,
+          8601
+        ],
+        [
+          8722,
+          8722
+        ],
+        [
+          8804,
+          8805
+        ],
+        [
+          9632,
+          9633
+        ],
+        [
+          9650,
+          9651
+        ],
+        [
+          9654,
+          9655
+        ],
+        [
+          9660,
+          9661
+        ],
+        [
+          9664,
+          9665
+        ],
+        [
+          9675,
+          9675
+        ],
+        [
+          9679,
+          9679
+        ]
+      ]
+    },
+    "openTypeFeatures": {
+      "gsub": [
+        "aalt",
+        "case",
+        "ccmp",
+        "locl",
+        "ss01",
+        "ss02",
+        "ss03",
+        "ss04",
+        "ss05",
+        "ss06",
+        "ss07",
+        "ss08",
+        "ss09",
+        "ss10",
+        "ss11",
+        "ss12",
+        "ss13",
+        "ss14"
+      ],
+      "gpos": [
+        "mark"
+      ]
+    },
+    "statPresent": true,
+    "capturedAt": "2026-08-10T19:21:22.283Z"
+  },
+  "Cal Sans": {
+    "family": "Cal Sans",
+    "repository": "calcom/sans",
+    "ref": "main",
+    "path": "fonts/calsans-gf-api/CalSans[GEOM,SHRP,YTAS,opsz,wght].ttf",
+    "gitBlobSha": "c9152353b122c59df6b3a49cb8133058cbfe89d9",
+    "sourceUrl": "https://raw.githubusercontent.com/calcom/sans/main/fonts/calsans-gf-api/CalSans%5BGEOM%2CSHRP%2CYTAS%2Copsz%2Cwght%5D.ttf",
+    "licenseId": "OFL-1.1",
+    "sha256": "28646b365180d27bab7604e82e307760366199f9741856092eb1fd6c16d2444e",
+    "size": 456204,
+    "sfntFormat": "ttf-sfnt",
+    "tables": [
+      {
+        "tag": "avar",
+        "checksum": "0x15a01561",
+        "length": 90
+      },
+      {
+        "tag": "cmap",
+        "checksum": "0x2d954e40",
+        "length": 2184
+      },
+      {
+        "tag": "fvar",
+        "checksum": "0xfaccd520",
+        "length": 220
+      },
+      {
+        "tag": "GDEF",
+        "checksum": "0x4551b909",
+        "length": 9938
+      },
+      {
+        "tag": "glyf",
+        "checksum": "0xae9c80a3",
+        "length": 52696
+      },
+      {
+        "tag": "GPOS",
+        "checksum": "0x539b88be",
+        "length": 111074
+      },
+      {
+        "tag": "GSUB",
+        "checksum": "0xed733e2c",
+        "length": 6098
+      },
+      {
+        "tag": "gvar",
+        "checksum": "0xa72abda8",
+        "length": 248392
+      },
+      {
+        "tag": "head",
+        "checksum": "0x303427df",
+        "length": 54
+      },
+      {
+        "tag": "hhea",
+        "checksum": "0x07c8095d",
+        "length": 36
+      },
+      {
+        "tag": "hmtx",
+        "checksum": "0x847f9946",
+        "length": 4076
+      },
+      {
+        "tag": "HVAR",
+        "checksum": "0x7b412114",
+        "length": 5115
+      },
+      {
+        "tag": "loca",
+        "checksum": "0xfd25325e",
+        "length": 2040
+      },
+      {
+        "tag": "maxp",
+        "checksum": "0x04170126",
+        "length": 32
+      },
+      {
+        "tag": "MVAR",
+        "checksum": "0x9082c450",
+        "length": 242
+      },
+      {
+        "tag": "name",
+        "checksum": "0xc9ffa10f",
+        "length": 2727
+      },
+      {
+        "tag": "OS/2",
+        "checksum": "0x4a73a053",
+        "length": 96
+      },
+      {
+        "tag": "post",
+        "checksum": "0x5bb0537c",
+        "length": 10447
+      },
+      {
+        "tag": "STAT",
+        "checksum": "0x6cd938df",
+        "length": 314
+      }
+    ],
+    "name": {
+      "copyright": "Copyright 2026 The Cal Sans Project Authors (https://github.com/calcom/sans)",
+      "family": "Cal Sans",
+      "subfamily": "Regular",
+      "fullName": "Cal Sans Regular",
+      "version": "Version 1.998; b12ba34",
+      "postScriptName": "CalSans-Regular",
+      "typographicFamily": "Cal Sans",
+      "typographicSubfamily": "Regular",
+      "uniqueId": "1998-CalSansWORD-2026-06-15",
+      "format": 0
+    },
+    "head": {
+      "unitsPerEm": 1000,
+      "xMin": -173,
+      "yMin": -276,
+      "xMax": 1262,
+      "yMax": 1036,
+      "macStyle": 0,
+      "indexToLocFormat": 0
+    },
+    "hhea": {
+      "ascender": 900,
+      "descender": -245,
+      "lineGap": 0,
+      "advanceWidthMax": 1319,
+      "minLeftSideBearing": -173,
+      "minRightSideBearing": -696,
+      "xMaxExtent": 1262,
+      "numberOfHMetrics": 1019
+    },
+    "maxp": {
+      "numGlyphs": 1019
+    },
+    "os2": {
+      "version": 4,
+      "xAvgCharWidth": 584,
+      "weightClass": 400,
+      "widthClass": 5,
+      "fsType": 8,
+      "vendorId": "WORD",
+      "fsSelection": 64,
+      "firstCharIndex": 13,
+      "lastCharIndex": 64258,
+      "typoAscender": 900,
+      "typoDescender": -245,
+      "typoLineGap": 0,
+      "winAscent": 1024,
+      "winDescent": 245,
+      "codePageRange1": 1610613139,
+      "codePageRange2": 0,
+      "xHeight": 515,
+      "capHeight": 720,
+      "defaultChar": 0,
+      "breakChar": 32,
+      "maxContext": 12
+    },
+    "fvar": {
+      "axes": [
+        {
+          "tag": "opsz",
+          "min": 8,
+          "default": 14,
+          "max": 45,
+          "flags": 0,
+          "nameId": 256
+        },
+        {
+          "tag": "GEOM",
+          "min": 0,
+          "default": 25,
+          "max": 100,
+          "flags": 0,
+          "nameId": 257
+        },
+        {
+          "tag": "wght",
+          "min": 400,
+          "default": 400,
+          "max": 700,
+          "flags": 0,
+          "nameId": 258
+        },
+        {
+          "tag": "YTAS",
+          "min": 720,
+          "default": 720,
+          "max": 800,
+          "flags": 1,
+          "nameId": 259
+        },
+        {
+          "tag": "SHRP",
+          "min": 0,
+          "default": 0,
+          "max": 100,
+          "flags": 0,
+          "nameId": 260
+        }
+      ],
+      "instanceCount": 4,
+      "instanceSize": 26
+    },
+    "cmap": {
+      "codepointCount": 694,
+      "minCodepoint": 13,
+      "maxCodepoint": 64258,
+      "formats": [
+        4
+      ],
+      "encodings": [
+        {
+          "platformID": 0,
+          "encodingID": 3,
+          "format": 4
+        },
+        {
+          "platformID": 3,
+          "encodingID": 1,
+          "format": 4
+        }
+      ],
+      "ranges": [
+        [
+          13,
+          13
+        ],
+        [
+          32,
+          126
+        ],
+        [
+          160,
+          275
+        ],
+        [
+          278,
+          299
+        ],
+        [
+          302,
+          328
+        ],
+        [
+          330,
+          333
+        ],
+        [
+          336,
+          382
+        ],
+        [
+          399,
+          399
+        ],
+        [
+          401,
+          402
+        ],
+        [
+          416,
+          417
+        ],
+        [
+          431,
+          432
+        ],
+        [
+          469,
+          476
+        ],
+        [
+          482,
+          483
+        ],
+        [
+          514,
+          515
+        ],
+        [
+          518,
+          519
+        ],
+        [
+          522,
+          523
+        ],
+        [
+          526,
+          527
+        ],
+        [
+          530,
+          531
+        ],
+        [
+          534,
+          539
+        ],
+        [
+          567,
+          567
+        ],
+        [
+          601,
+          601
+        ],
+        [
+          697,
+          697
+        ],
+        [
+          699,
+          700
+        ],
+        [
+          710,
+          712
+        ],
+        [
+          728,
+          733
+        ],
+        [
+          768,
+          772
+        ],
+        [
+          774,
+          780
+        ],
+        [
+          783,
+          783
+        ],
+        [
+          785,
+          786
+        ],
+        [
+          795,
+          795
+        ],
+        [
+          803,
+          804
+        ],
+        [
+          806,
+          808
+        ],
+        [
+          814,
+          814
+        ],
+        [
+          817,
+          817
+        ],
+        [
+          824,
+          824
+        ],
+        [
+          923,
+          923
+        ],
+        [
+          926,
+          926
+        ],
+        [
+          937,
+          937
+        ],
+        [
+          955,
+          955
+        ],
+        [
+          958,
+          958
+        ],
+        [
+          960,
+          960
+        ],
+        [
+          3647,
+          3647
+        ],
+        [
+          7692,
+          7693
+        ],
+        [
+          7712,
+          7713
+        ],
+        [
+          7716,
+          7717
+        ],
+        [
+          7722,
+          7723
+        ],
+        [
+          7732,
+          7739
+        ],
+        [
+          7744,
+          7753
+        ],
+        [
+          7772,
+          7775
+        ],
+        [
+          7778,
+          7779
+        ],
+        [
+          7788,
+          7791
+        ],
+        [
+          7808,
+          7813
+        ],
+        [
+          7822,
+          7823
+        ],
+        [
+          7826,
+          7830
+        ],
+        [
+          7838,
+          7838
+        ],
+        [
+          7840,
+          7929
+        ],
+        [
+          8194,
+          8205
+        ],
+        [
+          8211,
+          8212
+        ],
+        [
+          8214,
+          8214
+        ],
+        [
+          8216,
+          8218
+        ],
+        [
+          8220,
+          8222
+        ],
+        [
+          8224,
+          8226
+        ],
+        [
+          8230,
+          8230
+        ],
+        [
+          8239,
+          8240
+        ],
+        [
+          8242,
+          8243
+        ],
+        [
+          8249,
+          8250
+        ],
+        [
+          8252,
+          8253
+        ],
+        [
+          8260,
+          8260
+        ],
+        [
+          8304,
+          8304
+        ],
+        [
+          8308,
+          8313
+        ],
+        [
+          8320,
+          8329
+        ],
+        [
+          8353,
+          8353
+        ],
+        [
+          8358,
+          8358
+        ],
+        [
+          8360,
+          8366
+        ],
+        [
+          8369,
+          8370
+        ],
+        [
+          8372,
+          8373
+        ],
+        [
+          8376,
+          8378
+        ],
+        [
+          8380,
+          8383
+        ],
+        [
+          8385,
+          8385
+        ],
+        [
+          8467,
+          8467
+        ],
+        [
+          8470,
+          8470
+        ],
+        [
+          8482,
+          8482
+        ],
+        [
+          8486,
+          8486
+        ],
+        [
+          8494,
+          8494
+        ],
+        [
+          8531,
+          8532
+        ],
+        [
+          8539,
+          8542
+        ],
+        [
+          8592,
+          8601
+        ],
+        [
+          8706,
+          8706
+        ],
+        [
+          8709,
+          8710
+        ],
+        [
+          8719,
+          8719
+        ],
+        [
+          8721,
+          8722
+        ],
+        [
+          8725,
+          8725
+        ],
+        [
+          8730,
+          8730
+        ],
+        [
+          8734,
+          8734
+        ],
+        [
+          8747,
+          8747
+        ],
+        [
+          8756,
+          8757
+        ],
+        [
+          8776,
+          8776
+        ],
+        [
+          8800,
+          8800
+        ],
+        [
+          8804,
+          8805
+        ],
+        [
+          9055,
+          9055
+        ],
+        [
+          9401,
+          9401
+        ],
+        [
+          9632,
+          9633
+        ],
+        [
+          9642,
+          9643
+        ],
+        [
+          9650,
+          9657
+        ],
+        [
+          9660,
+          9667
+        ],
+        [
+          9670,
+          9671
+        ],
+        [
+          9674,
+          9676
+        ],
+        [
+          9679,
+          9679
+        ],
+        [
+          9702,
+          9702
+        ],
+        [
+          9724,
+          9724
+        ],
+        [
+          9733,
+          9734
+        ],
+        [
+          9745,
+          9746
+        ],
+        [
+          9825,
+          9825
+        ],
+        [
+          9829,
+          9829
+        ],
+        [
+          9834,
+          9835
+        ],
+        [
+          10003,
+          10004
+        ],
+        [
+          10007,
+          10008
+        ],
+        [
+          10022,
+          10024
+        ],
+        [
+          10084,
+          10084
+        ],
+        [
+          10216,
+          10217
+        ],
+        [
+          11089,
+          11090
+        ],
+        [
+          11800,
+          11800
+        ],
+        [
+          42891,
+          42892
+        ],
+        [
+          64257,
+          64258
+        ]
+      ]
+    },
+    "openTypeFeatures": {
+      "gsub": [
+        "calt",
+        "case",
+        "ccmp",
+        "dlig",
+        "dnom",
+        "frac",
+        "liga",
+        "locl",
+        "numr",
+        "ordn",
+        "pnum",
+        "rclt",
+        "sinf",
+        "subs",
+        "sups",
+        "titl",
+        "tnum",
+        "zero"
+      ],
+      "gpos": [
+        "kern",
+        "mark",
+        "mkmk"
+      ]
+    },
+    "statPresent": true,
+    "capturedAt": "2026-08-10T19:21:22.991Z"
+  },
+  "Hauora": {
+    "family": "Hauora",
+    "repository": "WCYS-Co/Hauora-Sans",
+    "ref": "master",
+    "path": "fonts/variable/Hauora[wght].ttf",
+    "gitBlobSha": "b796c5c8c59e551d35f8ab6a12699ff8f4471a51",
+    "sourceUrl": "https://raw.githubusercontent.com/WCYS-Co/Hauora-Sans/master/fonts/variable/Hauora%5Bwght%5D.ttf",
+    "licenseId": "OFL-1.1",
+    "sha256": "308fab3575c94ab85a4b017d80d450c0d05c5ecd4fffb86616ff8449f1c0afea",
+    "size": 166940,
+    "sfntFormat": "ttf-sfnt",
+    "tables": [
+      {
+        "tag": "cmap",
+        "checksum": "0x12c620e7",
+        "length": 1772
+      },
+      {
+        "tag": "fvar",
+        "checksum": "0x90f86992",
+        "length": 92
+      },
+      {
+        "tag": "gasp",
+        "checksum": "0x00000010",
+        "length": 8
+      },
+      {
+        "tag": "GDEF",
+        "checksum": "0xfd7a06d5",
+        "length": 80
+      },
+      {
+        "tag": "glyf",
+        "checksum": "0x56ad7972",
+        "length": 65780
+      },
+      {
+        "tag": "GPOS",
+        "checksum": "0x0d7b4ab8",
+        "length": 21198
+      },
+      {
+        "tag": "GSUB",
+        "checksum": "0x43cb8e8d",
+        "length": 3908
+      },
+      {
+        "tag": "gvar",
+        "checksum": "0x15fece0d",
+        "length": 60032
+      },
+      {
+        "tag": "head",
+        "checksum": "0x25860637",
+        "length": 54
+      },
+      {
+        "tag": "hhea",
+        "checksum": "0x10a30952",
+        "length": 36
+      },
+      {
+        "tag": "hmtx",
+        "checksum": "0xbb5f1df4",
+        "length": 2964
+      },
+      {
+        "tag": "HVAR",
+        "checksum": "0xe84ce853",
+        "length": 1532
+      },
+      {
+        "tag": "loca",
+        "checksum": "0x5f549ea7",
+        "length": 1484
+      },
+      {
+        "tag": "maxp",
+        "checksum": "0x02f600bf",
+        "length": 32
+      },
+      {
+        "tag": "name",
+        "checksum": "0x3c99edd9",
+        "length": 1501
+      },
+      {
+        "tag": "OS/2",
+        "checksum": "0x9d9e7c04",
+        "length": 96
+      },
+      {
+        "tag": "post",
+        "checksum": "0x3872d2f9",
+        "length": 5905
+      },
+      {
+        "tag": "prep",
+        "checksum": "0x68068c85",
+        "length": 7
+      },
+      {
+        "tag": "STAT",
+        "checksum": "0x7e96799d",
+        "length": 130
+      }
+    ],
+    "name": {
+      "copyright": "Copyright (c) 2020 WCYS & Co. with Reserved Font Name \"Hauora\" and \"Hauora Sans\"",
+      "family": "Hauora ExtraLight",
+      "subfamily": "Regular",
+      "uniqueId": "1.010;WCYS;Hauora-ExtraLight",
+      "fullName": "Hauora ExtraLight",
+      "version": "Version 1.010",
+      "postScriptName": "Hauora-ExtraLight",
+      "licenseDescription": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL",
+      "licenseInfoUrl": "https://github.com/WCYS-Co/Hauora-Sans/blob/master/OFL.txt",
+      "typographicFamily": "Hauora",
+      "typographicSubfamily": "ExtraLight",
+      "format": 0
+    },
+    "head": {
+      "unitsPerEm": 2000,
+      "xMin": -400,
+      "yMin": -510,
+      "xMax": 2524,
+      "yMax": 2132,
+      "macStyle": 0,
+      "indexToLocFormat": 0
+    },
+    "hhea": {
+      "ascender": 2132,
+      "descender": -600,
+      "lineGap": 0,
+      "advanceWidthMax": 2644,
+      "minLeftSideBearing": -400,
+      "minRightSideBearing": -400,
+      "xMaxExtent": 2524,
+      "numberOfHMetrics": 741
+    },
+    "maxp": {
+      "numGlyphs": 741
+    },
+    "os2": {
+      "version": 4,
+      "xAvgCharWidth": 1128,
+      "weightClass": 200,
+      "widthClass": 5,
+      "fsType": 0,
+      "vendorId": "WCYS",
+      "fsSelection": 192,
+      "firstCharIndex": 13,
+      "lastCharIndex": 64258,
+      "typoAscender": 2132,
+      "typoDescender": -600,
+      "typoLineGap": 0,
+      "winAscent": 2132,
+      "winDescent": 600,
+      "codePageRange1": 536871071,
+      "codePageRange2": 0,
+      "xHeight": 1080,
+      "capHeight": 1440,
+      "defaultChar": 0,
+      "breakChar": 32,
+      "maxContext": 4
+    },
+    "fvar": {
+      "axes": [
+        {
+          "tag": "wght",
+          "min": 200,
+          "default": 200,
+          "max": 800,
+          "flags": 0,
+          "nameId": 256
+        }
+      ],
+      "instanceCount": 7,
+      "instanceSize": 8
+    },
+    "cmap": {
+      "codepointCount": 677,
+      "minCodepoint": 13,
+      "maxCodepoint": 64258,
+      "formats": [
+        4
+      ],
+      "encodings": [
+        {
+          "platformID": 0,
+          "encodingID": 3,
+          "format": 4
+        },
+        {
+          "platformID": 3,
+          "encodingID": 1,
+          "format": 4
+        }
+      ],
+      "ranges": [
+        [
+          13,
+          13
+        ],
+        [
+          32,
+          126
+        ],
+        [
+          160,
+          275
+        ],
+        [
+          278,
+          299
+        ],
+        [
+          302,
+          305
+        ],
+        [
+          308,
+          311
+        ],
+        [
+          313,
+          318
+        ],
+        [
+          321,
+          328
+        ],
+        [
+          330,
+          333
+        ],
+        [
+          336,
+          382
+        ],
+        [
+          402,
+          402
+        ],
+        [
+          416,
+          417
+        ],
+        [
+          431,
+          432
+        ],
+        [
+          536,
+          539
+        ],
+        [
+          601,
+          601
+        ],
+        [
+          710,
+          711
+        ],
+        [
+          728,
+          733
+        ],
+        [
+          884,
+          885
+        ],
+        [
+          894,
+          894
+        ],
+        [
+          900,
+          906
+        ],
+        [
+          908,
+          908
+        ],
+        [
+          910,
+          929
+        ],
+        [
+          931,
+          974
+        ],
+        [
+          1024,
+          1119
+        ],
+        [
+          1168,
+          1169
+        ],
+        [
+          1198,
+          1199
+        ],
+        [
+          1210,
+          1211
+        ],
+        [
+          1256,
+          1257
+        ],
+        [
+          7808,
+          7813
+        ],
+        [
+          7838,
+          7838
+        ],
+        [
+          7840,
+          7929
+        ],
+        [
+          8209,
+          8209
+        ],
+        [
+          8211,
+          8212
+        ],
+        [
+          8216,
+          8218
+        ],
+        [
+          8220,
+          8226
+        ],
+        [
+          8230,
+          8230
+        ],
+        [
+          8240,
+          8240
+        ],
+        [
+          8249,
+          8250
+        ],
+        [
+          8260,
+          8260
+        ],
+        [
+          8288,
+          8288
+        ],
+        [
+          8304,
+          8304
+        ],
+        [
+          8308,
+          8313
+        ],
+        [
+          8320,
+          8329
+        ],
+        [
+          8355,
+          8355
+        ],
+        [
+          8361,
+          8362
+        ],
+        [
+          8364,
+          8364
+        ],
+        [
+          8366,
+          8366
+        ],
+        [
+          8369,
+          8369
+        ],
+        [
+          8372,
+          8372
+        ],
+        [
+          8377,
+          8378
+        ],
+        [
+          8381,
+          8381
+        ],
+        [
+          8383,
+          8383
+        ],
+        [
+          8470,
+          8470
+        ],
+        [
+          8482,
+          8482
+        ],
+        [
+          8592,
+          8595
+        ],
+        [
+          8629,
+          8629
+        ],
+        [
+          8706,
+          8706
+        ],
+        [
+          8709,
+          8709
+        ],
+        [
+          8719,
+          8719
+        ],
+        [
+          8721,
+          8722
+        ],
+        [
+          8725,
+          8725
+        ],
+        [
+          8730,
+          8730
+        ],
+        [
+          8734,
+          8734
+        ],
+        [
+          8747,
+          8747
+        ],
+        [
+          8776,
+          8776
+        ],
+        [
+          8800,
+          8800
+        ],
+        [
+          8804,
+          8805
+        ],
+        [
+          9650,
+          9650
+        ],
+        [
+          9674,
+          9674
+        ],
+        [
+          57345,
+          57346
+        ],
+        [
+          57351,
+          57353
+        ],
+        [
+          64257,
+          64258
+        ]
+      ]
+    },
+    "openTypeFeatures": {
+      "gsub": [
+        "aalt",
+        "calt",
+        "case",
+        "dnom",
+        "frac",
+        "liga",
+        "locl",
+        "numr",
+        "ordn",
+        "pnum",
+        "sinf",
+        "subs",
+        "sups",
+        "tnum"
+      ],
+      "gpos": [
+        "kern"
+      ]
+    },
+    "statPresent": true,
+    "capturedAt": "2026-08-10T19:21:23.324Z"
+  },
+  "Overused Grotesk": {
+    "family": "Overused Grotesk",
+    "repository": "RandomMaerks/Overused-Grotesk",
+    "ref": "main",
+    "path": "fonts/variable/OverusedGrotesk-VF.ttf",
+    "gitBlobSha": "49272e1baa1ceabcac475af66e040e4c29b79753",
+    "sourceUrl": "https://raw.githubusercontent.com/RandomMaerks/Overused-Grotesk/main/fonts/variable/OverusedGrotesk-VF.ttf",
+    "licenseId": "OFL-1.1",
+    "sha256": "81fe7ec52c68803073edbfab73474b93cd843df53e498e69a22dba42410b2176",
+    "size": 204160,
+    "sfntFormat": "ttf-sfnt",
+    "tables": [
+      {
+        "tag": "cmap",
+        "checksum": "0xc883f4b7",
+        "length": 860
+      },
+      {
+        "tag": "fvar",
+        "checksum": "0x96506992",
+        "length": 100
+      },
+      {
+        "tag": "gasp",
+        "checksum": "0x00000010",
+        "length": 8
+      },
+      {
+        "tag": "GDEF",
+        "checksum": "0xa6530df5",
+        "length": 134
+      },
+      {
+        "tag": "glyf",
+        "checksum": "0xf4445f92",
+        "length": 68438
+      },
+      {
+        "tag": "GPOS",
+        "checksum": "0x41e9961a",
+        "length": 43392
+      },
+      {
+        "tag": "GSUB",
+        "checksum": "0x550c7e5e",
+        "length": 4032
+      },
+      {
+        "tag": "gvar",
+        "checksum": "0xb66a6320",
+        "length": 64900
+      },
+      {
+        "tag": "head",
+        "checksum": "0x2e94ae05",
+        "length": 54
+      },
+      {
+        "tag": "hhea",
+        "checksum": "0x107e123b",
+        "length": 36
+      },
+      {
+        "tag": "hmtx",
+        "checksum": "0xb6d74fe3",
+        "length": 4472
+      },
+      {
+        "tag": "HVAR",
+        "checksum": "0xc1775980",
+        "length": 2671
+      },
+      {
+        "tag": "loca",
+        "checksum": "0x7d45395b",
+        "length": 2238
+      },
+      {
+        "tag": "maxp",
+        "checksum": "0x047600cd",
+        "length": 32
+      },
+      {
+        "tag": "name",
+        "checksum": "0x9b2abc87",
+        "length": 1332
+      },
+      {
+        "tag": "OS/2",
+        "checksum": "0x120022ac",
+        "length": 96
+      },
+      {
+        "tag": "post",
+        "checksum": "0xea431565",
+        "length": 11025
+      },
+      {
+        "tag": "STAT",
+        "checksum": "0x7870688c",
+        "length": 28
+      }
+    ],
+    "name": {
+      "copyright": "Copyright (c) 2023-2026, Bao Nguyen (RandomMaerks) (rmforbusiness@gmail.com)",
+      "family": "Overused Grotesk Light",
+      "subfamily": "Regular",
+      "uniqueId": "0.6;RDMK;OverusedGrotesk-Light",
+      "fullName": "Overused Grotesk Light",
+      "version": "0.6",
+      "postScriptName": "OverusedGrotesk-Light",
+      "licenseDescription": "Copyright (c) 2023-2026, Bao Nguyen (RandomMaerks) (rmforbusiness@gmail.com). This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL",
+      "licenseInfoUrl": "http://scripts.sil.org/OFL",
+      "typographicFamily": "Overused Grotesk",
+      "typographicSubfamily": "Light",
+      "format": 0
+    },
+    "head": {
+      "unitsPerEm": 2000,
+      "xMin": -244,
+      "yMin": -553,
+      "xMax": 2463,
+      "yMax": 1914,
+      "macStyle": 0,
+      "indexToLocFormat": 0
+    },
+    "hhea": {
+      "ascender": 2000,
+      "descender": -700,
+      "lineGap": 0,
+      "advanceWidthMax": 2552,
+      "minLeftSideBearing": -244,
+      "minRightSideBearing": -303,
+      "xMaxExtent": 2463,
+      "numberOfHMetrics": 1118
+    },
+    "maxp": {
+      "numGlyphs": 1118
+    },
+    "os2": {
+      "version": 4,
+      "xAvgCharWidth": 1038,
+      "weightClass": 300,
+      "widthClass": 5,
+      "fsType": 0,
+      "vendorId": "RDMK",
+      "fsSelection": 192,
+      "firstCharIndex": 10,
+      "lastCharIndex": 65533,
+      "typoAscender": 1600,
+      "typoDescender": -400,
+      "typoLineGap": 100,
+      "winAscent": 750,
+      "winDescent": 250,
+      "codePageRange1": 536871319,
+      "codePageRange2": 0,
+      "xHeight": 1000,
+      "capHeight": 1300,
+      "defaultChar": 0,
+      "breakChar": 32,
+      "maxContext": 12
+    },
+    "fvar": {
+      "axes": [
+        {
+          "tag": "wght",
+          "min": 300,
+          "default": 300,
+          "max": 900,
+          "flags": 0,
+          "nameId": 256
+        }
+      ],
+      "instanceCount": 8,
+      "instanceSize": 8
+    },
+    "cmap": {
+      "codepointCount": 792,
+      "minCodepoint": 10,
+      "maxCodepoint": 65533,
+      "formats": [
+        4
+      ],
+      "encodings": [
+        {
+          "platformID": 0,
+          "encodingID": 3,
+          "format": 4
+        },
+        {
+          "platformID": 3,
+          "encodingID": 1,
+          "format": 4
+        }
+      ],
+      "ranges": [
+        [
+          10,
+          10
+        ],
+        [
+          32,
+          126
+        ],
+        [
+          160,
+          383
+        ],
+        [
+          402,
+          402
+        ],
+        [
+          416,
+          417
+        ],
+        [
+          431,
+          432
+        ],
+        [
+          461,
+          468
+        ],
+        [
+          477,
+          477
+        ],
+        [
+          482,
+          483
+        ],
+        [
+          496,
+          496
+        ],
+        [
+          508,
+          509
+        ],
+        [
+          567,
+          567
+        ],
+        [
+          710,
+          711
+        ],
+        [
+          714,
+          715
+        ],
+        [
+          728,
+          733
+        ],
+        [
+          768,
+          772
+        ],
+        [
+          774,
+          780
+        ],
+        [
+          783,
+          783
+        ],
+        [
+          785,
+          787
+        ],
+        [
+          789,
+          789
+        ],
+        [
+          795,
+          795
+        ],
+        [
+          803,
+          808
+        ],
+        [
+          946,
+          946
+        ],
+        [
+          952,
+          952
+        ],
+        [
+          960,
+          960
+        ],
+        [
+          967,
+          967
+        ],
+        [
+          1024,
+          1119
+        ],
+        [
+          1168,
+          1171
+        ],
+        [
+          1174,
+          1175
+        ],
+        [
+          1178,
+          1181
+        ],
+        [
+          1186,
+          1187
+        ],
+        [
+          1198,
+          1203
+        ],
+        [
+          1208,
+          1211
+        ],
+        [
+          1240,
+          1241
+        ],
+        [
+          1244,
+          1247
+        ],
+        [
+          1252,
+          1257
+        ],
+        [
+          1268,
+          1269
+        ],
+        [
+          1423,
+          1423
+        ],
+        [
+          3647,
+          3647
+        ],
+        [
+          7838,
+          7838
+        ],
+        [
+          7840,
+          7929
+        ],
+        [
+          8211,
+          8212
+        ],
+        [
+          8214,
+          8214
+        ],
+        [
+          8216,
+          8227
+        ],
+        [
+          8230,
+          8230
+        ],
+        [
+          8240,
+          8240
+        ],
+        [
+          8242,
+          8247
+        ],
+        [
+          8249,
+          8250
+        ],
+        [
+          8260,
+          8260
+        ],
+        [
+          8304,
+          8304
+        ],
+        [
+          8308,
+          8334
+        ],
+        [
+          8345,
+          8345
+        ],
+        [
+          8355,
+          8356
+        ],
+        [
+          8358,
+          8358
+        ],
+        [
+          8361,
+          8366
+        ],
+        [
+          8369,
+          8373
+        ],
+        [
+          8376,
+          8378
+        ],
+        [
+          8380,
+          8381
+        ],
+        [
+          8383,
+          8383
+        ],
+        [
+          8451,
+          8451
+        ],
+        [
+          8457,
+          8457
+        ],
+        [
+          8470,
+          8471
+        ],
+        [
+          8482,
+          8482
+        ],
+        [
+          8486,
+          8486
+        ],
+        [
+          8491,
+          8491
+        ],
+        [
+          8494,
+          8494
+        ],
+        [
+          8528,
+          8543
+        ],
+        [
+          8585,
+          8585
+        ],
+        [
+          8592,
+          8601
+        ],
+        [
+          8634,
+          8635
+        ],
+        [
+          8644,
+          8644
+        ],
+        [
+          8646,
+          8646
+        ],
+        [
+          8651,
+          8652
+        ],
+        [
+          8656,
+          8661
+        ],
+        [
+          8704,
+          8704
+        ],
+        [
+          8706,
+          8707
+        ],
+        [
+          8710,
+          8710
+        ],
+        [
+          8712,
+          8713
+        ],
+        [
+          8719,
+          8719
+        ],
+        [
+          8721,
+          8722
+        ],
+        [
+          8730,
+          8730
+        ],
+        [
+          8733,
+          8734
+        ],
+        [
+          8747,
+          8747
+        ],
+        [
+          8776,
+          8776
+        ],
+        [
+          8800,
+          8800
+        ],
+        [
+          8804,
+          8805
+        ],
+        [
+          8834,
+          8834
+        ],
+        [
+          9312,
+          9320
+        ],
+        [
+          9450,
+          9450
+        ],
+        [
+          9471,
+          9471
+        ],
+        [
+          9632,
+          9633
+        ],
+        [
+          9650,
+          9651
+        ],
+        [
+          9654,
+          9655
+        ],
+        [
+          9660,
+          9661
+        ],
+        [
+          9664,
+          9665
+        ],
+        [
+          9670,
+          9671
+        ],
+        [
+          9674,
+          9675
+        ],
+        [
+          9679,
+          9683
+        ],
+        [
+          9698,
+          9701
+        ],
+        [
+          10102,
+          10110
+        ],
+        [
+          10216,
+          10219
+        ],
+        [
+          65532,
+          65533
+        ]
+      ]
+    },
+    "openTypeFeatures": {
+      "gsub": [
+        "calt",
+        "cv01",
+        "cv02",
+        "cv03",
+        "cv04",
+        "cv05",
+        "dnom",
+        "frac",
+        "locl",
+        "numr",
+        "ss01",
+        "ss02",
+        "ss03",
+        "ss04",
+        "ss05",
+        "ss06",
+        "ss07",
+        "ss08",
+        "ss09",
+        "ss10",
+        "ss11",
+        "ss12",
+        "subs",
+        "sups",
+        "tnum",
+        "zero"
+      ],
+      "gpos": [
+        "kern"
+      ]
+    },
+    "statPresent": true,
+    "capturedAt": "2026-08-10T19:21:23.934Z"
+  },
+  "Uncut Sans": {
+    "family": "Uncut Sans",
+    "repository": "kaspernordkvist/uncut_sans",
+    "ref": "main",
+    "path": "Variable/UncutSans-Variable.ttf",
+    "gitBlobSha": "983ea6e897ff0315fa71fa256ed630ea679e5e11",
+    "sourceUrl": "https://raw.githubusercontent.com/kaspernordkvist/uncut_sans/main/Variable/UncutSans-Variable.ttf",
+    "licenseId": "OFL-1.1",
+    "sha256": "9a7ef47d2d71dbb807d4d1d24331230fcf63cdf5312daa0439891f54664d89dc",
+    "size": 201532,
+    "sfntFormat": "ttf-sfnt",
+    "tables": [
+      {
+        "tag": "avar",
+        "checksum": "0x200a2005",
+        "length": 48
+      },
+      {
+        "tag": "cmap",
+        "checksum": "0xdbb6de02",
+        "length": 1364
+      },
+      {
+        "tag": "fvar",
+        "checksum": "0xfd2ae40b",
+        "length": 224
+      },
+      {
+        "tag": "GDEF",
+        "checksum": "0x13e295f4",
+        "length": 4978
+      },
+      {
+        "tag": "glyf",
+        "checksum": "0xac8ef0df",
+        "length": 37004
+      },
+      {
+        "tag": "GPOS",
+        "checksum": "0x7bb9ee5f",
+        "length": 34662
+      },
+      {
+        "tag": "GSUB",
+        "checksum": "0x502b7262",
+        "length": 5794
+      },
+      {
+        "tag": "gvar",
+        "checksum": "0xd17d627a",
+        "length": 102728
+      },
+      {
+        "tag": "head",
+        "checksum": "0x262a30fc",
+        "length": 54
+      },
+      {
+        "tag": "hhea",
+        "checksum": "0x07a50553",
+        "length": 36
+      },
+      {
+        "tag": "hmtx",
+        "checksum": "0x3d379d2a",
+        "length": 2946
+      },
+      {
+        "tag": "loca",
+        "checksum": "0xb0428d38",
+        "length": 1478
+      },
+      {
+        "tag": "maxp",
+        "checksum": "0x06ff00df",
+        "length": 32
+      },
+      {
+        "tag": "name",
+        "checksum": "0x9d1b8601",
+        "length": 2560
+      },
+      {
+        "tag": "OS/2",
+        "checksum": "0x0cf94966",
+        "length": 96
+      },
+      {
+        "tag": "post",
+        "checksum": "0x0effbd10",
+        "length": 7079
+      },
+      {
+        "tag": "STAT",
+        "checksum": "0xf1e2d14e",
+        "length": 152
+      }
+    ],
+    "name": {
+      "copyright": "Copyright 2021 Kasper Nordkvist",
+      "family": "Uncut Sans Variable",
+      "subfamily": "Regular",
+      "uniqueId": "1.304;UKWN;UncutSans-Variable",
+      "fullName": "Uncut Sans Variable",
+      "version": "Version 1.304;Glyphs 3.2 (3246)",
+      "postScriptName": "UncutSans-Variable",
+      "licenseDescription": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL",
+      "licenseInfoUrl": "https://scripts.sil.org/OFL",
+      "typographicFamily": "Uncut Sans Variable",
+      "typographicSubfamily": "Regular",
+      "format": 0
+    },
+    "head": {
+      "unitsPerEm": 1000,
+      "xMin": -160,
+      "yMin": -238,
+      "xMax": 1149,
+      "yMax": 986,
+      "macStyle": 0,
+      "indexToLocFormat": 0
+    },
+    "hhea": {
+      "ascender": 965,
+      "descender": -235,
+      "lineGap": 0,
+      "advanceWidthMax": 1234,
+      "minLeftSideBearing": -160,
+      "minRightSideBearing": -372,
+      "xMaxExtent": 1149,
+      "numberOfHMetrics": 735
+    },
+    "maxp": {
+      "numGlyphs": 738
+    },
+    "os2": {
+      "version": 4,
+      "xAvgCharWidth": 567,
+      "weightClass": 400,
+      "widthClass": 5,
+      "fsType": 0,
+      "vendorId": "UKWN",
+      "fsSelection": 192,
+      "firstCharIndex": 32,
+      "lastCharIndex": 10110,
+      "typoAscender": 965,
+      "typoDescender": -235,
+      "typoLineGap": 0,
+      "winAscent": 965,
+      "winDescent": 235,
+      "codePageRange1": 536871059,
+      "codePageRange2": 0,
+      "xHeight": 500,
+      "capHeight": 700,
+      "defaultChar": 0,
+      "breakChar": 32,
+      "maxContext": 13
+    },
+    "fvar": {
+      "axes": [
+        {
+          "tag": "wght",
+          "min": 300,
+          "default": 400,
+          "max": 700,
+          "flags": 0,
+          "nameId": 256
+        },
+        {
+          "tag": "ital",
+          "min": 0,
+          "default": 0,
+          "max": 11,
+          "flags": 0,
+          "nameId": 257
+        }
+      ],
+      "instanceCount": 12,
+      "instanceSize": 14
+    },
+    "cmap": {
+      "codepointCount": 472,
+      "minCodepoint": 32,
+      "maxCodepoint": 10110,
+      "formats": [
+        4
+      ],
+      "encodings": [
+        {
+          "platformID": 0,
+          "encodingID": 3,
+          "format": 4
+        },
+        {
+          "platformID": 3,
+          "encodingID": 1,
+          "format": 4
+        }
+      ],
+      "ranges": [
+        [
+          32,
+          126
+        ],
+        [
+          160,
+          169
+        ],
+        [
+          171,
+          185
+        ],
+        [
+          187,
+          311
+        ],
+        [
+          313,
+          383
+        ],
+        [
+          402,
+          402
+        ],
+        [
+          508,
+          511
+        ],
+        [
+          536,
+          539
+        ],
+        [
+          567,
+          567
+        ],
+        [
+          601,
+          601
+        ],
+        [
+          700,
+          700
+        ],
+        [
+          710,
+          711
+        ],
+        [
+          728,
+          733
+        ],
+        [
+          768,
+          772
+        ],
+        [
+          774,
+          776
+        ],
+        [
+          778,
+          780
+        ],
+        [
+          806,
+          808
+        ],
+        [
+          916,
+          916
+        ],
+        [
+          937,
+          937
+        ],
+        [
+          956,
+          956
+        ],
+        [
+          960,
+          960
+        ],
+        [
+          7712,
+          7713
+        ],
+        [
+          7808,
+          7813
+        ],
+        [
+          7838,
+          7838
+        ],
+        [
+          7868,
+          7869
+        ],
+        [
+          7922,
+          7923
+        ],
+        [
+          7928,
+          7929
+        ],
+        [
+          8201,
+          8201
+        ],
+        [
+          8209,
+          8209
+        ],
+        [
+          8211,
+          8212
+        ],
+        [
+          8216,
+          8218
+        ],
+        [
+          8220,
+          8222
+        ],
+        [
+          8224,
+          8226
+        ],
+        [
+          8230,
+          8230
+        ],
+        [
+          8240,
+          8240
+        ],
+        [
+          8249,
+          8250
+        ],
+        [
+          8260,
+          8260
+        ],
+        [
+          8304,
+          8304
+        ],
+        [
+          8308,
+          8313
+        ],
+        [
+          8320,
+          8329
+        ],
+        [
+          8361,
+          8361
+        ],
+        [
+          8364,
+          8364
+        ],
+        [
+          8377,
+          8378
+        ],
+        [
+          8383,
+          8383
+        ],
+        [
+          8467,
+          8467
+        ],
+        [
+          8470,
+          8471
+        ],
+        [
+          8482,
+          8482
+        ],
+        [
+          8494,
+          8494
+        ],
+        [
+          8531,
+          8532
+        ],
+        [
+          8539,
+          8542
+        ],
+        [
+          8592,
+          8601
+        ],
+        [
+          8617,
+          8618
+        ],
+        [
+          8624,
+          8627
+        ],
+        [
+          8706,
+          8706
+        ],
+        [
+          8709,
+          8710
+        ],
+        [
+          8719,
+          8719
+        ],
+        [
+          8721,
+          8722
+        ],
+        [
+          8730,
+          8730
+        ],
+        [
+          8734,
+          8734
+        ],
+        [
+          8747,
+          8747
+        ],
+        [
+          8776,
+          8776
+        ],
+        [
+          8800,
+          8800
+        ],
+        [
+          8804,
+          8805
+        ],
+        [
+          9312,
+          9320
+        ],
+        [
+          9450,
+          9450
+        ],
+        [
+          9471,
+          9471
+        ],
+        [
+          9674,
+          9675
+        ],
+        [
+          9679,
+          9679
+        ],
+        [
+          10102,
+          10110
+        ]
+      ]
+    },
+    "openTypeFeatures": {
+      "gsub": [
+        "aalt",
+        "case",
+        "ccmp",
+        "dnom",
+        "frac",
+        "liga",
+        "locl",
+        "numr",
+        "ordn",
+        "pnum",
+        "sinf",
+        "ss01",
+        "ss02",
+        "ss03",
+        "ss04",
+        "ss05",
+        "ss06",
+        "ss07",
+        "ss08",
+        "ss09",
+        "subs",
+        "sups",
+        "tnum",
+        "zero"
+      ],
+      "gpos": [
+        "kern",
+        "mark",
+        "mkmk"
+      ]
+    },
+    "statPresent": true,
+    "capturedAt": "2026-08-10T19:21:24.205Z"
+  }
+}

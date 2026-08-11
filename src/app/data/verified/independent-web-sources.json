@@ -1,0 +1,442 @@
+{
+  "Bromine": {
+    "family": "Bromine",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://www.indiantypefoundry.com/fonts/bromine",
+      "designer": "Indian Type Foundry",
+      "publisher": "Indian Type Foundry",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://www.indiantypefoundry.com/fonts/bromine",
+        "capturedAt": "2026-08-10T23:20:00+03:00",
+        "facts": [
+          "Official Indian Type Foundry product page identifies Bromine as a current ITF font family."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "The recovered Open Source label is not accepted. Exact ITF product/EULA capability mapping remains pending."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scriptsVerified": false
+    }
+  },
+  "Bw Gradual": {
+    "family": "Bw Gradual",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://brandingwithtype.com/typefaces/bw-gradual",
+      "designer": "Alberto Romanos",
+      "publisher": "Branding with Type",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://brandingwithtype.com/typefaces/bw-gradual",
+        "capturedAt": "2026-08-10T23:05:00+03:00",
+        "facts": [
+          "Official Branding with Type page identifies Bw Gradual as a current Branding with Type family.",
+          "Official foundry release identifies Alberto Romanos as designer and states seven weights with matching oblique italics.",
+          "Official foundry material states support for all European Latin languages."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "Branding with Type sells an all-in-one commercial license and a separate demo license. Exact ONOD capability mapping remains pending; the recovered Open Source label is invalid."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scripts": [
+        "Latin"
+      ],
+      "scriptsVerified": true
+    }
+  },
+  "Bw Modelica": {
+    "family": "Bw Modelica",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://brandingwithtype.com/typefaces/bw-modelica",
+      "designer": "Alberto Romanos",
+      "publisher": "Branding with Type",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://brandingwithtype.com/typefaces/bw-modelica",
+        "capturedAt": "2026-08-10T23:05:00+03:00",
+        "facts": [
+          "Official Branding with Type page identifies Bw Modelica and Alberto Romanos as designer.",
+          "Official page lists eight weights with matching oblique italics for the standard width and a larger four-width collection.",
+          "Official page states the standard-width character set was expanded from European Latin to Greek and Cyrillic, with an LGC subset explicitly listed."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "Branding with Type commercial licensing applies; exact ONOD capability mapping remains pending and the recovered Open Source label is invalid."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scripts": [
+        "Latin",
+        "Greek",
+        "Cyrillic"
+      ],
+      "scriptsVerified": true
+    }
+  },
+  "Bw Nista": {
+    "family": "Bw Nista",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://brandingwithtype.com/typefaces/bw-nista-collection",
+      "designer": "Alberto Romanos",
+      "publisher": "Branding with Type",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://brandingwithtype.com/typefaces/bw-nista-collection",
+        "capturedAt": "2026-08-10T23:05:00+03:00",
+        "facts": [
+          "Official Branding with Type collection page explicitly describes Bw Nista as a font family designed by Alberto Romanos.",
+          "Official page lists three Bw Nista subfamilies and seven named weights with matching oblique italics in each.",
+          "Official page states support for all European Latin languages / Extended Latin."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "Branding with Type commercial licensing applies; exact ONOD capability mapping remains pending and the recovered Open Source label is invalid."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scripts": [
+        "Latin"
+      ],
+      "scriptsVerified": true
+    }
+  },
+  "Duplet": {
+    "family": "Duplet",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://www.indiantypefoundry.com/fonts/duplet/glyphs",
+      "designer": "Diana Ovezea, Rafał Buchner",
+      "publisher": "Indian Type Foundry",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://www.indiantypefoundry.com/fonts/duplet/glyphs",
+        "capturedAt": "2026-08-10T22:55:00+03:00",
+        "facts": [
+          "Official Indian Type Foundry page identifies Duplet as an Indian Type Foundry family designed by Diana Ovezea and Rafał Buchner.",
+          "Official page lists 14 styles across seven named weights with companion italics.",
+          "Official page describes the family as covering European languages written with the Latin script and exposes retail buying options."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "The official foundry sells Duplet under retail licensing. The recovered generic Open Source label is invalid; an exact ONOD capability policy remains pending until ITF license terms are normalized."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scripts": [
+        "Latin"
+      ],
+      "scriptsVerified": true
+    }
+  },
+  "Gilam": {
+    "family": "Gilam",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://www.fontfabric.com/fonts/gilam/",
+      "designer": "Plamen Motev, Ivan Petrov",
+      "publisher": "Fontfabric",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://www.fontfabric.com/fonts/gilam/",
+        "capturedAt": "2026-08-10T22:55:00+03:00",
+        "facts": [
+          "Official Fontfabric page identifies Gilam as a Fontfabric family designed by Plamen Motev and Ivan Petrov.",
+          "Official page lists 18 font styles and paid Desktop/Web/App/Epub/Digital Ads licensing options.",
+          "Official page explicitly states support for Extended Latin, Cyrillic and Greek alphabets."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "Fontfabric exposes multiple paid license classes rather than a single open-source license id. Exact capability mapping stays pending until the applicable Fontfabric EULA is normalized."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scripts": [
+        "Latin",
+        "Cyrillic",
+        "Greek"
+      ],
+      "scriptsVerified": true
+    }
+  },
+  "Gratimo Grotesk": {
+    "family": "Gratimo Grotesk",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://www.typemates.com/fonts/gratimo-grotesk",
+      "designer": "Jakob Runge, Mona Franz",
+      "publisher": "TypeMates",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://www.typemates.com/fonts/gratimo-grotesk",
+        "capturedAt": "2026-08-10T23:10:00+03:00",
+        "facts": [
+          "Official TypeMates page identifies Gratimo Grotesk and Jakob Runge / Mona Franz as designers.",
+          "Official page specifies 12 styles and six weights.",
+          "Official page states support for 270+ languages across Latin, Cyrillic and Greek."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "TypeMates commercial license/EULA capability policy is not yet normalized in ONOD."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scripts": [
+        "Latin",
+        "Cyrillic",
+        "Greek"
+      ],
+      "scriptsVerified": true
+    }
+  },
+  "Lausanne": {
+    "family": "Lausanne",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://weltkern.com/typefaces/lausanne/",
+      "designer": "Nizar Kazan",
+      "publisher": "WELTKERN",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://weltkern.com/typefaces/lausanne/",
+        "capturedAt": "2026-08-10T20:44:00+03:00",
+        "facts": [
+          "Official WELTKERN typeface page identifies Lausanne as a current WELTKERN family.",
+          "Official WELTKERN licensing/credit material identifies TWK Lausanne as designed by Nizar Kazan and published by WELTKERN."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "WELTKERN exposes commercial licensing, but the recovered generic Open Source label must not be replaced by a definitive ONOD license id until the exact family/license terms are normalized into a reviewed policy."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scriptsVerified": false
+    }
+  },
+  "Nacelle": {
+    "family": "Nacelle",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://www.dotcolon.net/fonts/nacelle/",
+      "designer": "Sora Sagano",
+      "publisher": "DOT COLON",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://www.dotcolon.net/fonts/nacelle/",
+        "capturedAt": "2026-08-10T23:10:00+03:00",
+        "facts": [
+          "Official DOT COLON Nacelle page identifies Nacelle Version 1.00 and its named styles.",
+          "Official DOT COLON site identifies Sora Sagano as Type Designer."
+        ]
+      }
+    },
+    "license": {
+      "status": "verified",
+      "id": "OFL-1.1",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://www.dotcolon.net/fonts/nacelle/",
+        "capturedAt": "2026-08-10T23:10:00+03:00",
+        "facts": [
+          "Official Nacelle page explicitly states that Nacelle is licensed under the SIL Open Font License, Version 1.1."
+        ]
+      }
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scriptsVerified": false
+    }
+  },
+  "New Spirit": {
+    "family": "New Spirit",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://newlyn.com/fonts/new-spirit/",
+      "designer": "Newlyn",
+      "publisher": "Newlyn",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://newlyn.com/fonts/new-spirit/",
+        "capturedAt": "2026-08-10T23:05:00+03:00",
+        "facts": [
+          "Official Newlyn page identifies New Spirit as a current Newlyn commercial serif family and Windsor revival.",
+          "Official page lists six Roman styles from Light through Heavy and additional Italic/Condensed/Compressed families.",
+          "Official tester exposes English, Spanish, German, French, Polish, Italian and Hungarian, establishing Latin-script support."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "Newlyn sells direct commercial/self-hosted web licensing. Exact ONOD capability mapping remains pending; the recovered Open Source label is invalid."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scripts": [
+        "Latin"
+      ],
+      "scriptsVerified": true
+    }
+  },
+  "Nohemi": {
+    "family": "Nohemi",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://rajputrajesh-4489b.web.app/products/nohemi",
+      "designer": "Rajesh Rajput",
+      "publisher": "Rajesh Rajput",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://rajputrajesh-4489b.web.app/products/nohemi",
+        "capturedAt": "2026-08-10T20:44:00+03:00",
+        "facts": [
+          "Official designer product page identifies Nohemi as a Rajesh Rajput typeface."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "Identity is primary-source verified; exact redistribution/self-hosting/download license terms remain unresolved and must stay pending."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scriptsVerified": false
+    }
+  },
+  "Pramit": {
+    "family": "Pramit",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://www.indiantypefoundry.com/fonts/pramit",
+      "designer": "Indian Type Foundry",
+      "publisher": "Indian Type Foundry",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://www.indiantypefoundry.com/fonts/pramit",
+        "capturedAt": "2026-08-10T23:20:00+03:00",
+        "facts": [
+          "Official Indian Type Foundry product page identifies Pramit as a current ITF font family."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "The recovered Open Source label is not accepted. Exact ITF product/EULA capability mapping remains pending."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scriptsVerified": false
+    }
+  },
+  "Saans": {
+    "family": "Saans",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://displaay.net/typeface/saans",
+      "designer": "Martin Vácha",
+      "publisher": "Displaay Type Foundry",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://displaay.net/typeface/saans",
+        "capturedAt": "2026-08-10T23:00:00+03:00",
+        "facts": [
+          "Official Displaay page identifies Saans as a Displaay family designed by Martin Vácha.",
+          "Official page lists Saans as a 12-style proportional family within the Saans collection and explicitly exposes a variable font with Weight, Slant and Mono axes.",
+          "Official support section lists Latin character sets and Latin-script languages."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "Displaay sells retail licenses and free full trials; the recovered generic Open Source label is invalid. Exact Displaay EULA capability mapping remains pending."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variable": true,
+      "variableVerified": true,
+      "scripts": [
+        "Latin"
+      ],
+      "scriptsVerified": true
+    }
+  },
+  "Vercetti": {
+    "family": "Vercetti",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-web",
+      "sourceUrl": "https://filipposfragkogiannis.com/fonts/vercetti-regular/",
+      "designer": "Richard Mandona",
+      "publisher": "Filippos Fragkogiannis",
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://filipposfragkogiannis.com/fonts/vercetti-regular/",
+        "capturedAt": "2026-08-10T23:00:00+03:00",
+        "facts": [
+          "Official creator page states that Vercetti Regular is also known as Vercetti and identifies Richard Mandona as Typeface Designer and Filippos Fragkogiannis as Creative Director.",
+          "Official page states the font is distributed under Licence Amicale and references Licence Amicale V.0.2 while imposing additional EULA restrictions; ONOD therefore keeps the normalized license policy pending until those terms are reconciled.",
+          "Official supported-language list contains Latin-script languages and no Cyrillic/Greek set."
+        ]
+      }
+    },
+    "license": {
+      "status": "pending",
+      "note": "The official page names Licence Amicale V.0.2, but its page-specific EULA also restricts modification/public file sharing. ONOD will not map capabilities until a reviewed policy reconciles both sources."
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scripts": [
+        "Latin"
+      ],
+      "scriptsVerified": true
+    }
+  }
+}

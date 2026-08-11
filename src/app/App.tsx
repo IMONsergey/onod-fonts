@@ -14,6 +14,7 @@ import { TermsPage } from './pages/policies/TermsPage';
 import { LicensePage } from './pages/policies/LicensePage';
 import { mockFonts } from './data/mockFonts';
 import type { Font } from './data/mockFonts';
+import { getEffectiveFamilyName } from './lib/fontTrust';
 import { toast } from 'sonner';
 import { Toaster } from './components/ui/sonner';
 import { LanguageProvider, useLanguage } from './lib/i18n';
@@ -93,7 +94,7 @@ function AppContent() {
     else {
       const fontId = path.slice(1);
       const font = mockFonts.find(candidate => candidate.id === fontId);
-      pageTitle = font ? `${font.name} — ONOD Fonts` : `${t('page.fontDetails')} — ONOD Fonts`;
+      pageTitle = font ? `${getEffectiveFamilyName(font)} — ONOD Fonts` : `${t('page.fontDetails')} — ONOD Fonts`;
     }
     document.title = pageTitle;
   }, [location.pathname, t]);

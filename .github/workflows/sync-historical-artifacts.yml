@@ -1,0 +1,61 @@
+name: Sync historical font artifacts
+
+on:
+  push:
+    branches:
+      - main
+      - feat/font-data-engine
+    paths:
+      - src/app/data/verified/family-relations.json
+      - scripts/font-data/acquire-historical-artifacts.py
+      - scripts/font-data/validate-historical-artifacts.mjs
+      - .github/workflows/sync-historical-artifacts.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: onod-fonts-historical-artifacts-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout active branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install fontTools inspection dependency
+        run: python -m pip install 'fonttools>=4.53,<5'
+
+      - name: Acquire and inspect exact historical binaries
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/font-data/acquire-historical-artifacts.py
+
+      - name: Validate historical artifact evidence
+        run: node scripts/font-data/validate-historical-artifacts.mjs
+
+      - name: Commit artifact metadata evidence
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$(git status --porcelain -- src/app/data/verified/artifacts/historical-fonts.json)" ]; then
+            echo "Historical artifact evidence is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/app/data/verified/artifacts/historical-fonts.json
+          git commit -m "data: sync historical font artifact evidence"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:${GITHUB_REF_NAME}

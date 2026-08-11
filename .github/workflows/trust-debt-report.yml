@@ -4,14 +4,30 @@ on:
   push:
     branches:
       - main
-      - feat/trust-engine
+      - feat/font-data-engine
     paths:
       - src/app/data/mockFonts.ts
       - src/app/data/verified/google-fonts.json
       - src/app/data/verified/google-fonts-aliases.json
+      - src/app/data/verified/fontshare.json
+      - src/app/data/verified/fontshare-aliases.json
+      - src/app/data/verified/fontshare-license-policies.json
+      - src/app/data/verified/independent-sources.json
+      - src/app/data/verified/independent-web-sources.json
+      - src/app/data/verified/family-relations.json
+      - src/app/data/verified/artifacts/open-fonts.json
+      - src/app/data/verified/artifacts/family-aliases.json
       - src/app/lib/fontTrust.ts
+      - src/app/lib/fontRelations.ts
+      - src/app/lib/fontSourcePolicy.ts
       - scripts/build-runtime-metadata.mjs
       - scripts/build-trust-report.mjs
+      - scripts/build-fontshare-source-audit.mjs
+      - scripts/validate-independent-sources.mjs
+      - scripts/validate-independent-web-sources.mjs
+      - scripts/validate-family-relations.mjs
+      - scripts/font-data/validate-open-artifacts.mjs
+      - scripts/font-data/validate-open-artifacts-strict.mjs
       - .github/workflows/trust-debt-report.yml
   workflow_dispatch:
 
@@ -43,21 +59,31 @@ jobs:
         run: npm ci
 
       - name: Generate compact runtime metadata
-        run: node scripts/build-runtime-metadata.mjs
+        run: npm run metadata:runtime
 
-      - name: Generate trust debt report
-        run: node --experimental-strip-types scripts/build-trust-report.mjs
+      - name: Validate source, relation and artifact evidence
+        run: |
+          node --experimental-strip-types scripts/validate-independent-sources.mjs
+          node --experimental-strip-types scripts/validate-independent-web-sources.mjs
+          node --experimental-strip-types scripts/validate-family-relations.mjs
+          node --experimental-strip-types scripts/font-data/validate-open-artifacts.mjs
+          node --experimental-strip-types scripts/font-data/validate-open-artifacts-strict.mjs
 
-      - name: Commit report
+      - name: Generate trust and source-identity reports
+        run: |
+          node --experimental-strip-types scripts/build-trust-report.mjs
+          node --experimental-strip-types scripts/build-fontshare-source-audit.mjs
+
+      - name: Commit reports
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ -z "$(git status --porcelain -- docs/TRUST-DEBT.md)" ]; then
-            echo "Trust debt report is already current."
+          if [ -z "$(git status --porcelain -- docs/TRUST-DEBT.md docs/FONTSHARE-SOURCE-AUDIT.md)" ]; then
+            echo "Trust/source reports are already current."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/TRUST-DEBT.md
-          git commit -m "docs: refresh trust debt report"
+          git add docs/TRUST-DEBT.md docs/FONTSHARE-SOURCE-AUDIT.md
+          git commit -m "docs: refresh trust and Fontshare source reports"
           git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:${GITHUB_REF_NAME}

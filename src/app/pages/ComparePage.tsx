@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { FontLoader } from "@/components/FontLoader";
 import { useLanguage } from "@/lib/i18n";
 import { copyToClipboard } from "@/lib/clipboard";
+import { getEffectiveAuthor, getEffectiveCssStack, getEffectiveFamilyName } from "@/lib/fontTrust";
 import { useSearchParams } from "react-router";
 import {
   Dialog,
@@ -103,6 +104,10 @@ export const ComparePage: React.FC<CompareProps> = ({
   const calculatedSizes = useMemo(() => scaleSteps.map((_, i) => Math.round(baseSize * Math.pow(scaleRatio, i))), [baseSize, scaleRatio]);
   const headingFont = fonts.find(font => font.id === headingFontId) || fonts[0];
   const bodyFont = fonts.find(font => font.id === bodyFontId) || fonts[0];
+  const headingName = headingFont ? getEffectiveFamilyName(headingFont) : "";
+  const bodyName = bodyFont ? getEffectiveFamilyName(bodyFont) : "";
+  const headingStack = headingFont ? getEffectiveCssStack(headingFont) : "sans-serif";
+  const bodyStack = bodyFont ? getEffectiveCssStack(bodyFont) : "sans-serif";
 
   const suggestedFont = useMemo(() => {
     if (fonts.length >= 3 || fonts.length === 0 || !allFonts.length) return null;
@@ -119,8 +124,8 @@ export const ComparePage: React.FC<CompareProps> = ({
   const generateConfig = () => `
 // tailwind.config.js theme extension
 fontFamily: {
-  'body': ['"${bodyFont?.name}"', '${fallbackFamily(bodyFont)}'],
-  'display': ['"${headingFont?.name}"', '${fallbackFamily(headingFont)}'],
+  'body': ['"${bodyName}"', '${fallbackFamily(bodyFont)}'],
+  'display': ['"${headingName}"', '${fallbackFamily(headingFont)}'],
 },
 fontSize: {
   'base': '${baseSize}px',
@@ -204,11 +209,11 @@ fontSize: {
             <div className="space-y-4">
               <div className="bg-white border border-neutral-200 p-4">
                 <label htmlFor="workbench-heading" className="block font-bold text-xs uppercase mb-2">{t('compare.heading')}</label>
-                <select id="workbench-heading" className="w-full bg-transparent border-b border-neutral-200 pb-1 font-mono text-xs focus:outline-none focus:border-neutral-400" value={headingFont?.id || ''} onChange={(e) => setHeadingFontId(e.target.value)}>{fonts.map(f => <option key={f.id} value={f.id}>{f.name} ({f.categories[0]})</option>)}</select>
+                <select id="workbench-heading" className="w-full bg-transparent border-b border-neutral-200 pb-1 font-mono text-xs focus:outline-none focus:border-neutral-400" value={headingFont?.id || ''} onChange={(e) => setHeadingFontId(e.target.value)}>{fonts.map(f => <option key={f.id} value={f.id}>{getEffectiveFamilyName(f)} ({f.categories[0]})</option>)}</select>
               </div>
               <div className="bg-white border border-neutral-200 p-4">
                 <label htmlFor="workbench-body" className="block font-bold text-xs uppercase mb-2">{t('compare.body')}</label>
-                <select id="workbench-body" className="w-full bg-transparent border-b border-neutral-200 pb-1 font-mono text-xs focus:outline-none focus:border-neutral-400" value={bodyFont?.id || ''} onChange={(e) => setBodyFontId(e.target.value)}>{fonts.map(f => <option key={f.id} value={f.id}>{f.name} ({f.categories[0]})</option>)}</select>
+                <select id="workbench-body" className="w-full bg-transparent border-b border-neutral-200 pb-1 font-mono text-xs focus:outline-none focus:border-neutral-400" value={bodyFont?.id || ''} onChange={(e) => setBodyFontId(e.target.value)}>{fonts.map(f => <option key={f.id} value={f.id}>{getEffectiveFamilyName(f)} ({f.categories[0]})</option>)}</select>
               </div>
             </div>
           </div>
@@ -224,8 +229,8 @@ fontSize: {
 
           <div className="p-6 mt-auto">
             <h3 className="font-mono text-xs uppercase tracking-widest text-neutral-400 mb-4">{t('compare.active')}</h3>
-            <div className="space-y-2 mb-6">{fonts.map(f => <div key={f.id} className="flex justify-between items-center text-sm group"><span>{f.name}</span><button type="button" onClick={() => removeFromCompare(f.id)} className="text-neutral-300 hover:text-red-500 transition-colors" aria-label={`Remove ${f.name}`}><X className="w-4 h-4" /></button></div>)}</div>
-            {suggestedFont && toggleCompare && <div className="bg-neutral-100 border border-neutral-200 p-4"><div className="flex items-center justify-between mb-2"><span className="font-mono text-[10px] uppercase text-neutral-400">{language === 'ru' ? 'Контрастная эвристика' : 'Contrast heuristic'}</span><span className="font-mono text-[10px] uppercase bg-black text-white px-1">PAIR</span></div><div className="font-bold text-lg mb-1">{suggestedFont.name}</div><div className="font-mono text-[10px] text-neutral-500 mb-2 uppercase">{suggestedFont.categories[0]} / {suggestedFont.author}</div><p className="font-mono text-[8px] text-neutral-400 mb-3">{language === 'ru' ? 'Предложение основано на контрасте категории, не на метрическом анализе.' : 'Based on category contrast, not metric type analysis.'}</p><button type="button" onClick={() => toggleCompare(suggestedFont.id)} className="w-full py-2 border border-neutral-300 hover:bg-neutral-800 hover:text-white hover:border-neutral-800 transition-colors font-mono text-xs uppercase flex items-center justify-center gap-2"><Type className="w-3 h-3" />{language === 'ru' ? 'Добавить' : 'Add to stack'}</button></div>}
+            <div className="space-y-2 mb-6">{fonts.map(f => { const name = getEffectiveFamilyName(f); return <div key={f.id} className="flex justify-between items-center text-sm group"><span>{name}</span><button type="button" onClick={() => removeFromCompare(f.id)} className="text-neutral-300 hover:text-red-500 transition-colors" aria-label={`Remove ${name}`}><X className="w-4 h-4" /></button></div>; })}</div>
+            {suggestedFont && toggleCompare && <div className="bg-neutral-100 border border-neutral-200 p-4"><div className="flex items-center justify-between mb-2"><span className="font-mono text-[10px] uppercase text-neutral-400">{language === 'ru' ? 'Контрастная эвристика' : 'Contrast heuristic'}</span><span className="font-mono text-[10px] uppercase bg-black text-white px-1">PAIR</span></div><div className="font-bold text-lg mb-1">{getEffectiveFamilyName(suggestedFont)}</div><div className="font-mono text-[10px] text-neutral-500 mb-2 uppercase">{suggestedFont.categories[0]} / {getEffectiveAuthor(suggestedFont)}</div><p className="font-mono text-[8px] text-neutral-400 mb-3">{language === 'ru' ? 'Предложение основано на контрасте категории, не на метрическом анализе.' : 'Based on category contrast, not metric type analysis.'}</p><button type="button" onClick={() => toggleCompare(suggestedFont.id)} className="w-full py-2 border border-neutral-300 hover:bg-neutral-800 hover:text-white hover:border-neutral-800 transition-colors font-mono text-xs uppercase flex items-center justify-center gap-2"><Type className="w-3 h-3" />{language === 'ru' ? 'Добавить' : 'Add to stack'}</button></div>}
           </div>
         </div>
 
@@ -233,16 +238,16 @@ fontSize: {
           <div className="max-w-3xl mx-auto space-y-16">
             <section className="space-y-6">
               <p className="font-mono text-xs uppercase tracking-widest text-neutral-400 mb-8 border-b border-neutral-200 pb-2">Preview / Article Layout</p>
-              <h1 style={{ fontFamily: headingFont?.cssStack, fontSize: `${calculatedSizes[5]}px`, lineHeight: 1.1 }} className="font-bold tracking-tight">{customContent || t('preview.title')}</h1>
-              <p style={{ fontFamily: bodyFont?.cssStack, fontSize: `${calculatedSizes[2]}px` }} className="text-neutral-500 font-light leading-relaxed max-w-2xl">{customContent || t('preview.subtitle')}</p>
+              <h1 style={{ fontFamily: headingStack, fontSize: `${calculatedSizes[5]}px`, lineHeight: 1.1 }} className="font-bold tracking-tight">{customContent || t('preview.title')}</h1>
+              <p style={{ fontFamily: bodyStack, fontSize: `${calculatedSizes[2]}px` }} className="text-neutral-500 font-light leading-relaxed max-w-2xl">{customContent || t('preview.subtitle')}</p>
             </section>
 
             <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
-              <div className="md:col-span-4 border-t border-neutral-200 pt-4"><span className="font-mono text-[10px] uppercase mb-2 block">{t('preview.meta')}</span><div style={{ fontFamily: bodyFont?.cssStack, fontSize: `${baseSize}px` }} className="space-y-1"><div>{t('preview.author')}: {headingFont?.author}</div><div>{t('preview.date')}: Nov 28, 2024</div><div>{t('preview.read')}: 5 min</div></div></div>
-              <div className="md:col-span-8 border-t border-neutral-200 pt-4 space-y-8"><p style={{ fontFamily: bodyFont?.cssStack, fontSize: `${calculatedSizes[1]}px`, lineHeight: 1.6 }}>{customContent || t('preview.body1').replace('{heading}', headingFont?.name || '').replace('{body}', bodyFont?.name || '')}</p><h2 style={{ fontFamily: headingFont?.cssStack, fontSize: `${calculatedSizes[3]}px` }} className="font-bold pt-8">{t('compare.scale')}</h2><p style={{ fontFamily: bodyFont?.cssStack, fontSize: `${baseSize}px`, lineHeight: 1.6 }}>{customContent || t('preview.body2').replace('{ratio}', scaleRatio.toString()).replace('{base}', baseSize.toString())}</p><blockquote className="pl-6 border-l-4 border-neutral-300 py-2 my-8"><p style={{ fontFamily: headingFont?.cssStack, fontSize: `${calculatedSizes[2]}px` }} className="italic">“{t('preview.quote')}”</p></blockquote></div>
+              <div className="md:col-span-4 border-t border-neutral-200 pt-4"><span className="font-mono text-[10px] uppercase mb-2 block">{t('preview.meta')}</span><div style={{ fontFamily: bodyStack, fontSize: `${baseSize}px` }} className="space-y-1"><div>{t('preview.author')}: {headingFont ? getEffectiveAuthor(headingFont) : ''}</div><div>{t('preview.date')}: Nov 28, 2024</div><div>{t('preview.read')}: 5 min</div></div></div>
+              <div className="md:col-span-8 border-t border-neutral-200 pt-4 space-y-8"><p style={{ fontFamily: bodyStack, fontSize: `${calculatedSizes[1]}px`, lineHeight: 1.6 }}>{customContent || t('preview.body1').replace('{heading}', headingName).replace('{body}', bodyName)}</p><h2 style={{ fontFamily: headingStack, fontSize: `${calculatedSizes[3]}px` }} className="font-bold pt-8">{t('compare.scale')}</h2><p style={{ fontFamily: bodyStack, fontSize: `${baseSize}px`, lineHeight: 1.6 }}>{customContent || t('preview.body2').replace('{ratio}', scaleRatio.toString()).replace('{base}', baseSize.toString())}</p><blockquote className="pl-6 border-l-4 border-neutral-300 py-2 my-8"><p style={{ fontFamily: headingStack, fontSize: `${calculatedSizes[2]}px` }} className="italic">“{t('preview.quote')}”</p></blockquote></div>
             </section>
 
-            <section className="border-t border-neutral-200 pt-12 pb-24"><h3 className="font-mono text-xs uppercase tracking-widest text-neutral-400 mb-8">{t('preview.ui')}</h3><div className="flex flex-wrap gap-4"><button type="button" className="bg-neutral-800 text-white px-8 py-4 hover:opacity-80 transition-opacity" style={{ fontFamily: bodyFont?.cssStack, fontSize: `${baseSize}px` }}>{t('preview.primary')}</button><button type="button" className="border border-neutral-300 bg-transparent text-black px-8 py-4 hover:bg-neutral-50 transition-colors" style={{ fontFamily: bodyFont?.cssStack, fontSize: `${baseSize}px` }}>{t('preview.secondary')}</button></div></section>
+            <section className="border-t border-neutral-200 pt-12 pb-24"><h3 className="font-mono text-xs uppercase tracking-widest text-neutral-400 mb-8">{t('preview.ui')}</h3><div className="flex flex-wrap gap-4"><button type="button" className="bg-neutral-800 text-white px-8 py-4 hover:opacity-80 transition-opacity" style={{ fontFamily: bodyStack, fontSize: `${baseSize}px` }}>{t('preview.primary')}</button><button type="button" className="border border-neutral-300 bg-transparent text-black px-8 py-4 hover:bg-neutral-50 transition-colors" style={{ fontFamily: bodyStack, fontSize: `${baseSize}px` }}>{t('preview.secondary')}</button></div></section>
           </div>
         </div>
       </div>

@@ -1,0 +1,121 @@
+{
+  "Bw Seido": {
+    "catalogFamily": "Bw Seido",
+    "status": "verified",
+    "relation": "collection-member",
+    "provider": "Branding with Type",
+    "collection": {
+      "family": "Bw Seido Collection",
+      "sourceUrl": "https://brandingwithtype.com/typefaces/bw-seido-collection",
+      "designer": "Branding with Type",
+      "members": ["Bw Seido Raw", "Bw Seido Round"],
+      "scripts": ["Latin"],
+      "license": {
+        "status": "pending"
+      },
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://brandingwithtype.com/typefaces/bw-seido-collection",
+        "capturedAt": "2026-08-11T05:42:00+03:00",
+        "facts": [
+          "Official Branding with Type page identifies Bw Seido Collection and explicitly lists Bw Seido Raw and Bw Seido Round as its two subfamilies.",
+          "The collection page records 24 styles total: six weights plus matching oblique italics across the two subfamilies.",
+          "The collection page states Extended Latin language support."
+        ]
+      }
+    },
+    "loadReplacementAllowed": false,
+    "note": "The recovered umbrella name Bw Seido is retained as a stable catalog identity for the official collection. ONOD must not silently render either Raw or Round when the recovered record asks for Bw Seido."
+  },
+  "Cederville Cursive": {
+    "catalogFamily": "Cederville Cursive",
+    "status": "verified",
+    "relation": "catalog-correction",
+    "provider": "Google Fonts",
+    "canonical": {
+      "family": "Cedarville Cursive",
+      "sourceUrl": "https://fonts.google.com/specimen/Cedarville+Cursive",
+      "designer": "Kimberly Geswein",
+      "licenseId": "OFL-1.1",
+      "weights": [400],
+      "variable": false,
+      "scripts": ["Latin"],
+      "evidence": {
+        "repository": "google/fonts",
+        "path": "ofl/cedarvillecursive/METADATA.pb",
+        "blobSha": "0a537ff7b9badfe4737f5f70663449a5f7e157f7",
+        "facts": [
+          "Official Google Fonts METADATA.pb identifies the current family as Cedarville Cursive, designed by Kimberly Geswein, licensed OFL, with one normal 400 face.",
+          "The recovered ONOD catalog spelling Cederville Cursive differs from the canonical Google family only by the incorrect vowel in Cedarville."
+        ]
+      }
+    },
+    "loadReplacementAllowed": true,
+    "note": "This is a reviewed catalog spelling correction, not a historical successor or similarity match. The recovered stable font ID may render the canonical Cedarville Cursive family."
+  },
+  "Open Sans Condensed": {
+    "catalogFamily": "Open Sans Condensed",
+    "status": "verified",
+    "relation": "historical-removed",
+    "provider": "Google Fonts",
+    "historical": {
+      "family": "Open Sans Condensed",
+      "sourceUrl": "https://github.com/google/fonts/commit/42fa6aedff8c20a9516b130182ba260a8ff3decb",
+      "designer": "Steve Matteson",
+      "licenseId": "Apache-2.0",
+      "weights": [300, 700],
+      "variable": false,
+      "scripts": ["Latin", "Cyrillic", "Greek", "Vietnamese"],
+      "evidence": {
+        "repository": "google/fonts",
+        "commitSha": "42fa6aedff8c20a9516b130182ba260a8ff3decb",
+        "metadataPath": "apache/opensanscondensed/METADATA.pb",
+        "metadataBlobSha": "eaca62d13ebea6639e3239cd98c7b1ca990d0f81",
+        "licensePath": "apache/opensanscondensed/LICENSE.txt",
+        "licenseBlobSha": "75b52484ea471f882c29e02693b4f02dba175b5e",
+        "facts": [
+          "The official google/fonts removal commit deletes Open Sans Condensed from the catalog and shows the prior METADATA.pb with exact family identity Open Sans Condensed, designer Steve Matteson and license APACHE2.",
+          "The prior METADATA.pb records normal 300, italic 300 and normal 700 faces and Latin, Cyrillic, Greek and Vietnamese subsets.",
+          "The historical LICENSE.txt blob is Apache License 2.0."
+        ]
+      }
+    },
+    "loadReplacementAllowed": false,
+    "note": "Open Sans Condensed is a verified historical Google Fonts family removed from the catalog on 2024-09-24. ONOD may preserve its historical identity and technical metadata but must not silently substitute another Open Sans family for rendering."
+  },
+  "Source Sans Pro": {
+    "catalogFamily": "Source Sans Pro",
+    "status": "verified",
+    "relation": "historical-successor",
+    "provider": "Adobe",
+    "historical": {
+      "family": "Source Sans Pro",
+      "sourceUrl": "https://github.com/adobe-fonts/source-sans",
+      "designer": "Paul D. Hunt",
+      "licenseId": "OFL-1.1",
+      "evidence": {
+        "repository": "adobe-fonts/source-sans",
+        "commitSha": "f42c6e78cef38a192aa1e45bc3ff9b80e0d4b7f6",
+        "licensePath": "LICENSE.txt",
+        "licenseBlobSha": "87ec82c441254d7509b8c096981179fd34bbf968",
+        "facts": [
+          "Official Adobe repository history contains SourceSansPro release files and package identity for Source Sans Pro.",
+          "LICENSE.txt at the historical Source Sans Pro revision explicitly licenses the Font Software under SIL Open Font License 1.1."
+        ]
+      }
+    },
+    "successor": {
+      "family": "Source Sans 3",
+      "sourceUrl": "https://github.com/adobe-fonts/source-sans",
+      "evidence": {
+        "repository": "adobe-fonts/source-sans",
+        "commitSha": "7c691c2772570a0d3a9e1bffe8a9d6074257d985",
+        "facts": [
+          "The same official Adobe repository later releases Source Sans 3 version 3.052 and SourceSans3 font files."
+        ]
+      }
+    },
+    "loadReplacementAllowed": false,
+    "note": "This relation proves historical identity and successor lineage. It does not authorize ONOD to silently render Source Sans 3 when the catalog record asks for Source Sans Pro."
+  }
+}

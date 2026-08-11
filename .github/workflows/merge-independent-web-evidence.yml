@@ -1,0 +1,55 @@
+name: Ingest independent web evidence
+
+on:
+  push:
+    branches:
+      - main
+      - feat/font-data-engine
+    paths:
+      - src/app/data/verified/independent-web-sources-*.json
+      - scripts/merge-independent-web-evidence.mjs
+      - .github/workflows/merge-independent-web-evidence.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: onod-fonts-independent-web-ingest-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ingest:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout active branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Merge evidence shards into canonical store
+        run: node scripts/merge-independent-web-evidence.mjs
+
+      - name: Validate canonical web evidence
+        run: node --experimental-strip-types scripts/validate-independent-web-sources.mjs
+
+      - name: Commit canonical evidence
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$(git status --porcelain -- src/app/data/verified/independent-web-sources.json src/app/data/verified/independent-web-sources-*.json)" ]; then
+            echo "Independent web evidence is already canonical."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A src/app/data/verified/independent-web-sources.json src/app/data/verified/independent-web-sources-*.json
+          git commit -m "data: ingest independent web evidence shards"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:${GITHUB_REF_NAME}

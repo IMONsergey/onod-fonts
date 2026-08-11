@@ -1,0 +1,132 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { mockFonts } from '../src/app/data/mockFonts.ts';
+
+const relations = JSON.parse(readFileSync(resolve(process.cwd(), 'src/app/data/verified/family-relations.json'), 'utf8'));
+const catalog = new Set(mockFonts.map(font => font.name));
+const errors = [];
+const allowedKinds = new Set(['historical-successor', 'historical-removed', 'provider-rename', 'collection-member', 'catalog-correction']);
+const sha1 = value => /^[0-9a-f]{40}$/i.test(value || '');
+const httpUrl = value => {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' || url.protocol === 'http:';
+  } catch {
+    return false;
+  }
+};
+const reviewedFacts = proof => Array.isArray(proof?.facts) && proof.facts.length > 0 && proof.facts.every(fact => typeof fact === 'string' && fact.trim());
+const validWeights = weights => Array.isArray(weights) && weights.length > 0 && weights.every(weight => Number.isFinite(Number(weight)) && Number(weight) >= 1 && Number(weight) <= 1000);
+const validScripts = scripts => Array.isArray(scripts) && scripts.length > 0 && scripts.every(script => typeof script === 'string' && script.trim());
+
+for (const [name, record] of Object.entries(relations)) {
+  if (!catalog.has(name)) errors.push(`${name}: catalog family does not exist.`);
+  if (record?.catalogFamily !== name) errors.push(`${name}: catalogFamily must match relation key exactly.`);
+  if (record?.status !== 'verified') errors.push(`${name}: only status=verified relations are allowed in canonical relation evidence.`);
+  if (!allowedKinds.has(record?.relation)) errors.push(`${name}: unsupported relation '${record?.relation}'.`);
+  if (typeof record?.provider !== 'string' || !record.provider.trim()) errors.push(`${name}: provider is required.`);
+
+  if (record.relation === 'catalog-correction') {
+    if (record.loadReplacementAllowed !== true) errors.push(`${name}: catalog-correction must explicitly allow canonical rendering replacement.`);
+    if (record.historical || record.successor || record.collection) errors.push(`${name}: catalog-correction must use canonical evidence only.`);
+
+    const canonical = record.canonical;
+    if (!canonical || typeof canonical !== 'object') {
+      errors.push(`${name}: catalog-correction requires canonical evidence.`);
+      continue;
+    }
+    if (typeof canonical.family !== 'string' || !canonical.family.trim() || canonical.family === name) errors.push(`${name}: canonical family must be a distinct non-empty corrected identity.`);
+    if (!httpUrl(canonical.sourceUrl)) errors.push(`${name}: canonical sourceUrl must be HTTP(S).`);
+    if (typeof canonical.designer !== 'string' || !canonical.designer.trim()) errors.push(`${name}: canonical designer is required.`);
+    if (typeof canonical.licenseId !== 'string' || !canonical.licenseId.trim()) errors.push(`${name}: canonical exact license id is required.`);
+    if (!validWeights(canonical.weights)) errors.push(`${name}: canonical numeric weights are required.`);
+    if (typeof canonical.variable !== 'boolean') errors.push(`${name}: canonical variable capability must be explicit.`);
+    if (!validScripts(canonical.scripts)) errors.push(`${name}: canonical scripts are required.`);
+
+    const proof = canonical.evidence;
+    if (!proof || typeof proof !== 'object') errors.push(`${name}: canonical correction evidence is required.`);
+    else {
+      if (typeof proof.repository !== 'string' || !/^[^/]+\/[^/]+$/.test(proof.repository)) errors.push(`${name}: canonical evidence repository is invalid.`);
+      if (typeof proof.path !== 'string' || !/^(ofl|apache|ufl)\/.+\/METADATA\.pb$/.test(proof.path)) errors.push(`${name}: canonical Google metadata path is invalid.`);
+      if (!sha1(proof.blobSha)) errors.push(`${name}: canonical metadata blobSha must be a Git blob SHA.`);
+      if (!reviewedFacts(proof)) errors.push(`${name}: canonical correction needs reviewed facts.`);
+    }
+    continue;
+  }
+
+  if (record.relation === 'collection-member') {
+    if (record.loadReplacementAllowed !== false) errors.push(`${name}: collection-member must never silently substitute a member family.`);
+    if (record.historical || record.successor || record.canonical) errors.push(`${name}: collection-member must use collection evidence only.`);
+
+    const collection = record.collection;
+    if (!collection || typeof collection !== 'object') {
+      errors.push(`${name}: collection-member requires collection evidence.`);
+      continue;
+    }
+    if (typeof collection.family !== 'string' || !collection.family.trim() || collection.family === name) errors.push(`${name}: collection family must be a distinct umbrella identity.`);
+    if (!httpUrl(collection.sourceUrl)) errors.push(`${name}: collection sourceUrl must be HTTP(S).`);
+    if (typeof collection.designer !== 'string' || !collection.designer.trim()) errors.push(`${name}: collection designer/publisher is required.`);
+    if (!Array.isArray(collection.members) || collection.members.length < 2 || collection.members.some(member => typeof member !== 'string' || !member.trim())) errors.push(`${name}: collection-member requires at least two explicit member families.`);
+    if (!validScripts(collection.scripts)) errors.push(`${name}: collection-member requires reviewed script coverage.`);
+    if (!['pending', 'verified'].includes(collection.license?.status)) errors.push(`${name}: collection license status must be pending or verified.`);
+    if (collection.license?.status === 'pending' && collection.license?.id) errors.push(`${name}: pending collection license must not expose an exact id.`);
+    if (collection.license?.status === 'verified' && (typeof collection.license?.id !== 'string' || !collection.license.id.trim())) errors.push(`${name}: verified collection license requires an exact id.`);
+
+    const proof = collection.evidence;
+    if (!proof || proof.kind !== 'official-web') errors.push(`${name}: collection evidence must be official-web.`);
+    if (!httpUrl(proof?.url) || proof.url !== collection.sourceUrl) errors.push(`${name}: collection evidence URL must exactly match sourceUrl.`);
+    if (!proof?.capturedAt || Number.isNaN(Date.parse(proof.capturedAt))) errors.push(`${name}: collection capturedAt must be a valid timestamp.`);
+    if (!reviewedFacts(proof)) errors.push(`${name}: collection relation requires reviewed primary-source facts.`);
+    continue;
+  }
+
+  if (record.loadReplacementAllowed !== false) errors.push(`${name}: silent replacement is forbidden for ${record.relation}; loadReplacementAllowed must be false.`);
+
+  const historical = record?.historical;
+  if (!historical || historical.family !== name) errors.push(`${name}: historical family must exactly match the recovered catalog identity.`);
+  if (!httpUrl(historical?.sourceUrl)) errors.push(`${name}: historical sourceUrl must be an HTTP(S) primary source.`);
+  if (typeof historical?.designer !== 'string' || !historical.designer.trim()) errors.push(`${name}: historical designer is required.`);
+
+  const proof = historical?.evidence;
+  if (!proof || typeof proof !== 'object') errors.push(`${name}: historical evidence is required.`);
+  else {
+    if (typeof proof.repository !== 'string' || !/^[^/]+\/[^/]+$/.test(proof.repository)) errors.push(`${name}: historical evidence repository is invalid.`);
+    if (!sha1(proof.commitSha)) errors.push(`${name}: historical evidence commitSha must be a Git commit SHA.`);
+    if (!reviewedFacts(proof)) errors.push(`${name}: historical evidence needs reviewed facts.`);
+    if (historical.licenseId) {
+      if (typeof proof.licensePath !== 'string' || !proof.licensePath) errors.push(`${name}: verified historical license requires licensePath.`);
+      if (!sha1(proof.licenseBlobSha)) errors.push(`${name}: verified historical license requires licenseBlobSha.`);
+    }
+  }
+
+  if (record.relation === 'historical-successor') {
+    const successor = record.successor;
+    if (!successor || typeof successor.family !== 'string' || !successor.family.trim() || successor.family === name) errors.push(`${name}: historical-successor relation requires a distinct successor family.`);
+    if (!httpUrl(successor?.sourceUrl)) errors.push(`${name}: successor sourceUrl is invalid.`);
+    const successorProof = successor?.evidence;
+    if (!successorProof || !sha1(successorProof.commitSha)) errors.push(`${name}: successor relation requires a Git commit SHA.`);
+    if (successorProof && (typeof successorProof.repository !== 'string' || !/^[^/]+\/[^/]+$/.test(successorProof.repository))) errors.push(`${name}: successor evidence repository is invalid.`);
+    if (!reviewedFacts(successorProof)) errors.push(`${name}: successor relation requires reviewed facts.`);
+  }
+
+  if (record.relation === 'historical-removed') {
+    if (record.successor) errors.push(`${name}: historical-removed relation must not invent a successor.`);
+    if (!historical?.licenseId) errors.push(`${name}: historical-removed relation requires an exact historical license id.`);
+    if (!validWeights(historical?.weights)) errors.push(`${name}: historical-removed relation requires exact metadata-backed weights.`);
+    if (typeof historical?.variable !== 'boolean') errors.push(`${name}: historical-removed relation requires explicit variable capability.`);
+    if (!validScripts(historical?.scripts)) errors.push(`${name}: historical-removed relation requires metadata-backed scripts.`);
+    if (typeof proof?.metadataPath !== 'string' || !/^(ofl|apache|ufl)\/.+\/METADATA\.pb$/.test(proof.metadataPath)) errors.push(`${name}: historical-removed relation requires a valid metadataPath.`);
+    if (!sha1(proof?.metadataBlobSha)) errors.push(`${name}: historical-removed relation requires metadataBlobSha.`);
+  }
+}
+
+const corrections = Object.values(relations).filter(record => record.relation === 'catalog-correction').length;
+const removed = Object.values(relations).filter(record => record.relation === 'historical-removed').length;
+const collections = Object.values(relations).filter(record => record.relation === 'collection-member').length;
+console.log(`Family relation evidence validation: ${Object.keys(relations).length} verified relations (${corrections} canonical corrections, ${removed} historical removals, ${collections} collection relations).`);
+if (errors.length) {
+  console.error(`Errors: ${errors.length}`);
+  errors.forEach(error => console.error(`  ERROR ${error}`));
+  process.exit(1);
+}
+console.log('Family relation evidence validation passed; replacement is allowed only for explicit canonical corrections.');

@@ -1,0 +1,196 @@
+{
+  "Open Sans Condensed": {
+    "sfntVersion": "\u0000\u0001\u0000\u0000",
+    "tables": [
+      "DSIG",
+      "GDEF",
+      "GPOS",
+      "GSUB",
+      "GlyphOrder",
+      "OS/2",
+      "cmap",
+      "cvt ",
+      "fpgm",
+      "gasp",
+      "glyf",
+      "head",
+      "hhea",
+      "hmtx",
+      "kern",
+      "loca",
+      "maxp",
+      "name",
+      "post",
+      "prep"
+    ],
+    "names": {
+      "family": [
+        "Open Sans Condensed",
+        "Open Sans Condensed Light"
+      ],
+      "subfamily": [
+        "Light",
+        "Regular"
+      ],
+      "fullName": [
+        "Open Sans Condensed Light"
+      ],
+      "postScriptName": [
+        "OpenSansCondensed-Light"
+      ],
+      "typographicFamily": [
+        "Open Sans Condensed"
+      ],
+      "typographicSubfamily": [
+        "Light"
+      ]
+    },
+    "axes": [],
+    "cmap": {
+      "count": 883,
+      "min": 32,
+      "max": 65533,
+      "scripts": [
+        "Latin",
+        "Greek",
+        "Cyrillic",
+        "Vietnamese"
+      ]
+    },
+    "features": {
+      "GSUB": [
+        "liga",
+        "lnum",
+        "locl",
+        "onum",
+        "pnum",
+        "salt",
+        "ss01",
+        "ss02",
+        "ss03",
+        "tnum"
+      ],
+      "GPOS": []
+    },
+    "metrics": {
+      "unitsPerEm": 2048,
+      "ascender": 2189,
+      "descender": -600,
+      "glyphCount": 938,
+      "weightClass": 300,
+      "widthClass": 3
+    },
+    "family": "Open Sans Condensed",
+    "relation": "historical-removed",
+    "repository": "google/fonts",
+    "ref": "09fe88e80988f324709ccf93cf3e29bc3dd90652",
+    "path": "apache/opensanscondensed/OpenSansCondensed-Light.ttf",
+    "gitBlobSha": "81e0b71b07c96c842aad1e75f2bd711325cb784a",
+    "sourceUrl": "https://raw.githubusercontent.com/google/fonts/09fe88e80988f324709ccf93cf3e29bc3dd90652/apache/opensanscondensed/OpenSansCondensed-Light.ttf",
+    "licenseId": "Apache-2.0",
+    "sha256": "8ae2a4d772519a12130bd844dab9916a575ac5ef8e371a643d6f67e15c7f8566",
+    "size": 220940
+  },
+  "Source Sans Pro": {
+    "sfntVersion": "\u0000\u0001\u0000\u0000",
+    "tables": [
+      "BASE",
+      "DSIG",
+      "GDEF",
+      "GPOS",
+      "GSUB",
+      "GlyphOrder",
+      "OS/2",
+      "cmap",
+      "cvt ",
+      "fpgm",
+      "gasp",
+      "glyf",
+      "head",
+      "hhea",
+      "hmtx",
+      "loca",
+      "maxp",
+      "name",
+      "post",
+      "prep"
+    ],
+    "names": {
+      "family": [
+        "Source Sans Pro"
+      ],
+      "subfamily": [
+        "Regular"
+      ],
+      "fullName": [
+        "Source Sans Pro"
+      ],
+      "postScriptName": [
+        "SourceSansPro-Regular"
+      ]
+    },
+    "axes": [],
+    "cmap": {
+      "count": 1300,
+      "min": 0,
+      "max": 127339,
+      "scripts": [
+        "Latin",
+        "Greek",
+        "Cyrillic",
+        "Vietnamese"
+      ]
+    },
+    "features": {
+      "GSUB": [
+        "aalt",
+        "c2sc",
+        "case",
+        "ccmp",
+        "dnom",
+        "frac",
+        "liga",
+        "locl",
+        "numr",
+        "onum",
+        "ordn",
+        "pnum",
+        "salt",
+        "sinf",
+        "smcp",
+        "ss01",
+        "ss02",
+        "ss03",
+        "ss04",
+        "ss05",
+        "subs",
+        "sups",
+        "zero"
+      ],
+      "GPOS": [
+        "kern",
+        "mark",
+        "mkmk",
+        "size"
+      ]
+    },
+    "metrics": {
+      "unitsPerEm": 1000,
+      "ascender": 984,
+      "descender": -273,
+      "glyphCount": 1944,
+      "weightClass": 400,
+      "widthClass": 5
+    },
+    "family": "Source Sans Pro",
+    "relation": "historical-successor",
+    "repository": "adobe-fonts/source-sans",
+    "ref": "f42c6e78cef38a192aa1e45bc3ff9b80e0d4b7f6",
+    "path": "TTF/SourceSansPro-Regular.ttf",
+    "gitBlobSha": "a011dff93ff179ec07a529f8ae2ae26bb979f105",
+    "sourceUrl": "https://raw.githubusercontent.com/adobe-fonts/source-sans/f42c6e78cef38a192aa1e45bc3ff9b80e0d4b7f6/TTF/SourceSansPro-Regular.ttf",
+    "licenseId": "OFL-1.1",
+    "sha256": "4c3749a7496356db5c7bc2e9899ac5075581519918e885c323e0321a3cafec06",
+    "size": 293960
+  }
+}

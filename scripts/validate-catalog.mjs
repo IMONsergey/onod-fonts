@@ -64,14 +64,19 @@ if (!Array.isArray(mockFonts)) {
     const effectiveLanguages = getEffectiveLanguages(font);
     const runtimeUpstream = getVerifiedGoogleFont(font);
 
-    if (trust.confidence === 'derived') {
-      addWarning(font, 'metadata is generated/derived and requires upstream verification.');
-      if (effectiveWeights.length !== 1 || effectiveWeights[0] !== '400') addError(font, 'derived metadata must be constrained to conservative weight 400 at runtime.');
-      if (isEffectivelyVariable(font)) addError(font, 'derived metadata must not expose variable axes as verified.');
+    if (!trust.identityVerified) addWarning(font, 'source/family identity still requires primary-source verification.');
+    if (!trust.licenseVerified) addWarning(font, 'exact license still requires primary-source verification.');
+
+    if (!trust.weightsVerified) {
+      if (effectiveWeights.length !== 1 || effectiveWeights[0] !== '400') addError(font, 'unverified weight metadata must be constrained to conservative weight 400 at runtime.');
+    } else {
+      if (effectiveWeights.length === 0) addError(font, 'verified weights must produce at least one runtime weight.');
     }
 
+    if (!trust.variableVerified && isEffectivelyVariable(font)) addError(font, 'unverified variable capability must not be exposed as verified runtime behavior.');
+    if (!trust.scriptsVerified) addWarning(font, 'script/language metadata remains unverified.');
     if (trust.licenseLabel === 'Verify at source') addWarning(font, 'generic license label requires exact upstream license enrichment.');
-    if (effectiveLanguages.length === 0) addError(font, 'effective language list must not be empty.');
+    if (effectiveLanguages.length === 0) addWarning(font, 'effective language list is empty; script filters must not infer unsupported coverage.');
 
     if (runtimeUpstream) {
       if (runtimeUpstream.family !== font.name) addError(font, 'runtime upstream family name does not match catalog identity.');
@@ -122,16 +127,24 @@ for (const [name, script] of [['Noto Sans JP', 'Japanese'], ['Noto Serif JP', 'J
   if (font && !getEffectiveLanguages(font).includes(script)) addError(font, `legacy script repair failed: expected ${script}.`);
 }
 
-const derivedWarnings = warnings.filter(item => item.includes('generated/derived')).length;
-const genericLicenseWarnings = warnings.filter(item => item.includes('generic license')).length;
+const sourceDebt = mockFonts.filter(font => {
+  const trust = getFontTrustReport(font);
+  return !trust.identityVerified || !trust.licenseVerified;
+}).length;
+const weightDebt = mockFonts.filter(font => !getFontTrustReport(font).weightsVerified).length;
+const variableDebt = mockFonts.filter(font => !getFontTrustReport(font).variableVerified).length;
+const scriptDebt = mockFonts.filter(font => !getFontTrustReport(font).scriptsVerified).length;
 const verifiedVariable = mockFonts.filter(isEffectivelyVariable).length;
-const runtimeVerified = mockFonts.filter(font => getFontTrustReport(font).upstreamVerified).length;
+const runtimeVerified = mockFonts.filter(font => {
+  const trust = getFontTrustReport(font);
+  return trust.identityVerified && trust.licenseVerified;
+}).length;
 
 console.log(`Catalog validation: ${mockFonts.length} families, ${seenIds.size} unique ids, ${seenNames.size} unique names.`);
-console.log(`Canonical evidence: ${validEvidenceRecords} Google Fonts METADATA.pb records with path/SHA provenance (${reviewedAliasRecords} reviewed aliases).`);
-console.log(`Runtime verification: ${runtimeVerified} catalog families backed by compact generated metadata.`);
-console.log(`Runtime trust policy: ${verifiedVariable} verified variable families; remaining derived records are constrained to Regular 400.`);
-console.log(`Trust debt: ${derivedWarnings} derived metadata records, ${genericLicenseWarnings} generic license labels.`);
+console.log(`Canonical Google evidence: ${validEvidenceRecords} METADATA.pb records with path/SHA provenance (${reviewedAliasRecords} reviewed aliases).`);
+console.log(`Runtime source/license verification: ${runtimeVerified}/${mockFonts.length}.`);
+console.log(`Field-level debt: source/license ${sourceDebt}; weights ${weightDebt}; variable ${variableDebt}; scripts ${scriptDebt}.`);
+console.log(`Verified variable families exposed at runtime: ${verifiedVariable}.`);
 
 if (warnings.length) {
   console.warn(`Warnings: ${warnings.length}`);
@@ -146,4 +159,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log('Catalog structural, evidence, reviewed-alias and runtime trust-policy validation passed.');
+console.log('Catalog structural, evidence, reviewed-alias and field-level runtime trust validation passed.');

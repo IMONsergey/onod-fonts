@@ -1,0 +1,174 @@
+{
+  "Aspekta": {
+    "family": "Aspekta",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-github",
+      "repository": "ivodolenc/aspekta",
+      "sourceUrl": "https://github.com/ivodolenc/aspekta",
+      "designer": "Ivo Dolenc",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "main",
+        "path": "README.md",
+        "blobSha": "f4321c50b50dfebb9eb5594ee26e560d7d159f1e"
+      }
+    },
+    "license": {
+      "status": "verified",
+      "id": "OFL-1.1",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "main",
+        "path": "LICENSE.txt",
+        "blobSha": "3b4c78701510d28833b3b9c9798d47f577bb2cf4"
+      }
+    },
+    "technical": {
+      "variable": true,
+      "axes": {
+        "wght": { "min": 50, "max": 1000 }
+      },
+      "scripts": ["Latin"],
+      "weightsVerified": true,
+      "variableVerified": true,
+      "scriptsVerified": true
+    }
+  },
+  "Cal Sans": {
+    "family": "Cal Sans",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-github",
+      "repository": "calcom/sans",
+      "sourceUrl": "https://github.com/calcom/sans",
+      "designer": "Mark Davis",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "main",
+        "path": "README.md",
+        "blobSha": "1fa3144b88f9950be633814d260e88a135e07ee4"
+      }
+    },
+    "license": {
+      "status": "verified",
+      "id": "OFL-1.1",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "main",
+        "path": "OFL.txt",
+        "blobSha": "52135553ce36d47c868d0dd93de3accaf60fea76"
+      }
+    },
+    "technical": {
+      "variable": true,
+      "axes": {
+        "opsz": { "min": 8, "max": 45 }
+      },
+      "weightsVerified": false,
+      "variableVerified": true,
+      "scriptsVerified": false
+    }
+  },
+  "Hauora": {
+    "family": "Hauora",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-github",
+      "repository": "WCYS-Co/Hauora-Sans",
+      "sourceUrl": "https://github.com/WCYS-Co/Hauora-Sans",
+      "designer": "WCYS & Co.",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "master",
+        "path": "README.md",
+        "blobSha": "2040e653cf6c973105fca4a1b60975604987f860"
+      }
+    },
+    "license": {
+      "status": "verified",
+      "id": "OFL-1.1",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "master",
+        "path": "OFL.txt",
+        "blobSha": "2850a01bad5a4528d0b576111cebb18fb92bd2f8"
+      }
+    },
+    "technical": {
+      "variable": true,
+      "scripts": ["Latin", "Cyrillic"],
+      "weightsVerified": false,
+      "variableVerified": true,
+      "scriptsVerified": true
+    }
+  },
+  "Overused Grotesk": {
+    "family": "Overused Grotesk",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-github",
+      "repository": "RandomMaerks/Overused-Grotesk",
+      "sourceUrl": "https://github.com/RandomMaerks/Overused-Grotesk",
+      "designer": "Bao Nguyen / RandomMaerks",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "main",
+        "path": "README.md",
+        "blobSha": "509d1c9370cc678330e25a458cf64f111b461222"
+      }
+    },
+    "license": {
+      "status": "verified",
+      "id": "OFL-1.1",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "main",
+        "path": "LICENSE.txt",
+        "blobSha": "06a195e7a85ad38a41847c2f52ec0ed947165901"
+      }
+    },
+    "technical": {
+      "variable": true,
+      "weights": [300, 350, 400, 500, 600, 700, 800, 900],
+      "axes": {
+        "wght": { "min": 300, "max": 900 }
+      },
+      "scripts": ["Latin", "Cyrillic"],
+      "weightsVerified": true,
+      "variableVerified": true,
+      "scriptsVerified": true
+    }
+  },
+  "Uncut Sans": {
+    "family": "Uncut Sans",
+    "identity": {
+      "status": "verified",
+      "sourceType": "official-github",
+      "repository": "kaspernordkvist/uncut_sans",
+      "sourceUrl": "https://github.com/kaspernordkvist/uncut_sans",
+      "designer": "Kasper Nordkvist",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "main",
+        "path": "README.md",
+        "blobSha": "719d94847c9785799c4d206c1cf790baa8d6442a"
+      }
+    },
+    "license": {
+      "status": "verified",
+      "id": "OFL-1.1",
+      "evidence": {
+        "kind": "github-blob",
+        "ref": "main",
+        "path": "LICENSE.txt",
+        "blobSha": "6c183e55e58cd92df368bad8199adbf3eb6ad6cf"
+      }
+    },
+    "technical": {
+      "weightsVerified": false,
+      "variableVerified": false,
+      "scriptsVerified": false
+    }
+  }
+}

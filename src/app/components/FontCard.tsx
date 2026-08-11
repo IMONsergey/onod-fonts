@@ -95,7 +95,7 @@ export const FontCard: React.FC<FontCardProps> = memo(({
 
   if (layout === "list") {
     return (
-      <article className="group border-b border-neutral-200 bg-white min-h-[300px] flex flex-col md:flex-row transition-colors hover:bg-neutral-50">
+      <article data-font-id={font.id} className="group border-b border-neutral-200 bg-white min-h-[300px] flex flex-col md:flex-row transition-colors hover:bg-neutral-50">
         <div className="w-full md:w-72 flex-shrink-0 p-4 md:p-6 border-r border-neutral-200 flex flex-col justify-between relative">
           <div>
             <div className="flex items-start justify-between mb-4 gap-2">
@@ -137,7 +137,7 @@ export const FontCard: React.FC<FontCardProps> = memo(({
   }
 
   return (
-    <article className="group bg-white border-b border-r border-neutral-200 flex flex-col h-[350px] relative hover:bg-neutral-50 transition-colors">
+    <article data-font-id={font.id} className="group bg-white border-b border-r border-neutral-200 flex flex-col h-[350px] relative hover:bg-neutral-50 transition-colors">
       <div className="p-3 flex justify-between items-start border-b border-neutral-100 gap-2">
         <div className="min-w-0"><button type="button" onClick={() => onViewDetails(font.id)} className="block text-left text-sm text-black tracking-tight hover:underline truncate" style={{ fontWeight: 700 }}>{effectiveFamilyName}</button><p className="font-mono text-[9px] text-neutral-500 uppercase truncate">{effectiveSourceLabel}</p></div>
         <div className="flex items-center gap-1.5 shrink-0"><MetadataBadges compact /><button type="button" onClick={copyCss} className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity" title="Copy CSS" aria-label="Copy CSS">{cssCopied ? <Check className="w-3 h-3 text-green-600" /> : <Code className="w-3 h-3 text-neutral-400" />}</button><button type="button" onClick={() => onToggleFavorite(font.id)} aria-label={isFavorite ? t('card.removeFromFavorites') : t('card.addToFavorites')}><Heart className={cn("w-3 h-3", isFavorite ? "fill-black" : "stroke-black")} /></button></div>

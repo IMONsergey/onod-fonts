@@ -13,7 +13,7 @@ interface BaseRelation {
 }
 
 export interface HistoricalFamilyRelation extends BaseRelation {
-  relation: "historical-successor" | "historical-removed" | "provider-rename" | "collection-member";
+  relation: "historical-successor" | "historical-removed" | "provider-rename";
   loadReplacementAllowed: false;
   historical: {
     family: string;
@@ -27,6 +27,22 @@ export interface HistoricalFamilyRelation extends BaseRelation {
   successor?: {
     family: string;
     sourceUrl: string;
+  };
+}
+
+export interface CollectionFamilyRelation extends BaseRelation {
+  relation: "collection-member";
+  loadReplacementAllowed: false;
+  collection: {
+    family: string;
+    sourceUrl: string;
+    designer: string;
+    members: string[];
+    scripts: string[];
+    license: {
+      status: "pending" | "verified";
+      id?: string;
+    };
   };
 }
 
@@ -44,7 +60,7 @@ export interface CatalogCorrectionRelation extends BaseRelation {
   };
 }
 
-export type VerifiedFamilyRelation = HistoricalFamilyRelation | CatalogCorrectionRelation;
+export type VerifiedFamilyRelation = HistoricalFamilyRelation | CollectionFamilyRelation | CatalogCorrectionRelation;
 
 const relations = relationsJson as unknown as Record<string, VerifiedFamilyRelation>;
 
@@ -56,7 +72,13 @@ export function getVerifiedFamilyRelation(font: Font): VerifiedFamilyRelation | 
 
 export function getHistoricalSourceRelation(font: Font): HistoricalFamilyRelation | undefined {
   const relation = getVerifiedFamilyRelation(font);
-  if (!relation || relation.relation === "catalog-correction") return undefined;
+  if (!relation || !["historical-successor", "historical-removed", "provider-rename"].includes(relation.relation)) return undefined;
+  return relation as HistoricalFamilyRelation;
+}
+
+export function getCollectionRelation(font: Font): CollectionFamilyRelation | undefined {
+  const relation = getVerifiedFamilyRelation(font);
+  if (!relation || relation.relation !== "collection-member") return undefined;
   return relation;
 }
 

@@ -16,6 +16,7 @@ type QueueTask = {
 };
 
 const MAX_CONCURRENT_FONT_LOADS = 4;
+const CARD_PRELOAD_MARGIN = '500px 0px';
 let activeFontLoads = 0;
 const pendingFontLoads: QueueTask[] = [];
 
@@ -104,6 +105,8 @@ const waitForStylesheet = (link: HTMLLinkElement, url: string) => new Promise<vo
 });
 
 export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
+  const fontIdsKey = fonts.map(font => font.id).join('|');
+
   useEffect(() => {
     if (!fonts?.length) return;
 
@@ -129,12 +132,14 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
           link.rel = 'stylesheet';
           link.href = url;
           link.dataset.fontId = font.id;
-          document.head.appendChild(link);
           created = true;
         }
 
+        const stylesheetReady = waitForStylesheet(link, url);
+        if (created) document.head.appendChild(link);
+
         try {
-          await waitForStylesheet(link, url);
+          await stylesheetReady;
           globalReadyIds.add(id);
           await verifyFontFace(font);
         } catch (error) {
@@ -194,39 +199,61 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
       void promise.catch(() => {});
     };
 
-    for (const font of fonts) {
+    const requestFont = (font: Font) => {
       const sourceLabel = getEffectiveSourceLabel(font);
       const fontshareSlug = getEffectiveFontshareSlug(font);
       if (fontshareSlug) {
         addStylesheet(font, `https://api.fontshare.com/v2/css?f[]=${encodeURIComponent(fontshareSlug)}@1&display=swap`, stylesheetId('fontshare', font));
-        continue;
+        return;
       }
 
       const artifact = getVerifiedOpenFontArtifact(font);
       if (artifact) {
         addArtifactFace(font, artifact, 'current');
-        continue;
+        return;
       }
 
       const historicalArtifact = getVerifiedHistoricalFontArtifact(font);
       if (historicalArtifact) {
         addArtifactFace(font, historicalArtifact, 'historical');
-        continue;
+        return;
       }
 
       if (sourceLabel === 'Google Fonts') {
         addStylesheet(font, googleFontUrl(font), stylesheetId('google', font));
-        continue;
+        return;
       }
 
       if (font.customCssUrl && sourceLabel === font.source) {
         addStylesheet(font, font.customCssUrl, stylesheetId('custom', font));
-        continue;
+        return;
       }
 
       setFontRuntimeStatus(font.id, 'error', `No verified font loading strategy for canonical source: ${sourceLabel}`);
+    };
+
+    const observers: IntersectionObserver[] = [];
+    for (const font of fonts) {
+      const anchor = document.querySelector<HTMLElement>(`[data-font-id="${font.id}"]`);
+      if (!anchor || typeof IntersectionObserver === 'undefined') {
+        requestFont(font);
+        continue;
+      }
+
+      const observer = new IntersectionObserver(entries => {
+        if (!entries.some(entry => entry.isIntersecting)) return;
+        observer.disconnect();
+        requestFont(font);
+      }, { root: null, rootMargin: CARD_PRELOAD_MARGIN, threshold: 0.01 });
+      observer.observe(anchor);
+      observers.push(observer);
     }
-  }, [fonts]);
+
+    return () => observers.forEach(observer => observer.disconnect());
+  // The font id sequence is the loading contract. Parent preview/control rerenders
+  // should not tear down and recreate viewport observers for the same batch.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fontIdsKey]);
 
   return null;
 };

@@ -1,4 +1,32 @@
 {
+  "Bw Seido": {
+    "catalogFamily": "Bw Seido",
+    "status": "verified",
+    "relation": "collection-member",
+    "provider": "Branding with Type",
+    "collection": {
+      "family": "Bw Seido Collection",
+      "sourceUrl": "https://brandingwithtype.com/typefaces/bw-seido-collection",
+      "designer": "Branding with Type",
+      "members": ["Bw Seido Raw", "Bw Seido Round"],
+      "scripts": ["Latin"],
+      "license": {
+        "status": "pending"
+      },
+      "evidence": {
+        "kind": "official-web",
+        "url": "https://brandingwithtype.com/typefaces/bw-seido-collection",
+        "capturedAt": "2026-08-11T05:42:00+03:00",
+        "facts": [
+          "Official Branding with Type page identifies Bw Seido Collection and explicitly lists Bw Seido Raw and Bw Seido Round as its two subfamilies.",
+          "The collection page records 24 styles total: six weights plus matching oblique italics across the two subfamilies.",
+          "The collection page states Extended Latin language support."
+        ]
+      }
+    },
+    "loadReplacementAllowed": false,
+    "note": "The recovered umbrella name Bw Seido is retained as a stable catalog identity for the official collection. ONOD must not silently render either Raw or Round when the recovered record asks for Bw Seido."
+  },
   "Cederville Cursive": {
     "catalogFamily": "Cederville Cursive",
     "status": "verified",

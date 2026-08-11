@@ -1,17 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from 'react-router';
-import { AnimatePresence } from 'motion/react';
 import { PageTransition } from './components/PageTransition';
 import { Header } from './components/Header';
 import { FontCatalogPage } from './pages/FontCatalogPage';
-import { FontDetailsPage } from './pages/FontDetailsPage';
-import { ComparePage } from './pages/ComparePage';
-import { FavoritesPage } from './pages/FavoritesPage';
-import { AboutPage } from './pages/AboutPage';
-import { ProtocolPage } from './pages/ProtocolPage';
-import { PrivacyPage } from './pages/policies/PrivacyPage';
-import { TermsPage } from './pages/policies/TermsPage';
-import { LicensePage } from './pages/policies/LicensePage';
 import { mockFonts } from './data/mockFonts';
 import type { Font } from './data/mockFonts';
 import { getEffectiveFamilyName } from './lib/fontTrust';
@@ -21,6 +12,15 @@ import { LanguageProvider, useLanguage } from './lib/i18n';
 import { Footer } from './components/Footer';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import faviconImg from '../assets/favicon.png';
+
+const ComparePage = lazy(() => import('./pages/ComparePage').then(module => ({ default: module.ComparePage })));
+const FavoritesPage = lazy(() => import('./pages/FavoritesPage').then(module => ({ default: module.FavoritesPage })));
+const AboutPage = lazy(() => import('./pages/AboutPage').then(module => ({ default: module.AboutPage })));
+const ProtocolPage = lazy(() => import('./pages/ProtocolPage').then(module => ({ default: module.ProtocolPage })));
+const PrivacyPage = lazy(() => import('./pages/policies/PrivacyPage').then(module => ({ default: module.PrivacyPage })));
+const TermsPage = lazy(() => import('./pages/policies/TermsPage').then(module => ({ default: module.TermsPage })));
+const LicensePage = lazy(() => import('./pages/policies/LicensePage').then(module => ({ default: module.LicensePage })));
+const FontDetailsPage = lazy(() => import('./pages/FontDetailsPage').then(module => ({ default: module.FontDetailsPage })));
 
 function readStoredFontIds(key: string): string[] {
   if (typeof window === 'undefined') return [];
@@ -44,6 +44,12 @@ function sameIds(a: string[], b: string[]) {
   return a.length === b.length && a.every((value, index) => value === b[index]);
 }
 
+const RouteLoading = () => (
+  <div role="status" aria-live="polite" className="min-h-[45vh] flex items-center justify-center bg-white">
+    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400">Loading</span>
+  </div>
+);
+
 function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -60,7 +66,6 @@ function AppContent() {
     localStorage.setItem('font-catalog-compare', JSON.stringify(compareList));
   }, [compareList]);
 
-  // A shared Workbench URL is authoritative over localStorage when it contains font ids.
   useEffect(() => {
     if (location.pathname !== '/compare') return;
     const params = new URLSearchParams(location.search);
@@ -172,7 +177,7 @@ function AppContent() {
         compareCount={compareList.length}
       />
       <main id="main-content" className="min-h-screen">
-        <AnimatePresence mode="wait">
+        <Suspense fallback={<RouteLoading />}>
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<PageTransition><FontCatalogPage fonts={mockFonts} previewText={previewText} setPreviewText={setPreviewText} favorites={favorites} toggleFavorite={toggleFavorite} compareList={compareList} toggleCompare={toggleCompare} viewDetails={viewDetails} onOpenStack={() => openWorkbench()} /></PageTransition>} />
             <Route path="/compare" element={<PageTransition><ComparePage fonts={mockFonts.filter(font => compareList.includes(font.id))} allFonts={mockFonts} previewText={previewText} setPreviewText={setPreviewText} removeFromCompare={toggleCompare} toggleCompare={toggleCompare} onBack={() => navigate('/')} /></PageTransition>} />
@@ -184,7 +189,7 @@ function AppContent() {
             <Route path="/license" element={<PageTransition><LicensePage /></PageTransition>} />
             <Route path="/:id" element={<PageTransition><FontDetailsWrapper mockFonts={mockFonts} previewText={previewText} favorites={favorites} toggleFavorite={toggleFavorite} compareList={compareList} toggleCompare={toggleCompare} testPairing={(ids: string[]) => { setCompareList(validFontIds(ids)); openWorkbench(ids); }} /></PageTransition>} />
           </Routes>
-        </AnimatePresence>
+        </Suspense>
       </main>
       <Footer />
       <Toaster position="bottom-right" />

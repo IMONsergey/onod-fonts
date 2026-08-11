@@ -7,7 +7,6 @@ import { Search, LayoutGrid, List as ListIcon, Settings2, X, ArrowRight, MoveHor
 import { FontLoader } from "@/components/FontLoader";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n";
-import { AnimatePresence, motion } from "motion/react";
 import { useSearchParams } from "react-router";
 
 interface FontCatalogPageProps {
@@ -217,7 +216,7 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({ fonts, preview
 
       {isFilterOpen && <button type="button" className="fixed inset-0 bg-black/20 z-20 md:hidden backdrop-blur-sm" onClick={() => setIsFilterOpen(false)} aria-label="Close filters" />}
 
-      <AnimatePresence>{showScrollTop && <motion.button type="button" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }} onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className={cn("fixed right-5 z-40 w-10 h-10 border border-neutral-200 bg-white shadow-sm flex items-center justify-center hover:bg-neutral-100", compareList.length ? "bottom-24" : "bottom-6")} aria-label="Scroll to top"><ArrowUp className="w-4 h-4" /></motion.button>}</AnimatePresence>
+      {showScrollTop && <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className={cn("fixed right-5 z-40 w-10 h-10 border border-neutral-200 bg-white shadow-sm flex items-center justify-center hover:bg-neutral-100 transition-[opacity,transform,background-color] duration-200", compareList.length ? "bottom-24" : "bottom-6")} aria-label="Scroll to top"><ArrowUp className="w-4 h-4" /></button>}
     </div>
   );
 };

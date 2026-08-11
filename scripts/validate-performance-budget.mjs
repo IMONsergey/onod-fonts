@@ -20,11 +20,11 @@ const entryPath = resolve(root, 'dist', relative);
 const rawBytes = statSync(entryPath).size;
 const gzipBytes = gzipSync(readFileSync(entryPath), { level: 9 }).byteLength;
 
-// Phase baseline before Browser QA/Performance: ~932 kB raw / ~242 kB gzip.
-// First route-splitting batch measured ~839 kB / ~218 kB. Keep margin for
-// deterministic minifier/hash movement while making a return to the old bundle impossible.
-const MAX_ENTRY_RAW_BYTES = 860_000;
-const MAX_ENTRY_GZIP_BYTES = 225_000;
+// Font Data Engine baseline: ~932 kB raw / ~242 kB gzip.
+// Route splitting + safe Google runtime compaction now measure ~815 kB / 216 kB.
+// Keep modest minifier/hash headroom while preventing regression to the earlier bundle.
+const MAX_ENTRY_RAW_BYTES = 830_000;
+const MAX_ENTRY_GZIP_BYTES = 220_000;
 
 const kb = value => (value / 1000).toFixed(1);
 console.log(`Startup entry: ${entryUrl}`);

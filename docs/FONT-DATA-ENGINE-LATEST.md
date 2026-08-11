@@ -8,14 +8,14 @@ This is the short authoritative handoff for PR #16. Read it with `PROJECT-CONTEX
 
 **PR #16 is approved for merge by its release policy.**
 
-Final human-authored release head before this approval: `77b54c7abfb767a6f50c7d99c66ddcc4e2bee0b3`.
+Final human-authored release head: `ad179c48e9de4d3df38abfda0dfa1446dbada2c1`.
 
-All PR checks passed:
+All PR checks passed on that exact head:
 
-- ONOD Fonts CI #240 — success;
-- Independent runtime consistency #18 — success;
-- Validate independent web identity evidence #104 — success;
-- Validate open font artifact evidence #89 — success.
+- ONOD Fonts CI #241 — success;
+- Independent runtime consistency #19 — success;
+- Validate independent web identity evidence #105 — success;
+- Validate open font artifact evidence #90 — success.
 
 The final CI confirms production dependency audit, canonical/runtime evidence consistency, family relation validation, open + historical artifact validation, field-level catalog trust, TypeScript, Vite production build, GitHub Pages bundle validation and direct-route/built-asset smoke.
 
@@ -96,7 +96,7 @@ FFL/proprietary binaries are not inspected unless a reviewed capability policy p
 
 ## Mandatory release gate
 
-PR #16 passed the required gate:
+PR #16 passed the required gate on `ad179c48e9de4d3df38abfda0dfa1446dbada2c1`:
 
 1. production dependency audit;
 2. compact metadata generation;

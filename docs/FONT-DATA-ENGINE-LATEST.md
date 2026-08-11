@@ -8,20 +8,18 @@ This is the short authoritative handoff for PR #16. Read it with `PROJECT-CONTEX
 
 **PR #16 is approved for merge by its release policy.**
 
-Final human-authored release head: `2528a5b446690a0af512717347535e424374f3a8`.
+Final validated branch tree before merge: `b2b4a8cbd60d8426b51af1c66e7f718039105260`.
 
-All PR checks passed on that exact head:
+All PR checks passed on that tree:
 
-- ONOD Fonts CI #243 — success;
-- Independent runtime consistency #21 — success;
-- Validate independent web identity evidence #107 — success;
-- Validate open font artifact evidence #92 — success.
+- ONOD Fonts CI #244 — success;
+- Independent runtime consistency #22 — success;
+- Validate independent web identity evidence #108 — success;
+- Validate open font artifact evidence #93 — success.
 
 The final CI confirms production dependency audit, canonical/runtime evidence consistency, family relation validation, open + historical artifact validation, field-level catalog trust, TypeScript, Vite production build, GitHub Pages bundle validation and direct-route/built-asset smoke.
 
 ## Current measured trust state
-
-Generated report after the reviewed Bw Seido collection relation:
 
 - catalog families: **1,346**
 - identity trust debt: **20**
@@ -96,7 +94,7 @@ FFL/proprietary binaries are not inspected unless a reviewed capability policy p
 
 ## Mandatory release gate
 
-PR #16 passed the required gate on `2528a5b446690a0af512717347535e424374f3a8`:
+PR #16 passed the required gate on `b2b4a8cbd60d8426b51af1c66e7f718039105260`:
 
 1. production dependency audit;
 2. compact metadata generation;

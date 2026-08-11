@@ -201,7 +201,7 @@ fontSize: {
         <div className="w-full xl:w-[400px] bg-neutral-50 border-b xl:border-b-0 xl:border-r border-neutral-200 flex flex-col h-auto xl:h-[calc(100vh-128px)] overflow-y-auto">
           <div className="p-6 border-b border-neutral-200">
             <h3 className="font-mono text-xs uppercase tracking-widest text-neutral-400 mb-4">{t('compare.customContent')}</h3>
-            <textarea value={customContent} onChange={(e) => updateContent(e.target.value)} placeholder={t('preview.placeholder')} className="w-full h-24 bg-white border border-neutral-200 p-3 text-sm resize-none focus:outline-none focus:border-neutral-400 placeholder:text-neutral-300 transition-colors" />
+            <textarea aria-label={t('compare.customContent')} value={customContent} onChange={(e) => updateContent(e.target.value)} placeholder={t('preview.placeholder')} className="w-full h-24 bg-white border border-neutral-200 p-3 text-sm resize-none focus:outline-none focus:border-neutral-400 placeholder:text-neutral-300 transition-colors" />
           </div>
 
           <div className="p-6 border-b border-neutral-200">

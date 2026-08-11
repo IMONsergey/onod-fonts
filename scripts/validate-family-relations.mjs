@@ -28,7 +28,7 @@ for (const [name, record] of Object.entries(relations)) {
 
   if (record.relation === 'catalog-correction') {
     if (record.loadReplacementAllowed !== true) errors.push(`${name}: catalog-correction must explicitly allow canonical rendering replacement.`);
-    if (record.historical || record.successor) errors.push(`${name}: catalog-correction must use canonical evidence, not historical/successor fields.`);
+    if (record.historical || record.successor || record.collection) errors.push(`${name}: catalog-correction must use canonical evidence only.`);
 
     const canonical = record.canonical;
     if (!canonical || typeof canonical !== 'object') {
@@ -51,6 +51,32 @@ for (const [name, record] of Object.entries(relations)) {
       if (!sha1(proof.blobSha)) errors.push(`${name}: canonical metadata blobSha must be a Git blob SHA.`);
       if (!reviewedFacts(proof)) errors.push(`${name}: canonical correction needs reviewed facts.`);
     }
+    continue;
+  }
+
+  if (record.relation === 'collection-member') {
+    if (record.loadReplacementAllowed !== false) errors.push(`${name}: collection-member must never silently substitute a member family.`);
+    if (record.historical || record.successor || record.canonical) errors.push(`${name}: collection-member must use collection evidence only.`);
+
+    const collection = record.collection;
+    if (!collection || typeof collection !== 'object') {
+      errors.push(`${name}: collection-member requires collection evidence.`);
+      continue;
+    }
+    if (typeof collection.family !== 'string' || !collection.family.trim() || collection.family === name) errors.push(`${name}: collection family must be a distinct umbrella identity.`);
+    if (!httpUrl(collection.sourceUrl)) errors.push(`${name}: collection sourceUrl must be HTTP(S).`);
+    if (typeof collection.designer !== 'string' || !collection.designer.trim()) errors.push(`${name}: collection designer/publisher is required.`);
+    if (!Array.isArray(collection.members) || collection.members.length < 2 || collection.members.some(member => typeof member !== 'string' || !member.trim())) errors.push(`${name}: collection-member requires at least two explicit member families.`);
+    if (!validScripts(collection.scripts)) errors.push(`${name}: collection-member requires reviewed script coverage.`);
+    if (!['pending', 'verified'].includes(collection.license?.status)) errors.push(`${name}: collection license status must be pending or verified.`);
+    if (collection.license?.status === 'pending' && collection.license?.id) errors.push(`${name}: pending collection license must not expose an exact id.`);
+    if (collection.license?.status === 'verified' && (typeof collection.license?.id !== 'string' || !collection.license.id.trim())) errors.push(`${name}: verified collection license requires an exact id.`);
+
+    const proof = collection.evidence;
+    if (!proof || proof.kind !== 'official-web') errors.push(`${name}: collection evidence must be official-web.`);
+    if (!httpUrl(proof?.url) || proof.url !== collection.sourceUrl) errors.push(`${name}: collection evidence URL must exactly match sourceUrl.`);
+    if (!proof?.capturedAt || Number.isNaN(Date.parse(proof.capturedAt))) errors.push(`${name}: collection capturedAt must be a valid timestamp.`);
+    if (!reviewedFacts(proof)) errors.push(`${name}: collection relation requires reviewed primary-source facts.`);
     continue;
   }
 
@@ -96,7 +122,8 @@ for (const [name, record] of Object.entries(relations)) {
 
 const corrections = Object.values(relations).filter(record => record.relation === 'catalog-correction').length;
 const removed = Object.values(relations).filter(record => record.relation === 'historical-removed').length;
-console.log(`Family relation evidence validation: ${Object.keys(relations).length} verified relations (${corrections} canonical corrections, ${removed} historical removals).`);
+const collections = Object.values(relations).filter(record => record.relation === 'collection-member').length;
+console.log(`Family relation evidence validation: ${Object.keys(relations).length} verified relations (${corrections} canonical corrections, ${removed} historical removals, ${collections} collection relations).`);
 if (errors.length) {
   console.error(`Errors: ${errors.length}`);
   errors.forEach(error => console.error(`  ERROR ${error}`));

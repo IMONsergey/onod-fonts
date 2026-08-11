@@ -14,6 +14,7 @@ const globalReadyIds = new Set<string>();
 const globalLoadPromises = new Map<string, Promise<void>>();
 const stylesheetId = (prefix: string, font: Font) => `${prefix}-${font.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 const primaryFamily = (font: Font) => getEffectiveFamilyName(font);
+const normalizeFamilyName = (value: string) => value.trim().replace(/^['"]|['"]$/g, '').toLowerCase();
 
 const fontDescriptor = (font: Font) => {
   const weights = getEffectiveWeights(font).map(Number).filter(Number.isFinite);
@@ -21,15 +22,28 @@ const fontDescriptor = (font: Font) => {
   return `${weight} 16px "${primaryFamily(font).replace(/"/g, '\\"')}"`;
 };
 
+const hasLoadedRegisteredFace = (font: Font) => {
+  if (!document.fonts) return false;
+  const expected = normalizeFamilyName(primaryFamily(font));
+  return Array.from(document.fonts).some(face => normalizeFamilyName(face.family) === expected && face.status === 'loaded');
+};
+
 const verifyFontFace = async (font: Font) => {
-  if (!document.fonts) return setFontRuntimeStatus(font.id, 'ready');
+  if (!document.fonts) {
+    setFontRuntimeStatus(font.id, 'error', 'FontFaceSet API is unavailable; font registration cannot be verified.');
+    return;
+  }
 
   try {
     const descriptor = fontDescriptor(font);
     const sample = getEffectiveLanguages(font).includes('Cyrillic') ? 'Hamburgefontsiv Привет' : 'Hamburgefontsiv';
     await document.fonts.load(descriptor, sample);
-    const ready = document.fonts.check(descriptor, sample);
-    setFontRuntimeStatus(font.id, ready ? 'ready' : 'error', ready ? undefined : 'Font face was not registered; preview is using fallback.');
+    const ready = hasLoadedRegisteredFace(font);
+    setFontRuntimeStatus(
+      font.id,
+      ready ? 'ready' : 'error',
+      ready ? undefined : `No loaded FontFace registered for ${primaryFamily(font)}; preview is using fallback.`,
+    );
   } catch (error) {
     setFontRuntimeStatus(font.id, 'error', error instanceof Error ? error.message : 'Font face verification failed.');
   }

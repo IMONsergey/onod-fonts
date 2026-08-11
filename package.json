@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "metadata:runtime": "node scripts/build-runtime-metadata.mjs && node scripts/font-data/build-artifact-runtime.mjs && node scripts/font-data/build-historical-artifact-runtime.mjs",
+    "metadata:runtime": "node scripts/build-runtime-metadata.mjs && node scripts/build-google-runtime-wire.mjs && node scripts/font-data/build-artifact-runtime.mjs && node scripts/font-data/build-historical-artifact-runtime.mjs",
     "predev": "npm run metadata:runtime",
     "dev": "vite",
     "pretypecheck": "npm run metadata:runtime",

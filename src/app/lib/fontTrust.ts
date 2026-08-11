@@ -71,7 +71,7 @@ interface VerifiedHistoricalArtifact {
 interface RuntimeHistoricalRelation {
   catalogFamily: string;
   status: "verified";
-  relation: "historical-successor" | "historical-removed" | "provider-rename" | "collection-member";
+  relation: "historical-successor" | "historical-removed" | "provider-rename";
   provider: string;
   historical: {
     family: string;
@@ -85,6 +85,26 @@ interface RuntimeHistoricalRelation {
   successor?: {
     family: string;
     sourceUrl: string;
+  };
+  loadReplacementAllowed: false;
+  note: string;
+}
+
+interface RuntimeCollectionRelation {
+  catalogFamily: string;
+  status: "verified";
+  relation: "collection-member";
+  provider: string;
+  collection: {
+    family: string;
+    sourceUrl: string;
+    designer: string;
+    members: string[];
+    scripts: string[];
+    license: {
+      status: "pending" | "verified";
+      id?: string;
+    };
   };
   loadReplacementAllowed: false;
   note: string;
@@ -108,7 +128,7 @@ interface RuntimeCatalogCorrection {
   note: string;
 }
 
-type RuntimeFamilyRelation = RuntimeHistoricalRelation | RuntimeCatalogCorrection;
+type RuntimeFamilyRelation = RuntimeHistoricalRelation | RuntimeCollectionRelation | RuntimeCatalogCorrection;
 
 interface RuntimeFontsharePolicy {
   label: string;
@@ -126,7 +146,7 @@ export interface FontTrustReport {
   warnings: string[];
   upstreamVerified: boolean;
   verificationSource?: string;
-  provider?: "Google Fonts" | "Fontshare" | "Independent" | "Historical";
+  provider?: "Google Fonts" | "Fontshare" | "Independent" | "Historical" | "Collection";
   licenseCapabilities?: FontLicenseCapabilities;
 }
 
@@ -144,7 +164,14 @@ const isGeneratedDescription = (font: Font) => {
 
 const getHistoricalSourceRelation = (font: Font): RuntimeHistoricalRelation | undefined => {
   const relation = familyRelations[font.name];
-  if (!relation || relation.status !== "verified" || relation.catalogFamily !== font.name || relation.relation === "catalog-correction") return undefined;
+  if (!relation || relation.status !== "verified" || relation.catalogFamily !== font.name) return undefined;
+  if (!["historical-successor", "historical-removed", "provider-rename"].includes(relation.relation)) return undefined;
+  return relation as RuntimeHistoricalRelation;
+};
+
+const getCollectionRelation = (font: Font): RuntimeCollectionRelation | undefined => {
+  const relation = familyRelations[font.name];
+  if (!relation || relation.status !== "verified" || relation.catalogFamily !== font.name || relation.relation !== "collection-member") return undefined;
   return relation;
 };
 
@@ -288,6 +315,28 @@ export function getFontTrustReport(font: Font): FontTrustReport {
     };
   }
 
+  const collection = getCollectionRelation(font);
+  if (collection) {
+    const licenseVerified = collection.collection.license.status === "verified" && Boolean(collection.collection.license.id);
+    return {
+      confidence: licenseVerified ? "curated" : "derived",
+      identityVerified: true,
+      licenseVerified,
+      weightsVerified: false,
+      variableVerified: false,
+      scriptsVerified: Boolean(collection.collection.scripts.length),
+      licenseLabel: licenseVerified ? collection.collection.license.id! : "Verify at source",
+      warnings: [
+        `The recovered identity '${font.name}' is verified as the umbrella '${collection.collection.family}' collection containing ${collection.collection.members.join(" and ")}. ONOD does not silently choose a member family for rendering.`,
+        ...(licenseVerified ? [] : ["The collection identity is verified, but exact license capabilities remain pending review."]),
+        "Collection-level style counts do not prove CSS numeric weights or variable-font capability for the recovered umbrella record, so those technical fields remain conservative.",
+      ],
+      upstreamVerified: licenseVerified,
+      verificationSource: collection.collection.sourceUrl,
+      provider: "Collection",
+    };
+  }
+
   const historical = getHistoricalSourceRelation(font);
   if (historical) {
     const artifact = getVerifiedHistoricalArtifact(font);
@@ -384,6 +433,8 @@ export function getEffectiveWeights(font: Font) {
     return weights.length ? weights : ["400"];
   }
 
+  if (getCollectionRelation(font)) return ["400"];
+
   const historical = getHistoricalSourceRelation(font);
   if (historical?.relation === "historical-removed" && historical.historical.weights?.length) return historical.historical.weights.map(String);
 
@@ -402,6 +453,7 @@ export function isEffectivelyVariable(font: Font) {
   if (fontshare) return fontshare.variable || Object.keys(fontshare.axes).length > 0;
   const independent = getVerifiedIndependentFont(font);
   if (independent) return independent.technical.variableVerified ? Boolean(independent.technical.variable) : false;
+  if (getCollectionRelation(font)) return false;
   const historical = getHistoricalSourceRelation(font);
   if (historical?.relation === "historical-removed" && typeof historical.historical.variable === "boolean") return historical.historical.variable;
   const artifact = getVerifiedHistoricalArtifact(font);
@@ -446,6 +498,9 @@ export function getEffectiveLanguages(font: Font) {
     return [];
   }
 
+  const collection = getCollectionRelation(font);
+  if (collection) return collection.collection.scripts;
+
   const historical = getHistoricalSourceRelation(font);
   if (historical) {
     if (historical.relation === "historical-removed" && historical.historical.scripts?.length) return historical.historical.scripts;
@@ -470,6 +525,7 @@ export function getEffectiveAuthor(font: Font) {
     || getCatalogCorrectionRelation(font)?.canonical.designer
     || getVerifiedFontshareFont(font)?.designer
     || getVerifiedIndependentFont(font)?.identity.designer
+    || getCollectionRelation(font)?.collection.designer
     || getHistoricalSourceRelation(font)?.historical.designer
     || font.author;
 }
@@ -479,6 +535,7 @@ export function getEffectiveSourceUrl(font: Font) {
     || getCatalogCorrectionRelation(font)?.canonical.sourceUrl
     || getVerifiedFontshareFont(font)?.sourceUrl
     || getVerifiedIndependentFont(font)?.identity.sourceUrl
+    || getCollectionRelation(font)?.collection.sourceUrl
     || getVerifiedHistoricalArtifact(font)?.sourceUrl
     || getHistoricalSourceRelation(font)?.historical.sourceUrl
     || font.sourceUrl;
@@ -488,6 +545,8 @@ export function getEffectiveSourceLabel(font: Font) {
   if (getVerifiedGoogleFont(font) || getCatalogCorrectionRelation(font)) return "Google Fonts";
   if (getVerifiedFontshareFont(font)) return "Fontshare";
   if (getVerifiedIndependentFont(font)) return "Independent";
+  const collection = getCollectionRelation(font);
+  if (collection) return collection.provider;
   const historical = getHistoricalSourceRelation(font);
   if (historical) return `${historical.provider} (historical)`;
   return font.source;

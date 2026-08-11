@@ -98,9 +98,16 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters })
 
   const FilterCheckbox = ({ group, value, checked, count, onChange }: { group: string; value: string; checked: boolean; count: number; onChange: () => void }) => {
     const id = safeId(group, value);
+    const accessibleGroup = group === "source"
+      ? (language === 'ru' ? 'Источник' : 'Source')
+      : group === "category"
+        ? (language === 'ru' ? 'Категория' : 'Category')
+        : group === "script"
+          ? (language === 'ru' ? 'Письменность' : 'Script')
+          : (language === 'ru' ? 'Лицензия' : 'License');
     return (
       <div className="flex items-center space-x-3 group min-w-0">
-        <Checkbox id={id} checked={checked} onCheckedChange={onChange} className="h-3 w-3 border-neutral-400 rounded-none data-[state=checked]:bg-neutral-800 data-[state=checked]:text-white" />
+        <Checkbox id={id} checked={checked} onCheckedChange={onChange} aria-label={`${accessibleGroup}: ${value}`} className="h-3 w-3 border-neutral-400 rounded-none data-[state=checked]:bg-neutral-800 data-[state=checked]:text-white" />
         <Label htmlFor={id} className="font-mono text-xs text-neutral-600 uppercase cursor-pointer group-hover:text-black transition-colors select-none truncate flex-grow">{value}</Label>
         <span className="font-mono text-[9px] text-neutral-400 shrink-0">{count}</span>
       </div>
@@ -127,7 +134,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters })
       <div className="space-y-8">
         <div className="flex items-center justify-between py-2">
           <Label htmlFor="var-mode" className="font-mono text-xs uppercase font-medium text-black cursor-pointer select-none">{t('filters.variable')}<span className="ml-2 text-[9px] text-neutral-400" style={{ fontWeight: 400 }}>{fontCounts.variable}</span></Label>
-          <Switch id="var-mode" checked={filters.variableOnly} onCheckedChange={checked => updateFilter("variableOnly", checked)} className="data-[state=checked]:bg-neutral-800 border border-neutral-300" />
+          <Switch id="var-mode" checked={filters.variableOnly} onCheckedChange={checked => updateFilter("variableOnly", checked)} aria-label={language === 'ru' ? 'Только вариативные шрифты' : 'Variable fonts only'} className="data-[state=checked]:bg-neutral-800 border border-neutral-300" />
         </div>
         <p className="-mt-6 font-mono text-[8px] leading-relaxed text-neutral-400">{language === 'ru' ? 'Счётчик учитывает только гарнитуры с подтверждёнными метриками variable-оси.' : 'Count includes only families whose variable-axis metadata is treated as verified.'}</p>
 
@@ -135,7 +142,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters })
           <h3 className="font-mono text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{t('filters.platform')}</h3>
           <div className="space-y-2">
             {mainSources.map(source => <FilterCheckbox key={source} group="source" value={source} checked={filters.sources.includes(source)} count={fontCounts.sources[source]} onChange={() => toggleArrayFilter("sources", source)} />)}
-            {otherSources.length > 0 && <div className="flex items-center space-x-3 group pt-2 border-t border-dashed border-neutral-200 mt-2"><Checkbox id="source-other" checked={isOtherSelected} onCheckedChange={toggleOther} className="h-3 w-3 border-neutral-400 rounded-none data-[state=checked]:bg-neutral-800 data-[state=checked]:text-white" /><Label htmlFor="source-other" className="font-mono text-xs text-neutral-600 uppercase cursor-pointer group-hover:text-black transition-colors select-none truncate flex-grow">{language === 'ru' ? 'Другие источники' : 'Other sources'}</Label><span className="font-mono text-[9px] text-neutral-400 shrink-0">{fontCounts.otherTotal}</span></div>}
+            {otherSources.length > 0 && <div className="flex items-center space-x-3 group pt-2 border-t border-dashed border-neutral-200 mt-2"><Checkbox id="source-other" checked={isOtherSelected} onCheckedChange={toggleOther} aria-label={language === 'ru' ? 'Другие источники' : 'Other sources'} className="h-3 w-3 border-neutral-400 rounded-none data-[state=checked]:bg-neutral-800 data-[state=checked]:text-white" /><Label htmlFor="source-other" className="font-mono text-xs text-neutral-600 uppercase cursor-pointer group-hover:text-black transition-colors select-none truncate flex-grow">{language === 'ru' ? 'Другие источники' : 'Other sources'}</Label><span className="font-mono text-[9px] text-neutral-400 shrink-0">{fontCounts.otherTotal}</span></div>}
           </div>
           <p className="pt-2 border-t border-dashed border-neutral-200 font-mono text-[9px] text-neutral-400 uppercase leading-normal">{t('filters.platform.note')}</p>
         </section>

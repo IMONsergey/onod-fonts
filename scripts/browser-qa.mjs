@@ -199,9 +199,16 @@ async function desktopFlow(session) {
   await waitFor(session, 'historical Source Sans Pro result', `return document.querySelectorAll('article').length >= 1`);
   await execute(session, `document.querySelector('article button')?.click(); return true;`);
   await waitFor(session, 'historical Source Sans Pro details', `return document.title.startsWith('Source Sans Pro')`);
-  await waitFor(session, 'historical Source Sans Pro font registration', `return document.fonts?.check('400 16px "Source Sans Pro"') === true`, 12000);
+  await waitFor(session, 'historical Source Sans Pro registered FontFace', `
+    return document.fonts && [...document.fonts].some(face =>
+      face.family.replace(/^['\"]|['\"]$/g, '').toLowerCase() === 'source sans pro' && face.status === 'loaded'
+    );
+  `, 12000);
   const historicalResources = await execute(session, `return performance.getEntriesByType('resource').map(entry => entry.name)`);
-  assert(historicalResources.some(url => /SourceSansPro-Regular\.otf/i.test(url)), 'Exact historical Source Sans Pro artifact was not requested');
+  assert(
+    historicalResources.some(url => /adobe-fonts\/source-sans\/f42c6e78cef38a192aa1e45bc3ff9b80e0d4b7f6\/TTF\/SourceSansPro-Regular\.ttf/i.test(url)),
+    'Exact historical Source Sans Pro TTF artifact was not requested',
+  );
   assert(!historicalResources.some(url => /SourceSans3/i.test(url)), 'Source Sans 3 successor was silently requested');
 }
 

@@ -155,7 +155,7 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] font-sans text-neutral-800 selection:bg-blue-100">
+    <div className="min-h-screen bg-[#FAFAFA] font-sans text-neutral-800 selection:bg-neutral-200">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:bg-neutral-800 focus:text-white focus:font-mono focus:text-xs focus:uppercase focus:tracking-widest">
         Skip to content
       </a>

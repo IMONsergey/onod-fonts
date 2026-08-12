@@ -47,6 +47,7 @@ export const FontCard: React.FC<FontCardProps> = memo(({
   const FavoriteButton = ({ compact = false }: { compact?: boolean }) => (
     <button
       type="button"
+      data-action="favorite"
       onClick={event => {
         event.stopPropagation();
         onToggleFavorite(font.id);

@@ -90,7 +90,7 @@ async function desktopFlow(session) {
 
   await navigate(session, BASE_URL);
   await waitFor(session, 'catalog reset', `return document.querySelectorAll('article[data-font-id]').length >= 1`);
-  const favoriteClicked = await execute(session, `const b=document.querySelector('article[data-font-id] button[aria-label*="favorite" i]'); if(!b)return false;b.click();return true;`);
+  const favoriteClicked = await execute(session, `const b=document.querySelector('article[data-font-id] button[data-action="favorite"]'); if(!b)return false;b.click();return true;`);
   assert(favoriteClicked, 'Could not toggle a favorite');
   await waitFor(session, 'favorites localStorage', `try{return JSON.parse(localStorage.getItem('font-catalog-favorites')||'[]').length>=1}catch{return false}`);
   await navigate(session, new URL('favorites', BASE_URL).toString());

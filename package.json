@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "metadata:runtime": "node scripts/build-runtime-metadata.mjs && node scripts/font-data/build-artifact-runtime.mjs && node scripts/font-data/build-historical-artifact-runtime.mjs",
+    "metadata:runtime": "node scripts/build-runtime-metadata.mjs && node scripts/build-google-runtime-wire.mjs && node scripts/font-data/build-artifact-runtime.mjs && node scripts/font-data/build-historical-artifact-runtime.mjs",
     "predev": "npm run metadata:runtime",
     "dev": "vite",
     "pretypecheck": "npm run metadata:runtime",
@@ -21,8 +21,10 @@
     "artifact:evidence:validate": "node --experimental-strip-types scripts/font-data/validate-open-artifacts.mjs && node --experimental-strip-types scripts/font-data/validate-open-artifacts-strict.mjs && node --experimental-strip-types scripts/font-data/validate-historical-artifacts.mjs",
     "catalog:validate": "npm run metadata:runtime && node --experimental-strip-types scripts/validate-catalog.mjs",
     "build:validate": "node scripts/validate-build.mjs",
+    "performance:budget": "node scripts/validate-performance-budget.mjs",
+    "browser:qa": "node scripts/browser-qa.mjs",
     "smoke:preview": "node scripts/smoke-preview.mjs",
-    "check": "npm run metadata:runtime && node scripts/validate-monochrome-ui.mjs && node --experimental-strip-types scripts/validate-fontshare-evidence.mjs --require-coverage && node --experimental-strip-types scripts/validate-independent-sources.mjs && node --experimental-strip-types scripts/validate-independent-web-sources.mjs && node --experimental-strip-types scripts/validate-independent-runtime-consistency.mjs && node --experimental-strip-types scripts/validate-family-relations.mjs && node --experimental-strip-types scripts/font-data/validate-open-artifacts.mjs && node --experimental-strip-types scripts/font-data/validate-open-artifacts-strict.mjs && node --experimental-strip-types scripts/font-data/validate-historical-artifacts.mjs && node --experimental-strip-types scripts/validate-catalog.mjs && tsc --noEmit && vite build && node scripts/validate-build.mjs && node scripts/smoke-preview.mjs"
+    "check": "npm run metadata:runtime && node scripts/validate-monochrome-ui.mjs && node --experimental-strip-types scripts/validate-fontshare-evidence.mjs --require-coverage && node --experimental-strip-types scripts/validate-independent-sources.mjs && node --experimental-strip-types scripts/validate-independent-web-sources.mjs && node --experimental-strip-types scripts/validate-independent-runtime-consistency.mjs && node --experimental-strip-types scripts/validate-family-relations.mjs && node --experimental-strip-types scripts/font-data/validate-open-artifacts.mjs && node --experimental-strip-types scripts/font-data/validate-open-artifacts-strict.mjs && node --experimental-strip-types scripts/font-data/validate-historical-artifacts.mjs && node --experimental-strip-types scripts/validate-catalog.mjs && tsc --noEmit && vite build && node scripts/validate-performance-budget.mjs && node scripts/validate-build.mjs && node scripts/smoke-preview.mjs"
   },
   "dependencies": {
     "clsx": "2.1.1",

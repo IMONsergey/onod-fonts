@@ -25,7 +25,7 @@ export const GridModule = () => {
              <div 
                 className="absolute inset-0 pointer-events-none z-10"
                 style={{ 
-                    backgroundImage: `linear-gradient(to bottom, rgba(0,0,255,0.1) 1px, transparent 1px)`,
+                    backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1) 1px, transparent 1px)`,
                     backgroundSize: `100% ${16 * lineHeight}px`
                 }}
              />

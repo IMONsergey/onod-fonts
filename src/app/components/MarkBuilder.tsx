@@ -186,7 +186,7 @@ const MarkBuilder = () => {
       <button
         type="button"
         onClick={event => { event.stopPropagation(); clear(); }}
-        className="h-12 px-8 border border-black bg-white text-black flex items-center justify-center gap-3 hover:bg-red-500 hover:text-white hover:border-red-500 active:scale-95 transition-all duration-200 group w-full md:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+        className="h-12 px-8 border border-black bg-white text-black flex items-center justify-center gap-3 hover:bg-neutral-500 hover:text-white hover:border-neutral-500 active:scale-95 transition-all duration-200 group w-full md:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
       >
         <Trash2 className="w-3 h-3" />
         <span className="font-mono text-[10px] uppercase tracking-[0.2em] font-bold">{t('compare.clear')}</span>

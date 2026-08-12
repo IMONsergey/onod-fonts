@@ -56,7 +56,7 @@ export const KerningModule = () => {
             onDragEnd={(e, info) => {
                 setOffset(prev => prev + info.offset.x);
             }}
-            className="text-blue-600 relative z-10 hover:text-blue-700 transition-colors"
+            className="text-neutral-600 relative z-10 hover:text-neutral-700 transition-colors"
           >
             V
           </motion.span>

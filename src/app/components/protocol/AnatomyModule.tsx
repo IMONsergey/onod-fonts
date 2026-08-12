@@ -68,7 +68,7 @@ export const AnatomyModule = () => {
              {parts.map(part => (
                  <div 
                     key={part.id}
-                    className={`absolute w-3 h-3 rounded-full border-2 border-white bg-blue-600 transition-transform duration-300 ${activePart === part.id ? 'scale-150 z-20' : 'scale-100 z-10'}`}
+                    className={`absolute w-3 h-3 rounded-full border-2 border-white bg-neutral-600 transition-transform duration-300 ${activePart === part.id ? 'scale-150 z-20' : 'scale-100 z-10'}`}
                     style={{ left: `${part.x}%`, top: `${part.y}%` }}
                  />
              ))}
@@ -82,7 +82,7 @@ export const AnatomyModule = () => {
                     key={activePart}
                     className="space-y-4"
                 >
-                    <span className="inline-block px-3 py-1 bg-blue-600 text-white font-mono text-[10px] uppercase tracking-widest mb-2">
+                    <span className="inline-block px-3 py-1 bg-neutral-600 text-white font-mono text-[10px] uppercase tracking-widest mb-2">
                         {t('module.anatomy.part')}: {parts.find(p => p.id === activePart)?.label}
                     </span>
                     <h5 className="text-2xl md:text-4xl font-bold tracking-tighter uppercase">

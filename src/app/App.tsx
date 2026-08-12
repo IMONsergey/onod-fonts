@@ -1,8 +1,17 @@
-import React, { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from 'react-router';
+import { AnimatePresence } from 'motion/react';
 import { PageTransition } from './components/PageTransition';
 import { Header } from './components/Header';
 import { FontCatalogPage } from './pages/FontCatalogPage';
+import { FontDetailsPage } from './pages/FontDetailsPage';
+import { ComparePage } from './pages/ComparePage';
+import { FavoritesPage } from './pages/FavoritesPage';
+import { AboutPage } from './pages/AboutPage';
+import { ProtocolPage } from './pages/ProtocolPage';
+import { PrivacyPage } from './pages/policies/PrivacyPage';
+import { TermsPage } from './pages/policies/TermsPage';
+import { LicensePage } from './pages/policies/LicensePage';
 import { mockFonts } from './data/mockFonts';
 import type { Font } from './data/mockFonts';
 import { getEffectiveFamilyName } from './lib/fontTrust';
@@ -12,15 +21,6 @@ import { LanguageProvider, useLanguage } from './lib/i18n';
 import { Footer } from './components/Footer';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import faviconImg from '../assets/favicon.png';
-
-const FontDetailsPage = lazy(() => import('./pages/FontDetailsPage').then(module => ({ default: module.FontDetailsPage })));
-const ComparePage = lazy(() => import('./pages/ComparePage').then(module => ({ default: module.ComparePage })));
-const FavoritesPage = lazy(() => import('./pages/FavoritesPage').then(module => ({ default: module.FavoritesPage })));
-const AboutPage = lazy(() => import('./pages/AboutPage').then(module => ({ default: module.AboutPage })));
-const ProtocolPage = lazy(() => import('./pages/ProtocolPage').then(module => ({ default: module.ProtocolPage })));
-const PrivacyPage = lazy(() => import('./pages/policies/PrivacyPage').then(module => ({ default: module.PrivacyPage })));
-const TermsPage = lazy(() => import('./pages/policies/TermsPage').then(module => ({ default: module.TermsPage })));
-const LicensePage = lazy(() => import('./pages/policies/LicensePage').then(module => ({ default: module.LicensePage })));
 
 function readStoredFontIds(key: string): string[] {
   if (typeof window === 'undefined') return [];
@@ -44,12 +44,6 @@ function sameIds(a: string[], b: string[]) {
   return a.length === b.length && a.every((value, index) => value === b[index]);
 }
 
-const RouteLoading = () => (
-  <div role="status" aria-live="polite" className="min-h-[45vh] flex items-center justify-center bg-white">
-    <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-400">Loading</span>
-  </div>
-);
-
 function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -66,6 +60,7 @@ function AppContent() {
     localStorage.setItem('font-catalog-compare', JSON.stringify(compareList));
   }, [compareList]);
 
+  // A shared Workbench URL is authoritative over localStorage when it contains font ids.
   useEffect(() => {
     if (location.pathname !== '/compare') return;
     const params = new URLSearchParams(location.search);
@@ -118,8 +113,12 @@ function AppContent() {
   const toggleFavorite = useCallback((id: string) => {
     setFavorites(previous => {
       const isFavorite = previous.includes(id);
-      toast.info(isFavorite ? t('toast.removedFromFavorites') : t('toast.addedToFavorites'));
-      return isFavorite ? previous.filter(fontId => fontId !== id) : [...previous, id];
+      if (isFavorite) {
+        toast.info(t('toast.removedFromFavorites'));
+        return previous.filter(fontId => fontId !== id);
+      }
+      toast.success(t('toast.addedToFavorites'));
+      return [...previous, id];
     });
   }, [t]);
 
@@ -131,6 +130,7 @@ function AppContent() {
         toast.error(t('toast.compareLimitReached'));
         return previous;
       }
+      toast.success(t('toast.addedToCompare'));
       return [...previous, id];
     });
   }, [t]);
@@ -146,6 +146,7 @@ function AppContent() {
   }, [compareList, navigate]);
 
   const getActivePage = () => {
+    if (location.pathname === '/') return 'catalog';
     if (location.pathname === '/compare') return 'compare';
     if (location.pathname === '/favorites') return 'favorites';
     if (location.pathname === '/protocol') return 'protocol';
@@ -171,11 +172,11 @@ function AppContent() {
         compareCount={compareList.length}
       />
       <main id="main-content" className="min-h-screen">
-        <Suspense fallback={<RouteLoading />}>
+        <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<PageTransition><FontCatalogPage fonts={mockFonts} previewText={previewText} setPreviewText={setPreviewText} favorites={favorites} toggleFavorite={toggleFavorite} viewDetails={viewDetails} /></PageTransition>} />
+            <Route path="/" element={<PageTransition><FontCatalogPage fonts={mockFonts} previewText={previewText} setPreviewText={setPreviewText} favorites={favorites} toggleFavorite={toggleFavorite} compareList={compareList} toggleCompare={toggleCompare} viewDetails={viewDetails} onOpenStack={() => openWorkbench()} /></PageTransition>} />
             <Route path="/compare" element={<PageTransition><ComparePage fonts={mockFonts.filter(font => compareList.includes(font.id))} allFonts={mockFonts} previewText={previewText} setPreviewText={setPreviewText} removeFromCompare={toggleCompare} toggleCompare={toggleCompare} onBack={() => navigate('/')} /></PageTransition>} />
-            <Route path="/favorites" element={<PageTransition><FavoritesPage fonts={mockFonts.filter(font => favorites.includes(font.id))} previewText={previewText} setPreviewText={setPreviewText} toggleFavorite={toggleFavorite} viewDetails={viewDetails} onGoToCatalog={() => navigate('/')} /></PageTransition>} />
+            <Route path="/favorites" element={<PageTransition><FavoritesPage fonts={mockFonts.filter(font => favorites.includes(font.id))} previewText={previewText} setPreviewText={setPreviewText} toggleFavorite={toggleFavorite} compareList={compareList} toggleCompare={toggleCompare} viewDetails={viewDetails} onGoToCatalog={() => navigate('/')} /></PageTransition>} />
             <Route path="/about" element={<PageTransition><AboutPage onNavigateHome={() => navigate('/')} /></PageTransition>} />
             <Route path="/protocol" element={<PageTransition><ProtocolPage /></PageTransition>} />
             <Route path="/privacy" element={<PageTransition><PrivacyPage /></PageTransition>} />
@@ -183,7 +184,7 @@ function AppContent() {
             <Route path="/license" element={<PageTransition><LicensePage /></PageTransition>} />
             <Route path="/:id" element={<PageTransition><FontDetailsWrapper mockFonts={mockFonts} previewText={previewText} favorites={favorites} toggleFavorite={toggleFavorite} compareList={compareList} toggleCompare={toggleCompare} testPairing={(ids: string[]) => { setCompareList(validFontIds(ids)); openWorkbench(ids); }} /></PageTransition>} />
           </Routes>
-        </Suspense>
+        </AnimatePresence>
       </main>
       <Footer />
       <Toaster position="bottom-right" />
@@ -202,13 +203,13 @@ const FontDetailsWrapper = ({ mockFonts: fontList, ...props }: { mockFonts: Font
 
   if (!font) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[70vh] text-center p-8 bg-white">
-        <div className="font-mono text-[9px] uppercase tracking-widest text-neutral-400 mb-6">404</div>
-        <h2 className="text-4xl md:text-6xl tracking-tighter mb-5 leading-none font-semibold">{t('fonts.notFound')}</h2>
-        <p className="text-sm text-neutral-500 mb-8 max-w-md leading-relaxed">
+      <div className="flex flex-col items-center justify-center min-h-[80vh] text-center p-8 bg-white">
+        <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-400 mb-8">ERROR 404</div>
+        <h2 className="text-6xl md:text-8xl tracking-tighter mb-8 uppercase leading-none" style={{ fontWeight: 700 }}>{t('fonts.notFound')}</h2>
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-500 mb-12 max-w-md leading-relaxed">
           {language === 'ru' ? 'Запрошенная гарнитура не найдена в индексе.' : 'The requested typeface could not be located in the index.'}
         </p>
-        <button type="button" onClick={() => navigate('/')} className="px-6 py-3 bg-neutral-900 text-white font-mono text-[10px] uppercase tracking-widest hover:bg-neutral-700 transition-colors">
+        <button type="button" onClick={() => navigate('/')} className="px-12 py-5 bg-neutral-800 text-white font-mono text-xs uppercase tracking-widest hover:bg-neutral-700 transition-colors">
           {t('details.back')}
         </button>
       </div>

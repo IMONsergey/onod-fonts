@@ -1,5 +1,6 @@
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowUp } from "lucide-react";
+import React, { memo, useRef, useEffect, useState, useCallback, useMemo } from "react";
+import { motion, useScroll, useSpring } from "motion/react";
+import { ArrowUp, ChevronDown, Database } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
 const KerningModule = React.lazy(() => import("@/components/protocol/KerningModule").then(m => ({ default: m.KerningModule })));
@@ -14,43 +15,62 @@ const AlignmentModule = React.lazy(() => import("@/components/protocol/Alignment
 const GlyphModule = React.lazy(() => import("@/components/protocol/GlyphModule").then(m => ({ default: m.GlyphModule })));
 const MixModule = React.lazy(() => import("@/components/protocol/MixModule").then(m => ({ default: m.MixModule })));
 
-const useLazyVisible = (rootMargin = "300px") => {
+const useLazyVisible = (rootMargin = "200px") => {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
+    const el = ref.current;
+    if (!el) return;
     const observer = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return;
-      setVisible(true);
-      observer.disconnect();
+      if (entry.isIntersecting) { setVisible(true); observer.disconnect(); }
     }, { rootMargin });
-    observer.observe(element);
+    observer.observe(el);
     return () => observer.disconnect();
   }, [rootMargin]);
   return { ref, visible };
 };
 
-const ModuleSkeleton = () => <div className="w-full min-h-72 border border-neutral-200 bg-neutral-50 p-8 animate-pulse"><div className="h-3 w-36 bg-neutral-200" /><div className="mt-5 h-40 bg-neutral-100" /></div>;
+const ModuleSkeleton = () => (
+  <div className="w-full border border-neutral-200 bg-neutral-50 p-8 md:p-12 animate-pulse">
+    <div className="h-4 w-48 bg-neutral-200 mb-4" />
+    <div className="h-8 w-72 bg-neutral-200 mb-8" />
+    <div className="h-48 bg-neutral-100" />
+  </div>
+);
 
-const Section = memo(({ number, title, desc, id, children }: { number: string; title: string; desc: string; id: string; children: React.ReactNode }) => {
-  const { ref, visible } = useLazyVisible();
+const Section = memo(({ number, title, desc, id, children }: { number: string; title: string; desc: string; id: string; children: React.ReactNode; }) => {
+  const { ref, visible } = useLazyVisible("300px");
   return (
-    <section ref={ref} id={id} className="border-b border-neutral-200 px-6 md:px-10 lg:px-14 py-14 md:py-20 bg-white">
-      <div className="max-w-[1600px] mx-auto grid lg:grid-cols-[260px_minmax(0,1fr)] gap-8 lg:gap-14">
-        <header className="lg:sticky lg:top-28 self-start">
-          <div className="font-mono text-[9px] text-neutral-300">{number}</div>
-          <h2 className="mt-3 text-2xl md:text-3xl font-semibold tracking-tight">{title}</h2>
-          <p className="mt-4 text-sm leading-relaxed text-neutral-500">{desc}</p>
-        </header>
-        <div className="min-w-0">{visible ? <React.Suspense fallback={<ModuleSkeleton />}>{children}</React.Suspense> : <ModuleSkeleton />}</div>
+    <section ref={ref} id={id} className="border-b border-neutral-200 relative py-16 md:py-24 px-6 md:px-12 lg:px-16 flex flex-col bg-white">
+      <div className="sticky top-[130px] z-30 bg-white mb-10 py-5 flex justify-between items-baseline border-b border-neutral-200">
+        <h2 className="text-2xl md:text-4xl tracking-tighter uppercase" style={{ fontWeight: 700 }}><span className="text-sm font-mono align-top mr-3 text-neutral-300">{number}</span>{title}</h2>
+        <ChevronDown className="w-5 h-5 animate-bounce text-neutral-300 hidden md:block" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 max-w-[1920px] mx-auto w-full">
+        <div className="lg:col-span-4 space-y-6 font-mono text-sm leading-relaxed text-neutral-500 text-justify lg:sticky lg:top-48 h-fit">
+          <p className="uppercase tracking-widest text-neutral-800 text-[10px]" style={{ fontWeight: 700 }}>/// SYSTEM NOTE</p><p>{desc}</p>
+        </div>
+        <div className="lg:col-span-8 w-full">{visible ? <React.Suspense fallback={<ModuleSkeleton />}>{children}</React.Suspense> : <ModuleSkeleton />}</div>
       </div>
     </section>
   );
 });
 
+const TOCNav = memo(({ modules, activeId }: { modules: { id: string; number: string; title: string }[]; activeId: string }) => (
+  <nav className="hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-40 flex-col gap-1.5" aria-label="Table of contents">
+    {modules.map((m) => (
+      <a key={m.id} href={`#${m.id}`} className={`group flex items-center gap-2 transition-all duration-200 ${activeId === m.id ? "opacity-100" : "opacity-30 hover:opacity-70"}`} title={m.title} aria-label={`${m.number} — ${m.title}`} aria-current={activeId === m.id ? "true" : undefined}>
+        <span className={`block h-px transition-all duration-200 ${activeId === m.id ? "w-6 bg-neutral-800" : "w-3 bg-neutral-400 group-hover:w-4"}`} />
+        <span className="font-mono text-[9px] uppercase tracking-widest text-neutral-500 hidden group-hover:inline">{m.number}</span>
+      </a>
+    ))}
+  </nav>
+));
+
 export const ProtocolPage = () => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
   const [activeId, setActiveId] = useState("");
   const modules = useMemo(() => [
     { id: "spacing", number: "01", titleKey: "protocol.spacing.title", descKey: "protocol.spacing.desc", Component: KerningModule },
@@ -67,35 +87,35 @@ export const ProtocolPage = () => {
   ], []);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) setActiveId(entry.target.id); }), { rootMargin: "-40% 0px -40% 0px" });
-    modules.forEach(module => { const element = document.getElementById(module.id); if (element) observer.observe(element); });
+    const observer = new IntersectionObserver((entries) => { entries.forEach((entry) => { if (entry.isIntersecting) setActiveId(entry.target.id); }); }, { rootMargin: "-40% 0px -40% 0px" });
+    modules.forEach((m) => { const el = document.getElementById(m.id); if (el) observer.observe(el); });
     return () => observer.disconnect();
   }, [modules]);
 
-  const scrollToTop = useCallback(() => window.scrollTo({ top: 0, behavior: "smooth" }), []);
+  const tocModules = useMemo(() => modules.map((m) => ({ id: m.id, number: m.number, title: t(m.titleKey) })), [modules, t]);
+  const scrollToTop = useCallback(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, []);
 
   return (
-    <div className="min-h-screen bg-white text-black">
-      <section className="px-6 md:px-10 lg:px-14 py-14 md:py-20 border-b border-neutral-200">
-        <div className="max-w-5xl">
-          <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-400">Typography protocol</div>
-          <h1 className="mt-5 text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tighter leading-[0.9]">{t("protocol.title")}</h1>
-          <p className="mt-7 max-w-2xl text-base md:text-lg leading-relaxed text-neutral-500">{t("protocol.subtitle")}</p>
-          <div className="mt-10 font-mono text-[9px] uppercase tracking-widest text-neutral-400">{modules.length} {language === "ru" ? "интерактивных модулей" : "interactive modules"}</div>
+    <div className="bg-white min-h-screen text-neutral-900 font-sans selection:bg-neutral-200 pt-[64px]">
+      <motion.div className="fixed top-[64px] left-0 right-0 h-[2px] bg-neutral-800 origin-left z-50" style={{ scaleX }} />
+      <TOCNav modules={tocModules} activeId={activeId} />
+      <div className="min-h-[55vh] flex flex-col justify-between p-6 md:p-12 lg:p-16 border-b border-neutral-200 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: "radial-gradient(#000 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+        <div className="flex justify-end items-start relative z-10"><div className="hidden md:block text-right font-mono text-[10px] leading-tight text-neutral-300 tracking-widest">{t("protocol.classification")}<br />{t("protocol.encryption")}<br />{t("protocol.auth")}</div></div>
+        <div className="max-w-5xl z-10 mt-12 md:mt-0">
+          <motion.h1 initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }} className="text-5xl md:text-[7rem] leading-[0.85] tracking-tighter uppercase mb-8 break-words hyphens-auto" style={{ fontWeight: 700 }}>{t("protocol.title")}</motion.h1>
+          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, delay: 0.15 }} className="flex flex-col md:flex-row gap-8 md:items-end border-l-2 border-neutral-300 pl-6"><p className="font-mono text-sm md:text-base max-w-xl uppercase tracking-widest leading-relaxed text-neutral-500">{t("protocol.subtitle")}</p></motion.div>
         </div>
-      </section>
-
-      <nav className="sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-neutral-200 overflow-x-auto" aria-label="Protocol modules">
-        <div className="px-4 md:px-6 h-12 flex items-center gap-1 min-w-max">
-          {modules.map(module => <a key={module.id} href={`#${module.id}`} aria-current={activeId === module.id ? "location" : undefined} className={`h-8 px-3 flex items-center font-mono text-[9px] uppercase tracking-widest transition-colors ${activeId === module.id ? "bg-neutral-900 text-white" : "text-neutral-400 hover:text-black hover:bg-neutral-50"}`}>{module.number}</a>)}
-        </div>
-      </nav>
-
-      {modules.map(module => <Section key={module.id} id={module.id} number={module.number} title={t(module.titleKey)} desc={t(module.descKey)}><module.Component /></Section>)}
-
-      <div className="px-6 md:px-10 lg:px-14 py-14 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-        <p className="text-sm text-neutral-400">{language === "ru" ? "Протокол — справочный раздел. Основная работа со шрифтами происходит в каталоге и Workbench." : "Protocol is a reference section. Primary font work happens in Catalog and Workbench."}</p>
-        <button type="button" onClick={scrollToTop} className="inline-flex items-center gap-2 px-5 py-3 border border-neutral-300 text-sm hover:bg-neutral-50 transition-colors">{t("protocol.return")} <ArrowUp className="w-4 h-4" /></button>
+      </div>
+      <div className="border-b border-neutral-200 py-12 md:py-20 px-6 md:px-12 lg:px-16 flex flex-col md:flex-row justify-between items-end gap-6 bg-white">
+        <div><h2 className="text-4xl md:text-7xl tracking-tighter uppercase leading-none" style={{ fontWeight: 700 }}>{t("protocol.archive.title")}</h2><p className="font-mono text-xs max-w-md uppercase tracking-widest text-neutral-400 mt-4">{t("protocol.archive.desc")} <br />Status: {modules.length} {t("protocol.status.online")}</p></div>
+        <div className="flex flex-col items-end gap-2 w-full md:w-auto text-neutral-300"><div className="font-mono text-[10px] uppercase tracking-widest flex items-center gap-2"><Database className="w-3.5 h-3.5" />{t("protocol.access.readOnly")}</div></div>
+      </div>
+      <div className="max-w-[100vw] overflow-hidden">{modules.map((m) => <Section key={m.id} id={m.id} number={m.number} title={t(m.titleKey)} desc={t(m.descKey)}><m.Component /></Section>)}</div>
+      <div className="p-12 md:p-24 bg-neutral-950 text-white text-center re-invert">
+        <h3 className="text-2xl md:text-5xl tracking-tighter uppercase mb-8" style={{ fontWeight: 700 }}>{t("protocol.systemCheck")}</h3>
+        <p className="font-mono text-[10px] uppercase tracking-widest mb-12 text-neutral-500">{t("protocol.ready")}</p>
+        <button onClick={scrollToTop} className="inline-flex items-center gap-2 border border-white/30 px-8 py-4 hover:bg-white hover:text-black transition-colors uppercase font-mono text-xs tracking-widest">{t("protocol.return")} <ArrowUp className="w-4 h-4" /></button>
       </div>
     </div>
   );

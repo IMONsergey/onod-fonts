@@ -18,9 +18,10 @@ const rawBytes = statSync(entryPath).size;
 const gzipBytes = gzipSync(readFileSync(entryPath), { level: 9 }).byteLength;
 
 // Pre-audit production baseline: 912.25 kB raw / 237.93 kB gzip.
-// This budget requires the critical entry to remain materially below that baseline.
-const MAX_ENTRY_RAW_BYTES = 830_000;
-const MAX_ENTRY_GZIP_BYTES = 220_000;
+// Audited platform overhaul: ~660.7 kB raw / 168.8 kB gzip.
+// Keep modest headroom while blocking regression toward the old baseline.
+const MAX_ENTRY_RAW_BYTES = 700_000;
+const MAX_ENTRY_GZIP_BYTES = 180_000;
 const kb = value => (value / 1000).toFixed(1);
 
 console.log(`Startup entry: ${entryUrl}`);

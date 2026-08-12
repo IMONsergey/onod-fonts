@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Copy, Plus, Search, Share2, X } from "lucide-react";
 import { Font } from "@/data/mockFonts";
 import { toast } from "sonner";
@@ -34,7 +34,7 @@ const fallbackFamily = (font?: Font) => {
 export const ComparePage: React.FC<CompareProps> = ({ fonts, allFonts = [], previewText, setPreviewText, removeFromCompare, toggleCompare, onBack }) => {
   const { t, language } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
-  const hydratedFromUrl = useRef(false);
+  const [urlHydrated, setUrlHydrated] = useState(() => !searchParams.get('fonts'));
   const [baseSize, setBaseSize] = useState(16);
   const [scaleRatio, setScaleRatio] = useState(1.25);
   const [customContent, setCustomContent] = useState("");
@@ -45,7 +45,7 @@ export const ComparePage: React.FC<CompareProps> = ({ fonts, allFonts = [], prev
   const [configCode, setConfigCode] = useState("");
 
   useEffect(() => {
-    if (hydratedFromUrl.current || !fonts.length) return;
+    if (urlHydrated || !fonts.length) return;
     const urlHeading = searchParams.get('heading') || searchParams.get('h');
     const urlBody = searchParams.get('body') || searchParams.get('b');
     setHeadingFontId(fonts.find(font => font.id === urlHeading)?.id || fonts[0].id);
@@ -59,8 +59,8 @@ export const ComparePage: React.FC<CompareProps> = ({ fonts, allFonts = [], prev
     } else if (previewText) {
       setCustomContent(previewText);
     }
-    hydratedFromUrl.current = true;
-  }, [fonts, previewText, searchParams, setPreviewText]);
+    setUrlHydrated(true);
+  }, [fonts, previewText, searchParams, setPreviewText, urlHydrated]);
 
   useEffect(() => {
     if (!fonts.length) {
@@ -73,6 +73,7 @@ export const ComparePage: React.FC<CompareProps> = ({ fonts, allFonts = [], prev
   }, [fonts]);
 
   useEffect(() => {
+    if (!urlHydrated) return;
     setSearchParams(current => {
       const next = new URLSearchParams(current);
       if (fonts.length) next.set('fonts', fonts.map(font => font.id).join(',')); else next.delete('fonts');
@@ -85,7 +86,7 @@ export const ComparePage: React.FC<CompareProps> = ({ fonts, allFonts = [], prev
       if (customContent) next.set('content', customContent.slice(0, 1000)); else next.delete('content');
       return next.toString() === current.toString() ? current : next;
     }, { replace: true });
-  }, [fonts, headingFontId, bodyFontId, baseSize, scaleRatio, customContent, setSearchParams]);
+  }, [fonts, headingFontId, bodyFontId, baseSize, scaleRatio, customContent, setSearchParams, urlHydrated]);
 
   const scaleSteps = ["base", "lg", "xl", "2xl", "3xl", "4xl"];
   const calculatedSizes = useMemo(() => scaleSteps.map((_, index) => Math.round(baseSize * Math.pow(scaleRatio, index))), [baseSize, scaleRatio]);

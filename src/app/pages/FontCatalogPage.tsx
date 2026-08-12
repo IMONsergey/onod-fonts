@@ -272,16 +272,20 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({
             onClick={() => setIsFilterOpen(false)}
             aria-label="Close filters"
           />
-          <aside className="fixed left-0 top-16 bottom-0 z-[71] w-[min(88vw,20rem)] bg-white border-r border-neutral-200 md:hidden" aria-label="Font filters">
-            <button
-              type="button"
-              onClick={() => setIsFilterOpen(false)}
-              className="absolute right-4 top-4 z-10 w-8 h-8 border border-neutral-200 bg-white flex items-center justify-center hover:bg-neutral-100 transition-colors"
-              aria-label="Close filters"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-            <FilterPanel filters={filters} setFilters={setFilters} />
+          <aside className="fixed left-0 top-16 bottom-0 z-[71] w-[min(88vw,20rem)] bg-white border-r border-neutral-200 md:hidden flex flex-col" aria-label="Font filters">
+            <div className="h-12 shrink-0 border-b border-neutral-200 px-3 flex items-center justify-end">
+              <button
+                type="button"
+                onClick={() => setIsFilterOpen(false)}
+                className="w-8 h-8 border border-neutral-200 bg-white flex items-center justify-center hover:bg-neutral-100 transition-colors"
+                aria-label="Close filters"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <div className="min-h-0 flex-1">
+              <FilterPanel filters={filters} setFilters={setFilters} />
+            </div>
           </aside>
         </>
       )}

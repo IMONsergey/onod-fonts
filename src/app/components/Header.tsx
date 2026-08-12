@@ -288,7 +288,7 @@ export const Header: React.FC<HeaderProps> = ({
                       <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-300">{language === 'ru' ? 'Типографический дизайн-инструмент' : 'Typography design instrument'}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-neutral-400" aria-hidden="true" />
                       <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-300">{language === 'ru' ? 'Онлайн' : 'Online'}</span>
                     </div>
                   </div>

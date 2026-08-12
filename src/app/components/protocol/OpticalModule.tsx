@@ -21,8 +21,8 @@ export const OpticalModule = () => {
       </div>
 
       <div className="relative h-48 md:h-64 flex items-center justify-center gap-4 md:gap-8 bg-neutral-50 border border-neutral-200 overflow-hidden">
-         <div className="absolute inset-x-0 top-1/2 -translate-y-12 md:-translate-y-16 h-px bg-red-500 z-10 opacity-50" />
-         <div className="absolute inset-x-0 top-1/2 translate-y-12 md:translate-y-16 h-px bg-red-500 z-10 opacity-50" />
+         <div className="absolute inset-x-0 top-1/2 -translate-y-12 md:-translate-y-16 h-px bg-neutral-500 z-10 opacity-50" />
+         <div className="absolute inset-x-0 top-1/2 translate-y-12 md:translate-y-16 h-px bg-neutral-500 z-10 opacity-50" />
 
          <div className="w-24 h-24 md:w-32 md:h-32 bg-black" />
 

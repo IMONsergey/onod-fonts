@@ -153,7 +153,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters })
         <section className="space-y-4">
           <h3 className="font-mono text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{language === 'ru' ? 'Лицензия' : 'License'}</h3>
           <div className="space-y-2">{licenses.map(license => <FilterCheckbox key={license} group="license" value={license} checked={filters.licenses.includes(license)} count={fontCounts.licenses[license] || 0} onChange={() => toggleArrayFilter("licenses", license)} />)}</div>
-          {(fontCounts.licenses["Verify at source"] || 0) > 0 && <p className="font-mono text-[8px] text-amber-700 leading-relaxed border border-amber-200 bg-amber-50 p-2">{language === 'ru' ? 'VERIFY AT SOURCE — источник или точная лицензия ещё не полностью подтверждены. Такие записи намеренно не объединяются с OFL/FFL.' : 'VERIFY AT SOURCE means source identity or the exact license is still pending. These records are intentionally not grouped with OFL/FFL.'}</p>}
+          {(fontCounts.licenses["Verify at source"] || 0) > 0 && <p className="font-mono text-[8px] text-neutral-700 leading-relaxed border border-neutral-200 bg-neutral-50 p-2">{language === 'ru' ? 'VERIFY AT SOURCE — источник или точная лицензия ещё не полностью подтверждены. Такие записи намеренно не объединяются с OFL/FFL.' : 'VERIFY AT SOURCE means source identity or the exact license is still pending. These records are intentionally not grouped with OFL/FFL.'}</p>}
         </section>
 
         <section className="space-y-4">

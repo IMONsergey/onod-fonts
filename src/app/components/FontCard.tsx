@@ -60,7 +60,7 @@ export const FontCard: React.FC<FontCardProps> = memo(({
 
   const displayPreview = previewText || effectiveFamilyName;
   const runtimeBadge = runtime.status === "error"
-    ? { label: "FALLBACK", className: "border-red-300 text-red-600" }
+    ? { label: "FALLBACK", className: "border-neutral-300 text-neutral-600" }
     : runtime.status === "loading"
       ? { label: "LOADING", className: "border-neutral-300 text-neutral-400" }
       : null;
@@ -83,11 +83,11 @@ export const FontCard: React.FC<FontCardProps> = memo(({
   const MetadataBadges = ({ compact = false }: { compact?: boolean }) => (
     <div className="flex gap-1 items-center flex-wrap justify-end">
       {runtimeBadge && <span title={runtime.message} className={cn("font-mono uppercase border px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]", runtimeBadge.className)}>{runtimeBadge.label}</span>}
-      {sourceAndLicenseVerified && <span title={trust.verificationSource} className={cn("font-mono uppercase border border-emerald-300 text-emerald-700 bg-emerald-50 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>VERIFIED</span>}
-      {trust.identityVerified && !trust.licenseVerified && <span title={trust.verificationSource} className={cn("font-mono uppercase border border-emerald-200 text-emerald-700 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>SOURCE✓</span>}
-      {trust.identityVerified && !trust.licenseVerified && <span title={language === 'ru' ? 'Точная лицензия ещё проверяется' : 'Exact license is still pending review'} className={cn("font-mono uppercase border border-amber-300 text-amber-700 bg-amber-50 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>LICENSE?</span>}
-      {!trust.identityVerified && <span title={language === 'ru' ? 'Источник ещё не подтверждён первичным источником' : 'Source identity has not yet been verified by primary evidence'} className={cn("font-mono uppercase border border-amber-300 text-amber-700 bg-amber-50 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>SOURCE?</span>}
-      {!trust.weightsVerified && <span title={language === 'ru' ? 'Точные веса ещё проверяются' : 'Exact weights are still pending'} className={cn("font-mono uppercase border border-amber-200 text-amber-700 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>WEIGHTS?</span>}
+      {sourceAndLicenseVerified && <span title={trust.verificationSource} className={cn("font-mono uppercase border border-neutral-300 text-neutral-700 bg-neutral-50 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>VERIFIED</span>}
+      {trust.identityVerified && !trust.licenseVerified && <span title={trust.verificationSource} className={cn("font-mono uppercase border border-neutral-200 text-neutral-700 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>SOURCE✓</span>}
+      {trust.identityVerified && !trust.licenseVerified && <span title={language === 'ru' ? 'Точная лицензия ещё проверяется' : 'Exact license is still pending review'} className={cn("font-mono uppercase border border-neutral-300 text-neutral-700 bg-neutral-50 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>LICENSE?</span>}
+      {!trust.identityVerified && <span title={language === 'ru' ? 'Источник ещё не подтверждён первичным источником' : 'Source identity has not yet been verified by primary evidence'} className={cn("font-mono uppercase border border-neutral-300 text-neutral-700 bg-neutral-50 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>SOURCE?</span>}
+      {!trust.weightsVerified && <span title={language === 'ru' ? 'Точные веса ещё проверяются' : 'Exact weights are still pending'} className={cn("font-mono uppercase border border-neutral-200 text-neutral-700 px-1 py-0.5", compact ? "text-[7px]" : "text-[8px]")}>WEIGHTS?</span>}
       {effectiveLanguages.includes("Cyrillic") && <span className={cn("font-mono uppercase border border-neutral-300 px-1 pt-0.5", compact ? "text-[8px]" : "text-[9px]")}>{trust.scriptsVerified ? "CYR" : "CYR?"}</span>}
       {effectiveVariable && <span className={cn("font-mono uppercase bg-neutral-800 text-white px-1 pt-0.5", compact ? "text-[8px]" : "text-[9px]")}>VAR</span>}
     </div>
@@ -121,7 +121,7 @@ export const FontCard: React.FC<FontCardProps> = memo(({
           <div className="flex gap-4 pt-6 border-t border-neutral-200 mt-auto">
             <button type="button" onClick={(e) => { e.stopPropagation(); onToggleFavorite(font.id); }} className="hover:opacity-50 transition-opacity" aria-label={isFavorite ? t('card.removeFromFavorites') : t('card.addToFavorites')}><Heart className={cn("w-4 h-4", isFavorite ? "fill-black" : "stroke-black")} /></button>
             <button type="button" onClick={(e) => { e.stopPropagation(); onToggleCompare(font.id); }} className="hover:opacity-50 transition-opacity flex items-center gap-1 group/btn" aria-label={isCompared ? t('card.removeFromCompare') : t('card.addToCompare')}>{isCompared ? <span className="bg-neutral-800 text-white p-0.5"><Check className="w-3 h-3" /></span> : <Plus className="w-4 h-4 stroke-black group-hover/btn:stroke-neutral-500" />}<span className="font-mono text-[9px] uppercase hidden group-hover/btn:inline">{isCompared ? t('card.inStack') : t('card.addToStack')}</span></button>
-            <button type="button" onClick={copyCss} className="hover:opacity-50 transition-opacity" title="Copy CSS" aria-label="Copy CSS">{cssCopied ? <Check className="w-4 h-4 text-green-600" /> : <Code className="w-4 h-4 stroke-neutral-400" />}</button>
+            <button type="button" onClick={copyCss} className="hover:opacity-50 transition-opacity" title="Copy CSS" aria-label="Copy CSS">{cssCopied ? <Check className="w-4 h-4 text-neutral-600" /> : <Code className="w-4 h-4 stroke-neutral-400" />}</button>
             {showLegacyDownload && <button type="button" onClick={(e) => openExternal(font.downloadUrl!, e)} className="hover:opacity-50 transition-opacity ml-auto" aria-label={t('details.download')}><Download className="w-4 h-4 stroke-black" /></button>}
             <button type="button" onClick={(e) => openExternal(effectiveSourceUrl, e)} className={cn("hover:opacity-50 transition-opacity", !showLegacyDownload && "ml-auto")} aria-label="Open source"><ExternalLink className="w-4 h-4 stroke-black" /></button>
           </div>
@@ -130,7 +130,7 @@ export const FontCard: React.FC<FontCardProps> = memo(({
         <button type="button" className="flex-grow flex flex-col relative p-4 md:p-6 group-hover:bg-neutral-50/50 transition-colors overflow-hidden text-left" onClick={() => onViewDetails(font.id)} aria-label={`Open ${effectiveFamilyName} details`}>
           <div className="absolute top-2 right-2 font-mono text-[9px] text-neutral-300 uppercase">+ Preview</div>
           <div className="flex-grow flex items-center justify-center overflow-hidden w-full"><p className="text-black leading-tight text-center break-words w-full transition-all duration-200" style={style}>{displayPreview}</p></div>
-          {runtime.status === "error" && <div className="absolute bottom-3 left-4 right-4 font-mono text-[8px] uppercase tracking-widest text-red-500 text-center">Font unavailable — showing fallback</div>}
+          {runtime.status === "error" && <div className="absolute bottom-3 left-4 right-4 font-mono text-[8px] uppercase tracking-widest text-neutral-500 text-center">Font unavailable — showing fallback</div>}
         </button>
       </article>
     );
@@ -140,14 +140,14 @@ export const FontCard: React.FC<FontCardProps> = memo(({
     <article className="group bg-white border-b border-r border-neutral-200 flex flex-col h-[350px] relative hover:bg-neutral-50 transition-colors">
       <div className="p-3 flex justify-between items-start border-b border-neutral-100 gap-2">
         <div className="min-w-0"><button type="button" onClick={() => onViewDetails(font.id)} className="block text-left text-sm text-black tracking-tight hover:underline truncate" style={{ fontWeight: 700 }}>{effectiveFamilyName}</button><p className="font-mono text-[9px] text-neutral-500 uppercase truncate">{effectiveSourceLabel}</p></div>
-        <div className="flex items-center gap-1.5 shrink-0"><MetadataBadges compact /><button type="button" onClick={copyCss} className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity" title="Copy CSS" aria-label="Copy CSS">{cssCopied ? <Check className="w-3 h-3 text-green-600" /> : <Code className="w-3 h-3 text-neutral-400" />}</button><button type="button" onClick={() => onToggleFavorite(font.id)} aria-label={isFavorite ? t('card.removeFromFavorites') : t('card.addToFavorites')}><Heart className={cn("w-3 h-3", isFavorite ? "fill-black" : "stroke-black")} /></button></div>
+        <div className="flex items-center gap-1.5 shrink-0"><MetadataBadges compact /><button type="button" onClick={copyCss} className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity" title="Copy CSS" aria-label="Copy CSS">{cssCopied ? <Check className="w-3 h-3 text-neutral-600" /> : <Code className="w-3 h-3 text-neutral-400" />}</button><button type="button" onClick={() => onToggleFavorite(font.id)} aria-label={isFavorite ? t('card.removeFromFavorites') : t('card.addToFavorites')}><Heart className={cn("w-3 h-3", isFavorite ? "fill-black" : "stroke-black")} /></button></div>
       </div>
 
-      <button type="button" className="flex-grow flex items-center justify-center p-4 overflow-hidden w-full" onClick={() => onViewDetails(font.id)} aria-label={`Open ${effectiveFamilyName} details`}><p className="text-center leading-tight transition-all duration-200" style={{ ...style, fontSize: `${Math.min(fontSize, 60)}px` }}>{displayPreview}</p>{runtime.status === "error" && <span className="absolute bottom-12 left-3 right-3 font-mono text-[7px] uppercase tracking-widest text-red-500">Fallback preview</span>}</button>
+      <button type="button" className="flex-grow flex items-center justify-center p-4 overflow-hidden w-full" onClick={() => onViewDetails(font.id)} aria-label={`Open ${effectiveFamilyName} details`}><p className="text-center leading-tight transition-all duration-200" style={{ ...style, fontSize: `${Math.min(fontSize, 60)}px` }}>{displayPreview}</p>{runtime.status === "error" && <span className="absolute bottom-12 left-3 right-3 font-mono text-[7px] uppercase tracking-widest text-neutral-500">Fallback preview</span>}</button>
 
       <div className="h-10 px-4 border-t border-neutral-100 flex justify-between items-center">
         <button type="button" onClick={(e) => { e.stopPropagation(); onToggleCompare(font.id); }} className="font-mono text-[10px] uppercase tracking-widest text-neutral-400 hover:text-black transition-colors flex items-center gap-2" aria-label={isCompared ? t('card.removeFromCompare') : t('card.addToCompare')}>{isCompared ? <Check className="w-3 h-3" /> : <Plus className="w-3 h-3" />}<span>{isCompared ? t('card.stacked') : t('card.stack')}</span></button>
-        <div className="flex items-center gap-2">{trust.weightsVerified ? <span className="font-mono text-[9px] text-neutral-400">{effectiveWeights.length}w</span> : <span className="font-mono text-[8px] text-amber-700 uppercase">WEIGHTS?</span>}</div>
+        <div className="flex items-center gap-2">{trust.weightsVerified ? <span className="font-mono text-[9px] text-neutral-400">{effectiveWeights.length}w</span> : <span className="font-mono text-[8px] text-neutral-700 uppercase">WEIGHTS?</span>}</div>
       </div>
     </article>
   );

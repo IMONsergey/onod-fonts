@@ -12,3 +12,7 @@
 - [`catalog-contribution-checklist.md`](./catalog-contribution-checklist.md) — contribution checklist for catalog records.
 
 `main` is the single source of truth. Audit findings should be closed by code/data changes and automated checks, not by editing conclusions out of the audit. During an active feature/remediation branch, keep `PROJECT-CONTEXT.md`, the umbrella issue and the primary PR description aligned with the actual repository state.
+
+## Reliability and UX update
+
+[Implementation, verification and remaining scope — 11 October 2026](UPDATE-2026-10-11.md).

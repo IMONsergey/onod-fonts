@@ -1,0 +1,266 @@
+{
+  "browser": "chromium",
+  "base": "http://127.0.0.1:4187/onod-fonts/",
+  "at": "2026-10-11T05:27:55.842Z",
+  "passed": 30,
+  "failed": 0,
+  "results": [
+    {
+      "name": "search-and-private-preview",
+      "status": "pass",
+      "evidence": {
+        "firstResult": "Inter",
+        "cleared": true,
+        "privateTextNotInUrl": true
+      }
+    },
+    {
+      "name": "workbench-idle-ratio-and-empty",
+      "status": "pass",
+      "evidence": {
+        "idleReplaces": 0,
+        "initialReplaces": 2,
+        "ratio": 1.5,
+        "emptySurvivesRefresh": true
+      }
+    },
+    {
+      "name": "catalog-80-return-anchor",
+      "status": "pass",
+      "evidence": {
+        "anchor": "huerta-40",
+        "before": {
+          "top": 380,
+          "scrollY": 6251
+        },
+        "after": {
+          "top": 380,
+          "scrollY": 6251
+        },
+        "cards": 80
+      }
+    },
+    {
+      "name": "filter-drawer-focus-and-escape",
+      "status": "pass",
+      "evidence": {
+        "focusRestored": true,
+        "duplicateIds": 0,
+        "script": "Cyrillic"
+      }
+    },
+    {
+      "name": "storage-denial-is-usable",
+      "status": "pass",
+      "evidence": {
+        "usable": true
+      }
+    },
+    {
+      "name": "details-real-axes-and-mobile-preview",
+      "status": "pass",
+      "evidence": {
+        "specimenTop": 346.5,
+        "italic": true,
+        "wght": 650,
+        "glyphLookup": "Ж"
+      }
+    },
+    {
+      "name": "empty-css-does-not-pass-as-ready",
+      "status": "pass",
+      "evidence": {
+        "falseReadyPrevented": true
+      }
+    },
+    {
+      "name": "workbench-share-and-back-forward",
+      "status": "pass",
+      "evidence": {
+        "sharedRolesRestored": true,
+        "numericDraftSafe": true
+      }
+    },
+    {
+      "name": "mobile-navigation-and-resize",
+      "status": "pass",
+      "evidence": {
+        "keyboardModal": true,
+        "resizeUnlocks": true
+      }
+    },
+    {
+      "name": "saved-import-merges-and-rejects-invalid",
+      "status": "pass",
+      "evidence": {
+        "validMerged": 2,
+        "unknownIgnored": true,
+        "malformedDidNotErase": true
+      }
+    },
+    {
+      "name": "exports-preserve-current-sizes",
+      "status": "pass",
+      "evidence": {
+        "scale": {
+          "baseSize": 20,
+          "ratio": 1.5
+        },
+        "heading": "101px",
+        "body": "30px"
+      }
+    },
+    {
+      "name": "real-pinned-faces-and-request-budget",
+      "status": "pass",
+      "evidence": {
+        "initialFontSources": 5,
+        "boldFacesVerified": 3
+      }
+    },
+    {
+      "name": "catalog-ru-320",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "catalog-ru-390",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "catalog-ru-768",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "catalog-ru-1024",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "catalog-ru-1440",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "catalog-ru-1920",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "catalog-en-320",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "catalog-en-390",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "catalog-en-768",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "catalog-en-1024",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "catalog-en-1440",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "catalog-en-1920",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "details-a11y-390",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "details-a11y-1440",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "workbench-a11y-390",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "workbench-a11y-1440",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "favorites-a11y-390",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    },
+    {
+      "name": "favorites-a11y-1440",
+      "status": "pass",
+      "evidence": {
+        "overflow": 0,
+        "axe": []
+      }
+    }
+  ]
+}

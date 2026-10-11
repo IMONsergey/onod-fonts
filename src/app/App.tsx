@@ -1,17 +1,16 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from 'react-router';
-import { AnimatePresence } from 'motion/react';
+import React, { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams, useNavigationType } from 'react-router';
 import { PageTransition } from './components/PageTransition';
 import { Header } from './components/Header';
 import { FontCatalogPage } from './pages/FontCatalogPage';
-import { FontDetailsPage } from './pages/FontDetailsPage';
-import { ComparePage } from './pages/ComparePage';
-import { FavoritesPage } from './pages/FavoritesPage';
-import { AboutPage } from './pages/AboutPage';
-import { ProtocolPage } from './pages/ProtocolPage';
-import { PrivacyPage } from './pages/policies/PrivacyPage';
-import { TermsPage } from './pages/policies/TermsPage';
-import { LicensePage } from './pages/policies/LicensePage';
+const FontDetailsPage = lazy(() => import('./pages/FontDetailsPage').then(module => ({ default: module.FontDetailsPage })));
+const ComparePage = lazy(() => import('./pages/ComparePage').then(module => ({ default: module.ComparePage })));
+const FavoritesPage = lazy(() => import('./pages/FavoritesPage').then(module => ({ default: module.FavoritesPage })));
+const AboutPage = lazy(() => import('./pages/AboutPage').then(module => ({ default: module.AboutPage })));
+const ProtocolPage = lazy(() => import('./pages/ProtocolPage').then(module => ({ default: module.ProtocolPage })));
+const PrivacyPage = lazy(() => import('./pages/policies/PrivacyPage').then(module => ({ default: module.PrivacyPage })));
+const TermsPage = lazy(() => import('./pages/policies/TermsPage').then(module => ({ default: module.TermsPage })));
+const LicensePage = lazy(() => import('./pages/policies/LicensePage').then(module => ({ default: module.LicensePage })));
 import { mockFonts } from './data/mockFonts';
 import type { Font } from './data/mockFonts';
 import { getEffectiveFamilyName } from './lib/fontTrust';
@@ -20,24 +19,27 @@ import { Toaster } from './components/ui/sonner';
 import { LanguageProvider, useLanguage } from './lib/i18n';
 import { Footer } from './components/Footer';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { readStorage, writeStorage, removeStorage, useTemporaryStorage } from './lib/safeStorage';
 import faviconImg from '../assets/favicon.png';
+
+const fontById = new Map(mockFonts.map(font => [font.id, font]));
 
 function readStoredFontIds(key: string): string[] {
   if (typeof window === 'undefined') return [];
   try {
-    const saved = window.localStorage.getItem(key);
+    const saved = readStorage(key);
     if (!saved) return [];
     const parsed = JSON.parse(saved);
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter((id): id is string => typeof id === 'string' && mockFonts.some(font => font.id === id));
+    return [...new Set(parsed.filter((id): id is string => typeof id === 'string' && fontById.has(id)))];
   } catch {
-    window.localStorage.removeItem(key);
+    removeStorage(key);
     return [];
   }
 }
 
 function validFontIds(ids: string[]) {
-  return Array.from(new Set(ids.filter(id => mockFonts.some(font => font.id === id)))).slice(0, 3);
+  return Array.from(new Set(ids.filter(id => fontById.has(id)))).slice(0, 3);
 }
 
 function sameIds(a: string[], b: string[]) {
@@ -46,29 +48,53 @@ function sameIds(a: string[], b: string[]) {
 
 function AppContent() {
   const navigate = useNavigate();
-  const location = useLocation();
+  const rawLocation = useLocation();
+  const location = { ...rawLocation, pathname: rawLocation.pathname.replace(/\/+$/, '') || '/' };
+  const navigationType = useNavigationType();
+  const temporaryStorage = useTemporaryStorage();
   const [previewText, setPreviewText] = useState('');
   const [favorites, setFavorites] = useState<string[]>(() => readStoredFontIds('font-catalog-favorites'));
-  const [compareList, setCompareList] = useState<string[]>(() => readStoredFontIds('font-catalog-compare'));
-  const { t } = useLanguage();
+  const [compareList, setCompareList] = useState<string[]>(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (/\/compare\/?$/.test(window.location.pathname) && params.has('fonts')) return validFontIds((params.get('fonts') || '').split(','));
+    return validFontIds(readStoredFontIds('font-catalog-compare'));
+  });
+  const comparedFonts = useMemo(() => compareList.map(id => fontById.get(id)).filter((font): font is Font => Boolean(font)), [compareList]);
+  const savedFonts = useMemo(() => favorites.map(id => fontById.get(id)).filter((font): font is Font => Boolean(font)), [favorites]);
+  const { t, language } = useLanguage();
 
   useEffect(() => {
-    localStorage.setItem('font-catalog-favorites', JSON.stringify(favorites));
+    writeStorage('font-catalog-favorites', JSON.stringify(favorites));
   }, [favorites]);
 
   useEffect(() => {
-    localStorage.setItem('font-catalog-compare', JSON.stringify(compareList));
+    writeStorage('font-catalog-compare', JSON.stringify(compareList));
   }, [compareList]);
 
-  // A shared Workbench URL is authoritative over localStorage when it contains font ids.
+  // Only a real history traversal hydrates the set again. Our own REPLACE writes
+  // must never race an in-progress removal or re-order in the workbench.
   useEffect(() => {
-    if (location.pathname !== '/compare') return;
+    if (location.pathname.replace(/\/$/, '') !== '/compare' || navigationType !== 'POP') return;
     const params = new URLSearchParams(location.search);
-    const encoded = params.get('fonts');
-    if (!encoded) return;
-    const ids = validFontIds(encoded.split(',').map(item => item.trim()).filter(Boolean));
-    if (ids.length > 0) setCompareList(previous => sameIds(previous, ids) ? previous : ids);
-  }, [location.pathname, location.search]);
+    if (!params.has('fonts')) return;
+    const ids = validFontIds((params.get('fonts') || '').split(',').map(item => item.trim()));
+    setCompareList(previous => sameIds(previous, ids) ? previous : ids);
+  }, [location.pathname, location.search, navigationType]);
+
+  useEffect(() => {
+    const sync = (event: StorageEvent) => {
+      if (event.key === 'font-catalog-favorites' || event.key === null) {
+        const ids = readStoredFontIds('font-catalog-favorites');
+        setFavorites(previous => sameIds(previous, ids) ? previous : ids);
+      }
+      if ((event.key === 'font-catalog-compare' || event.key === null) && location.pathname !== '/compare') {
+        const ids = validFontIds(readStoredFontIds('font-catalog-compare'));
+        setCompareList(previous => sameIds(previous, ids) ? previous : ids);
+      }
+    };
+    window.addEventListener('storage', sync);
+    return () => window.removeEventListener('storage', sync);
+  }, [location.pathname]);
 
   const prevPathRef = React.useRef(location.pathname);
   useEffect(() => {
@@ -111,29 +137,32 @@ function AppContent() {
   }, []);
 
   const toggleFavorite = useCallback((id: string) => {
-    setFavorites(previous => {
-      const isFavorite = previous.includes(id);
-      if (isFavorite) {
-        toast.info(t('toast.removedFromFavorites'));
-        return previous.filter(fontId => fontId !== id);
-      }
-      toast.success(t('toast.addedToFavorites'));
-      return [...previous, id];
+    if (!fontById.has(id)) return;
+    const wasSaved = favorites.includes(id);
+    setFavorites(previous => previous.includes(id) ? previous.filter(item => item !== id) : [...previous, id]);
+    if (wasSaved) toast.info(t('toast.removedFromFavorites'), {
+      duration: 5000,
+      action: { label: language === 'ru' ? 'Отменить' : 'Undo', onClick: () => setFavorites(previous => previous.includes(id) ? previous : [...previous, id]) },
     });
-  }, [t]);
+    else toast.success(t('toast.addedToFavorites'), { duration: 1600 });
+  }, [favorites, language, t]);
 
   const toggleCompare = useCallback((id: string) => {
-    setCompareList(previous => {
-      const isComparing = previous.includes(id);
-      if (isComparing) return previous.filter(fontId => fontId !== id);
-      if (previous.length >= 3) {
-        toast.error(t('toast.compareLimitReached'));
-        return previous;
-      }
-      toast.success(t('toast.addedToCompare'));
-      return [...previous, id];
-    });
-  }, [t]);
+    if (!fontById.has(id)) return;
+    if (!compareList.includes(id) && compareList.length >= 3) {
+      toast.error(t('toast.compareLimitReached'));
+      return;
+    }
+    setCompareList(previous => previous.includes(id) ? previous.filter(item => item !== id) : validFontIds([...previous, id]));
+  }, [compareList, t]);
+
+  const importFavorites = useCallback((ids: string[]) => {
+    setFavorites(previous => [...new Set([...previous, ...ids.filter(id => fontById.has(id))])]);
+  }, []);
+  const reorderCompare = useCallback((ids: string[]) => setCompareList(previous => {
+    const next = validFontIds(ids);
+    return next.length === previous.length && next.every(id => previous.includes(id)) ? next : previous;
+  }), []);
 
   const viewDetails = useCallback((id: string) => {
     navigate(`/${id}`, { state: { from: `${location.pathname}${location.search}` } });
@@ -157,7 +186,7 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-[#FAFAFA] font-sans text-neutral-800 selection:bg-neutral-200">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:bg-neutral-800 focus:text-white focus:font-mono focus:text-xs focus:uppercase focus:tracking-widest">
-        Skip to content
+        {language === 'ru' ? 'К основному содержимому' : 'Skip to content'}
       </a>
       <Header
         activePage={getActivePage()}
@@ -171,23 +200,25 @@ function AppContent() {
         favoritesCount={favorites.length}
         compareCount={compareList.length}
       />
+      {temporaryStorage && <div role="status" className="border-b border-neutral-300 bg-neutral-100 px-5 py-3 text-sm text-neutral-800">{language === 'ru' ? 'Хранилище браузера недоступно. Работа продолжается, но сохранения действуют только в этой вкладке.' : 'Browser storage is unavailable. You can continue working, but saved items will only last in this tab.'}</div>}
       <main id="main-content" className="min-h-screen">
-        <AnimatePresence mode="wait">
+        <Suspense fallback={<div role="status" className="p-8 text-sm text-neutral-600">{language === 'ru' ? 'Загрузка раздела…' : 'Loading section…'}</div>}>
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<PageTransition><FontCatalogPage fonts={mockFonts} previewText={previewText} setPreviewText={setPreviewText} favorites={favorites} toggleFavorite={toggleFavorite} compareList={compareList} toggleCompare={toggleCompare} viewDetails={viewDetails} onOpenStack={() => openWorkbench()} /></PageTransition>} />
-            <Route path="/compare" element={<PageTransition><ComparePage fonts={mockFonts.filter(font => compareList.includes(font.id))} allFonts={mockFonts} previewText={previewText} setPreviewText={setPreviewText} removeFromCompare={toggleCompare} toggleCompare={toggleCompare} onBack={() => navigate('/')} /></PageTransition>} />
-            <Route path="/favorites" element={<PageTransition><FavoritesPage fonts={mockFonts.filter(font => favorites.includes(font.id))} previewText={previewText} setPreviewText={setPreviewText} toggleFavorite={toggleFavorite} compareList={compareList} toggleCompare={toggleCompare} viewDetails={viewDetails} onGoToCatalog={() => navigate('/')} /></PageTransition>} />
+            <Route path="/compare" element={<PageTransition><ComparePage fonts={comparedFonts} allFonts={mockFonts} previewText={previewText} setPreviewText={setPreviewText} removeFromCompare={toggleCompare} toggleCompare={toggleCompare} onBack={() => navigate('/')} onReorder={reorderCompare} /></PageTransition>} />
+            <Route path="/favorites" element={<PageTransition><FavoritesPage fonts={savedFonts} previewText={previewText} setPreviewText={setPreviewText} toggleFavorite={toggleFavorite} compareList={compareList} toggleCompare={toggleCompare} viewDetails={viewDetails} onGoToCatalog={() => navigate('/')} onImportFavorites={importFavorites} /></PageTransition>} />
             <Route path="/about" element={<PageTransition><AboutPage onNavigateHome={() => navigate('/')} /></PageTransition>} />
             <Route path="/protocol" element={<PageTransition><ProtocolPage /></PageTransition>} />
             <Route path="/privacy" element={<PageTransition><PrivacyPage /></PageTransition>} />
             <Route path="/terms" element={<PageTransition><TermsPage /></PageTransition>} />
             <Route path="/license" element={<PageTransition><LicensePage /></PageTransition>} />
             <Route path="/:id" element={<PageTransition><FontDetailsWrapper mockFonts={mockFonts} previewText={previewText} favorites={favorites} toggleFavorite={toggleFavorite} compareList={compareList} toggleCompare={toggleCompare} testPairing={(ids: string[]) => { setCompareList(validFontIds(ids)); openWorkbench(ids); }} /></PageTransition>} />
+            <Route path="*" element={<div className="p-8"><h1 className="text-3xl">{language === 'ru' ? 'Страница не найдена' : 'Page not found'}</h1><button className="mt-6 border px-5 py-3" onClick={() => navigate('/')}>{t('details.back')}</button></div>} />
           </Routes>
-        </AnimatePresence>
+        </Suspense>
       </main>
       <Footer />
-      <Toaster position="bottom-right" />
+      <Toaster position="bottom-center" duration={1800} />
     </div>
   );
 }

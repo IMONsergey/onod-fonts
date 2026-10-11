@@ -1,176 +1,128 @@
 import React, { useEffect } from 'react';
-import { Font } from '../data/mockFonts';
-import { setFontRuntimeStatus } from '../lib/fontRuntime';
-import { getEffectiveFamilyName, getEffectiveFontshareSlug, getEffectiveLanguages, getEffectiveSourceLabel, getEffectiveWeights, isEffectivelyVariable } from '../lib/fontTrust';
-import { getVerifiedHistoricalFontArtifact, getVerifiedOpenFontArtifact, type VerifiedHistoricalFontArtifact, type VerifiedOpenFontArtifact } from '../lib/fontArtifactRuntime';
+import type { Font } from '../data/mockFonts';
+import { getFontRuntimeSnapshot, setFontRuntimeStatus } from '../lib/fontRuntime';
+import { getEffectiveAxes, getEffectiveFamilyName, getEffectiveFontshareSlug, getEffectiveLanguages, getEffectiveSourceLabel } from '../lib/fontTrust';
+import { getVerifiedHistoricalFontArtifact, getVerifiedOpenFontArtifact } from '../lib/fontArtifactRuntime';
+import { faceMatches, getDefaultFontWeight, googleStylesheetUrl, pinnedPreviewFaces, type FontPreviewRequest } from '../lib/fontLoadingPlan';
 
-interface FontLoaderProps {
-  fonts: Font[];
+interface FontLoaderProps { fonts: Font[]; requests?: FontPreviewRequest[]; }
+const sourcePromises = new Map<string, Promise<void>>();
+const activeRequests = new Map<string,string>();
+const tasks: Array<() => void> = [];
+let running = 0;
+const MAX_CONCURRENT = 4;
+function enqueue<T>(work: () => Promise<T>): Promise<T> {
+  return new Promise((resolve,reject) => {
+    tasks.push(() => { running++; work().then(resolve,reject).finally(()=>{running--; tasks.shift()?.();}); });
+    if (running < MAX_CONCURRENT) tasks.shift()?.();
+  });
+}
+function timeout<T>(promise: Promise<T>, ms=18000): Promise<T> {
+  return new Promise((resolve,reject)=>{
+    const timer=window.setTimeout(()=>reject(new Error('Font loading timed out')),ms);
+    promise.then(value=>{clearTimeout(timer);resolve(value)},error=>{clearTimeout(timer);reject(error)});
+  });
+}
+function safeUrl(url: string): string {
+  const parsed = new URL(url);
+  if (parsed.protocol !== 'https:') throw new Error('Only HTTPS font sources are allowed');
+  return parsed.href;
+}
+function once(key: string, load: () => Promise<void>): Promise<void> {
+  const prior=sourcePromises.get(key); if(prior) return prior;
+  const promise=load().catch(error=>{sourcePromises.delete(key);throw error});
+  sourcePromises.set(key,promise);
+  return promise;
+}
+function stylesheet(url: string): Promise<void> {
+  return once(url,()=>new Promise((resolve,reject)=>{
+    const link=document.createElement('link');link.rel='stylesheet';link.href=safeUrl(url);link.dataset.onodFontSource='true';
+    const timer=window.setTimeout(()=>{link.remove();reject(new Error('Font stylesheet timed out'))},15000);
+    link.onload=()=>{clearTimeout(timer);resolve()};
+    link.onerror=()=>{clearTimeout(timer);link.remove();reject(new Error('Font stylesheet could not be loaded'))};
+    document.head.appendChild(link);
+  }));
+}
+function binary(font: Font, url: string, weight: string, style='normal'): Promise<void> {
+  const key=`${font.id}:${url}:${weight}:${style}`;
+  return once(key,async()=>{
+    const face=new FontFace(getEffectiveFamilyName(font),`url("${safeUrl(url)}")`,{weight,style,display:'swap'});
+    const loaded=await timeout(face.load());document.fonts.add(loaded);
+  });
+}
+async function loadSource(font: Font, request: FontPreviewRequest) {
+  const pinned=pinnedPreviewFaces[font.id];
+  if(pinned) {
+    const weight=request.axes?.wght ?? request.weight ?? getDefaultFontWeight(font);
+    const matching=pinned.filter(face=>faceMatches({family:getEffectiveFamilyName(font),weight:face.weight,style:face.style},getEffectiveFamilyName(font),weight,request.style || 'normal'));
+    if(!matching.length) throw new Error('No verified source for the requested style and weight');
+    await Promise.all(matching.map(face=>binary(font,face.url,face.weight,face.style)));return;
+  }
+  const slug=getEffectiveFontshareSlug(font);
+  if(slug) {await stylesheet(`https://api.fontshare.com/v2/css?f[]=${encodeURIComponent(slug)}@1&display=swap`);return;}
+  const artifact=getVerifiedOpenFontArtifact(font) || getVerifiedHistoricalFontArtifact(font);
+  if(artifact) {
+    const axis=artifact.axes.wght;
+    const weight=axis ? `${axis.min} ${axis.max}` : 'weightClass' in artifact ? String(artifact.weightClass) : String(getDefaultFontWeight(font));
+    await binary(font,artifact.sourceUrl,weight);return;
+  }
+  const source=getEffectiveSourceLabel(font);
+  if(source==='Google Fonts') {await stylesheet(googleStylesheetUrl(font));return;}
+  if(font.customCssUrl && source===font.source) {await stylesheet(font.customCssUrl);return;}
+  throw new Error('No verified preview source is available for this family');
+}
+function sampleFor(font: Font): string {
+  const languages=getEffectiveLanguages(font);
+  const samples: Record<string,string>={Latin:'Hamburgefontsiv',Cyrillic:'Привет',Greek:'Ελληνικά',Arabic:'العربية',Hebrew:'עברית',Japanese:'こんにちは',Korean:'한글',Chinese:'中文',Devanagari:'हिन्दी',Bengali:'বাংলা',Thai:'ไทย',Tamil:'தமிழ்',Telugu:'తెలుగు',Kannada:'ಕನ್ನಡ',Malayalam:'മലയാളം',Khmer:'ខ្មែរ',Gujarati:'ગુજરાતી',Sinhala:'සිංහල'};
+  return languages.map(script=>samples[script]).find(Boolean) || 'A';
+}
+async function verify(font: Font, request: FontPreviewRequest) {
+  const style=request.style || 'normal';
+  const axis=getEffectiveAxes(font).wght;
+  const raw=request.axes?.wght ?? request.weight ?? getDefaultFontWeight(font);
+  const weight=axis ? Math.min(axis.max,Math.max(axis.min,raw)) : raw;
+  const family=getEffectiveFamilyName(font);
+  const faces=await timeout(document.fonts.load(`${style} ${weight} 16px "${family.replace(/"/g,'\\"')}"`,sampleFor(font)));
+  if(!faces.some(face=>face.status==='loaded' && faceMatches(face,family,weight,style))) {
+    throw new Error(`The requested ${style} ${weight} face was not loaded; the preview may use a fallback`);
+  }
 }
 
-type RuntimeArtifact = VerifiedOpenFontArtifact | VerifiedHistoricalFontArtifact;
-
-const globalReadyIds = new Set<string>();
-const globalLoadPromises = new Map<string, Promise<void>>();
-const stylesheetId = (prefix: string, font: Font) => `${prefix}-${font.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
-const primaryFamily = (font: Font) => getEffectiveFamilyName(font);
-
-const fontDescriptor = (font: Font) => {
-  const weights = getEffectiveWeights(font).map(Number).filter(Number.isFinite);
-  const weight = weights.includes(400) ? 400 : weights[0] || 400;
-  return `${weight} 16px "${primaryFamily(font).replace(/"/g, '\\"')}"`;
-};
-
-const verifyFontFace = async (font: Font) => {
-  if (!document.fonts) return setFontRuntimeStatus(font.id, 'ready');
-
-  try {
-    const descriptor = fontDescriptor(font);
-    const sample = getEffectiveLanguages(font).includes('Cyrillic') ? 'Hamburgefontsiv Привет' : 'Hamburgefontsiv';
-    await document.fonts.load(descriptor, sample);
-    const ready = document.fonts.check(descriptor, sample);
-    setFontRuntimeStatus(font.id, ready ? 'ready' : 'error', ready ? undefined : 'Font face was not registered; preview is using fallback.');
-  } catch (error) {
-    setFontRuntimeStatus(font.id, 'error', error instanceof Error ? error.message : 'Font face verification failed.');
-  }
-};
-
-const googleFontUrl = (font: Font) => {
-  const weights = getEffectiveWeights(font).sort((a, b) => Number(a) - Number(b));
-  let family = getEffectiveFamilyName(font);
-  if (isEffectivelyVariable(font) && weights.length > 1) family += `:wght@${weights[0]}..${weights.at(-1)}`;
-  else family += `:wght@${weights.join(';')}`;
-  return `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, '+')}&display=swap`;
-};
-
-const artifactWeightDescriptor = (font: Font, artifact: RuntimeArtifact) => {
-  const axis = artifact.axes.wght;
-  if (axis) return `${axis.min} ${axis.max}`;
-  if ('weightClass' in artifact) return String(artifact.weightClass);
-  const weights = getEffectiveWeights(font).map(Number).filter(Number.isFinite);
-  return String(weights.includes(400) ? 400 : weights[0] || 400);
-};
-
-export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
-  useEffect(() => {
-    if (!fonts?.length) return;
-
-    const addStylesheet = (font: Font, url: string, id: string) => {
-      if (globalReadyIds.has(id)) {
-        void verifyFontFace(font);
-        return;
-      }
-
-      const existing = document.getElementById(id) as HTMLLinkElement | null;
-      if (existing) {
-        setFontRuntimeStatus(font.id, 'loading');
-        if (existing.sheet) {
-          globalReadyIds.add(id);
-          void verifyFontFace(font);
-          return;
-        }
-        const onLoad = () => {
-          globalReadyIds.add(id);
-          void verifyFontFace(font);
-        };
-        const onError = () => setFontRuntimeStatus(font.id, 'error', `Stylesheet failed to load: ${url}`);
-        existing.addEventListener('load', onLoad, { once: true });
-        existing.addEventListener('error', onError, { once: true });
-        return;
-      }
-
-      setFontRuntimeStatus(font.id, 'loading');
-      const link = document.createElement('link');
-      link.id = id;
-      link.rel = 'stylesheet';
-      link.href = url;
-      link.dataset.fontId = font.id;
-      link.onload = () => {
-        globalReadyIds.add(id);
-        void verifyFontFace(font);
-      };
-      link.onerror = () => {
-        globalReadyIds.delete(id);
-        setFontRuntimeStatus(font.id, 'error', `Stylesheet failed to load: ${url}`);
-        link.remove();
-      };
-      document.head.appendChild(link);
+export const FontLoader: React.FC<FontLoaderProps> = ({ fonts, requests=[] }) => {
+  // The request signature, not an unstable array identity, controls revalidation.
+  const signature=fonts.map(font=>`${font.id}:${JSON.stringify(requests.find(request=>request.fontId===font.id)||{})}`).join('|');
+  useEffect(()=>{
+    let mounted=true;
+    const run=(font: Font, force=false)=>{
+      const request=requests.find(value=>value.fontId===font.id) || {fontId:font.id};
+      const key=`${font.id}:${JSON.stringify(request)}`;
+      if (!force && activeRequests.get(font.id) === key && getFontRuntimeSnapshot(font.id).status === 'ready') return;
+      activeRequests.set(font.id,key);
+      setFontRuntimeStatus(font.id,'loading');
+      void enqueue(async()=>{
+        if(!mounted && !force) return;
+        if(typeof FontFace==='undefined' || !document.fonts) throw new Error('This browser cannot verify font faces');
+        await loadSource(font,request);await verify(font,request);
+        if(activeRequests.get(font.id)===key) setFontRuntimeStatus(font.id,'ready');
+      }).catch(error=>{if(activeRequests.get(font.id)===key) setFontRuntimeStatus(font.id,'error',error instanceof Error ? error.message : 'Font loading failed')});
     };
-
-    const addArtifactFace = (font: Font, artifact: RuntimeArtifact, kind: 'current' | 'historical') => {
-      const id = stylesheetId(`${kind}-artifact-${artifact.sha256.slice(0, 12)}`, font);
-      if (globalReadyIds.has(id)) {
-        void verifyFontFace(font);
-        return;
+    // Catalog faces are loaded only near the viewport; detail/workbench faces
+    // have no catalog card and are requested immediately.
+    const observed = new Map<Element, Font>();
+    const observer = typeof IntersectionObserver === 'undefined' ? null : new IntersectionObserver(entries => {
+      for (const entry of entries) if (entry.isIntersecting) {
+        const font = observed.get(entry.target);
+        if (font) { run(font); observed.delete(entry.target); observer?.unobserve(entry.target); }
       }
-
-      const existingPromise = globalLoadPromises.get(id);
-      if (existingPromise) {
-        setFontRuntimeStatus(font.id, 'loading');
-        void existingPromise.then(() => verifyFontFace(font));
-        return;
-      }
-
-      if (typeof FontFace === 'undefined' || !document.fonts) {
-        setFontRuntimeStatus(font.id, 'error', 'Browser FontFace API is unavailable for verified artifact loading.');
-        return;
-      }
-
-      setFontRuntimeStatus(font.id, 'loading');
-      const promise = (async () => {
-        try {
-          const face = new FontFace(
-            primaryFamily(font),
-            `url("${artifact.sourceUrl}")`,
-            { weight: artifactWeightDescriptor(font, artifact), style: 'normal', display: 'swap' },
-          );
-          const loaded = await face.load();
-          document.fonts.add(loaded);
-          globalReadyIds.add(id);
-          await verifyFontFace(font);
-        } catch (error) {
-          globalReadyIds.delete(id);
-          setFontRuntimeStatus(font.id, 'error', error instanceof Error ? error.message : `Verified ${kind} artifact failed to load: ${artifact.sourceUrl}`);
-        } finally {
-          globalLoadPromises.delete(id);
-        }
-      })();
-      globalLoadPromises.set(id, promise);
-    };
-
-    for (const font of fonts) {
-      const sourceLabel = getEffectiveSourceLabel(font);
-      const fontshareSlug = getEffectiveFontshareSlug(font);
-      if (fontshareSlug) {
-        addStylesheet(font, `https://api.fontshare.com/v2/css?f[]=${encodeURIComponent(fontshareSlug)}@1&display=swap`, stylesheetId('fontshare', font));
-        continue;
-      }
-
-      const artifact = getVerifiedOpenFontArtifact(font);
-      if (artifact) {
-        addArtifactFace(font, artifact, 'current');
-        continue;
-      }
-
-      const historicalArtifact = getVerifiedHistoricalFontArtifact(font);
-      if (historicalArtifact) {
-        addArtifactFace(font, historicalArtifact, 'historical');
-        continue;
-      }
-
-      if (sourceLabel === 'Google Fonts') {
-        addStylesheet(font, googleFontUrl(font), stylesheetId('google', font));
-        continue;
-      }
-
-      if (font.customCssUrl && sourceLabel === font.source) {
-        addStylesheet(font, font.customCssUrl, stylesheetId('custom', font));
-        continue;
-      }
-
-      setFontRuntimeStatus(font.id, 'error', `No verified font loading strategy for canonical source: ${sourceLabel}`);
-    }
-  }, [fonts]);
-
+    }, { rootMargin: '240px 0px' });
+    fonts.forEach(font => {
+      const card = document.querySelector(`[data-font-id="${CSS.escape(font.id)}"]`);
+      if (card && observer) { observed.set(card, font); observer.observe(card); }
+      else run(font);
+    });
+    const retry=(event: Event)=>{const fontId=(event as CustomEvent<{fontId:string}>).detail?.fontId;const font=fonts.find(item=>item.id===fontId);if(font) run(font,true)};
+    window.addEventListener('onod:font-retry',retry);
+    return ()=>{mounted=false;observer?.disconnect();window.removeEventListener('onod:font-retry',retry)};
+  }, [signature]);
   return null;
 };

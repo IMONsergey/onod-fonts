@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { readStorage, writeStorage } from './safeStorage';
 import en from './translations/en.json';
 import ru from './translations/ru.json';
 import protocolEn from './translations/protocol-en.json';
@@ -40,12 +41,12 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<Language>(() => {
     if (typeof window === 'undefined') return 'ru';
-    const saved = window.localStorage.getItem('app-language');
+    const saved = readStorage('app-language');
     return saved === 'en' || saved === 'ru' ? saved : 'ru';
   });
 
   useEffect(() => {
-    window.localStorage.setItem('app-language', language);
+    writeStorage('app-language', language);
     document.documentElement.lang = language;
   }, [language]);
 

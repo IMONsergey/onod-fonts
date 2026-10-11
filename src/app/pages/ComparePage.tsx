@@ -1,34 +1,219 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
-import { Font } from "@/data/mockFonts";
-import { X, ArrowLeft, Type, Copy, Share2, Scale } from "lucide-react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import type { Font } from "@/data/mockFonts";
+import {
+  AlertTriangle,
+  ArrowDown,
+  ArrowLeft,
+  ArrowUp,
+  CheckCircle2,
+  Copy,
+  LoaderCircle,
+  RotateCcw,
+  Scale,
+  Share2,
+  Type,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
+import { googleStylesheetUrl } from "@/lib/fontLoadingPlan";
+import { FontCoverageNotice } from "@/components/FontCoverageNotice";
 import { FontLoader } from "@/components/FontLoader";
 import { useLanguage } from "@/lib/i18n";
 import { copyToClipboard } from "@/lib/clipboard";
-import { getEffectiveAuthor, getEffectiveCssStack, getEffectiveFamilyName } from "@/lib/fontTrust";
+import {
+  getEffectiveAuthor,
+  getEffectiveCssStack,
+  getEffectiveFamilyName,
+  getEffectiveFontshareSlug,
+  getEffectiveSourceLabel,
+  getEffectiveSourceUrl,
+  getEffectiveStyles,
+  getEffectiveWeights,
+} from "@/lib/fontTrust";
+import { useFontRuntimeStatus } from "@/lib/fontRuntime";
 import { useSearchParams } from "react-router";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  buildWorkbenchExport,
+  closestAvailableWeight,
+  type WorkbenchExportConfig,
+  type WorkbenchExportFormat,
+  type WorkbenchFontToken,
+  WORKBENCH_EXPORT_LABELS,
+} from "@/lib/workbenchExports";
+import {
+  DEFAULT_WORKBENCH_SETTINGS,
+  parseWorkbenchSearch,
+  sameSerializedSearch,
+  serializeWorkbenchSearch,
+  WORKBENCH_RATIOS,
+  type WorkbenchMode,
+  type WorkbenchPreset,
+  type WorkbenchUrlSettings,
+} from "@/lib/workbenchUrl";
 
-interface CompareProps {
+export interface CompareProps {
   fonts: Font[];
   allFonts?: Font[];
   previewText: string;
   setPreviewText: (text: string) => void;
   removeFromCompare: (id: string) => void;
   toggleCompare?: (id: string) => void;
+  onReorder?: (ids: string[]) => void;
   onBack: () => void;
 }
 
-const validNumber = (value: string | null, fallback: number, min: number, max: number) => {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) && parsed >= min && parsed <= max ? parsed : fallback;
+interface CopyText {
+  comparison: string;
+  pairing: string;
+  controls: string;
+  hideControls: string;
+  showControls: string;
+  sample: string;
+  sampleHint: string;
+  shareText: string;
+  shareTextHint: string;
+  typography: string;
+  base: string;
+  ratio: string;
+  lineHeight: string;
+  tracking: string;
+  reset: string;
+  roles: string;
+  heading: string;
+  body: string;
+  ui: string;
+  layout: string;
+  article: string;
+  interface: string;
+  hero: string;
+  selected: string;
+  candidate: string;
+  remove: string;
+  moveUp: string;
+  moveDown: string;
+  addCandidate: string;
+  export: string;
+  format: string;
+  copy: string;
+  copied: string;
+  copyFailed: string;
+  shareCopied: string;
+  shareFailed: string;
+  source: string;
+  runtimeIdle: string;
+  runtimeLoading: string;
+  runtimeReady: string;
+  runtimeError: string;
+  previewHeading: string;
+  previewBody: string;
+  interfaceHeading: string;
+  interfaceBody: string;
+  heroHeading: string;
+  heroBody: string;
+}
+
+const COPY: Record<"ru" | "en", CopyText> = {
+  ru: {
+    comparison: "Сравнение",
+    pairing: "Пара в макете",
+    controls: "Настройки верстака",
+    hideControls: "Скрыть настройки",
+    showControls: "Показать настройки",
+    sample: "Текст сравнения",
+    sampleHint: "Один и тот же текст, кегль и интерлиньяж для всех гарнитур.",
+    shareText: "Включить мой текст в ссылку",
+    shareTextHint: "По умолчанию текст остаётся только в этом браузере.",
+    typography: "Типографика",
+    base: "Базовый кегль",
+    ratio: "Коэффициент",
+    lineHeight: "Интерлиньяж",
+    tracking: "Трекинг, em",
+    reset: "Сбросить",
+    roles: "Роли",
+    heading: "Заголовок",
+    body: "Основной текст",
+    ui: "Интерфейс / кандидат",
+    layout: "Макет",
+    article: "Статья",
+    interface: "Интерфейс",
+    hero: "Обложка",
+    selected: "Выбранные гарнитуры",
+    candidate: "Кандидат / UI",
+    remove: "Убрать",
+    moveUp: "Поднять",
+    moveDown: "Опустить",
+    addCandidate: "Добавить кандидата",
+    export: "Экспорт токенов",
+    format: "Формат",
+    copy: "Копировать",
+    copied: "Код скопирован",
+    copyFailed: "Не удалось скопировать — код доступен ниже",
+    shareCopied: "Ссылка скопирована",
+    shareFailed: "Не удалось скопировать — ссылка доступна в настройках",
+    source: "Источник",
+    runtimeIdle: "Ожидание загрузки",
+    runtimeLoading: "Загрузка",
+    runtimeReady: "Загружен",
+    runtimeError: "Ошибка загрузки",
+    previewHeading: "Система, которая помогает читать",
+    previewBody: "Заголовок задаёт голос, а основной текст удерживает ритм длинного чтения. Роли остаются различимыми без искусственной жирности.",
+    interfaceHeading: "Обзор коллекции",
+    interfaceBody: "Найдите гарнитуру, проверьте источник и сохраните рабочую пару.",
+    heroHeading: "Смысл начинается с формы",
+    heroBody: "Три роли, один спокойный визуальный язык.",
+  },
+  en: {
+    comparison: "Comparison",
+    pairing: "Pair in layout",
+    controls: "Workbench controls",
+    hideControls: "Hide controls",
+    showControls: "Show controls",
+    sample: "Comparison text",
+    sampleHint: "The same text, size, and line height are used for every family.",
+    shareText: "Include my text in the link",
+    shareTextHint: "Your text stays in this browser by default.",
+    typography: "Typography",
+    base: "Base size",
+    ratio: "Ratio",
+    lineHeight: "Line height",
+    tracking: "Tracking, em",
+    reset: "Reset",
+    roles: "Roles",
+    heading: "Heading",
+    body: "Body",
+    ui: "Interface / candidate",
+    layout: "Layout",
+    article: "Article",
+    interface: "Interface",
+    hero: "Hero",
+    selected: "Selected families",
+    candidate: "Candidate / UI",
+    remove: "Remove",
+    moveUp: "Move up",
+    moveDown: "Move down",
+    addCandidate: "Add candidate",
+    export: "Export tokens",
+    format: "Format",
+    copy: "Copy",
+    copied: "Code copied",
+    copyFailed: "Copy failed — the code remains available below",
+    shareCopied: "Link copied",
+    shareFailed: "Copy failed — the link is available in controls",
+    source: "Source",
+    runtimeIdle: "Waiting to load",
+    runtimeLoading: "Loading",
+    runtimeReady: "Loaded",
+    runtimeError: "Load error",
+    previewHeading: "A system made for reading",
+    previewBody: "The heading establishes a voice while the body keeps long-form reading steady. Roles remain distinct without synthetic bold.",
+    interfaceHeading: "Collection overview",
+    interfaceBody: "Find a family, verify its source, and save a working pair.",
+    heroHeading: "Meaning begins with form",
+    heroBody: "Three roles, one calm visual language.",
+  },
 };
+
+const SCALE_STEPS = ["base", "lg", "xl", "2xl", "3xl"];
 
 const fallbackFamily = (font?: Font) => {
   if (!font) return "sans-serif";
@@ -37,227 +222,492 @@ const fallbackFamily = (font?: Font) => {
   return "sans-serif";
 };
 
-export const ComparePage: React.FC<CompareProps> = ({
-  fonts,
-  allFonts = [],
-  previewText,
-  setPreviewText,
-  removeFromCompare,
-  toggleCompare,
-  onBack,
-}) => {
-  const { t, language } = useLanguage();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const hydratedFromUrl = useRef(false);
-  const [baseSize, setBaseSize] = useState(16);
-  const [scaleRatio, setScaleRatio] = useState(1.25);
-  const [customContent, setCustomContent] = useState("");
-  const [headingFontId, setHeadingFontId] = useState("");
-  const [bodyFontId, setBodyFontId] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [configCode, setConfigCode] = useState("");
+const resolveRoleId = (fonts: Font[], requested: string, fallbackIndex: number) => {
+  if (fonts.some(font => font.id === requested)) return requested;
+  return fonts[fallbackIndex]?.id || fonts[0]?.id || "";
+};
+
+const safeCommentValue = (value: string) => value.replaceAll("*/", "* /").replace(/[\r\n]+/g, " ");
+
+const actualStyleFor = (font?: Font): "normal" | "italic" => {
+  if (!font) return "normal";
+  const styles = getEffectiveStyles(font).map(style => style.toLowerCase());
+  return styles.includes("normal") || styles.includes("regular") ? "normal" : styles.includes("italic") ? "italic" : "normal";
+};
+
+const sourceCssFor = (font: Font, weight: number, style: "normal" | "italic") => {
+  const family = getEffectiveFamilyName(font);
+  const sourceLabel = getEffectiveSourceLabel(font);
+  if (sourceLabel === "Google Fonts") {
+    return `@import url("${googleStylesheetUrl(font)}");`;
+  }
+  const fontshareSlug = getEffectiveFontshareSlug(font);
+  if (fontshareSlug) return `@import url("https://api.fontshare.com/v2/css?f[]=${encodeURIComponent(fontshareSlug)}@1&display=swap");`;
+  return `/* ${safeCommentValue(family)}: connect a stylesheet from the verified source ${safeCommentValue(getEffectiveSourceUrl(font))}; no font binary embedded. */`;
+};
+
+interface CommittedNumberFieldProps {
+  id: string;
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  onCommit: (value: number) => void;
+}
+
+const CommittedNumberField = ({ id, label, value, min, max, step, onCommit }: CommittedNumberFieldProps) => {
+  const [draft, setDraft] = useState(String(value));
+  const inputRef = useRef<HTMLInputElement>(null);
+  const cancelled = useRef(false);
 
   useEffect(() => {
-    if (hydratedFromUrl.current || fonts.length === 0) return;
-    const urlHeading = searchParams.get('heading') || searchParams.get('h');
-    const urlBody = searchParams.get('body') || searchParams.get('b');
-    const heading = fonts.find(font => font.id === urlHeading)?.id || fonts[0].id;
-    const body = fonts.find(font => font.id === urlBody)?.id || fonts[1]?.id || fonts[0].id;
-    setHeadingFontId(heading);
-    setBodyFontId(body);
-    setBaseSize(validNumber(searchParams.get('base'), 16, 8, 96));
-    setScaleRatio(validNumber(searchParams.get('ratio'), 1.25, 1, 2));
-    const urlContent = searchParams.get('content');
-    if (urlContent) {
-      setCustomContent(urlContent.slice(0, 1000));
-      setPreviewText(urlContent.slice(0, 1000));
-    } else if (previewText) {
-      setCustomContent(previewText);
+    if (document.activeElement !== inputRef.current) setDraft(String(value));
+  }, [value]);
+
+  const commit = () => {
+    if (cancelled.current) { cancelled.current = false; setDraft(String(value)); return; }
+    const parsed = Number(draft);
+    if (draft.trim() === "" || !Number.isFinite(parsed)) {
+      setDraft(String(value));
+      return;
     }
-    hydratedFromUrl.current = true;
-  }, [fonts, previewText, searchParams, setPreviewText]);
+    const normalized = Math.min(max, Math.max(min, parsed));
+    setDraft(String(normalized));
+    onCommit(normalized);
+  };
+
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1.5 block font-mono text-[11px] uppercase tracking-wide text-neutral-600">{label}</label>
+      <input
+        ref={inputRef}
+        id={id}
+        type="number"
+        inputMode="decimal"
+        min={min}
+        max={max}
+        step={step}
+        value={draft}
+        onChange={event => setDraft(event.target.value)}
+        onBlur={commit}
+        onKeyDown={event => {
+          if (event.key === "Enter") event.currentTarget.blur();
+          if (event.key === "Escape") {
+            cancelled.current = true;
+            setDraft(String(value));
+            event.currentTarget.blur();
+          }
+        }}
+        className="onod-input w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-black outline-none transition-colors focus:border-neutral-600"
+      />
+    </div>
+  );
+};
+
+const FontRuntimeBadge = ({ font, copy }: { font: Font; copy: CopyText }) => {
+  const runtime = useFontRuntimeStatus(font.id);
+  const config = runtime.status === "error"
+    ? { icon: AlertTriangle, label: copy.runtimeError, className: "text-neutral-900" }
+    : runtime.status === "loading"
+      ? { icon: LoaderCircle, label: copy.runtimeLoading, className: "text-neutral-600" }
+      : runtime.status === "ready"
+        ? { icon: CheckCircle2, label: copy.runtimeReady, className: "text-neutral-600" }
+        : { icon: Scale, label: copy.runtimeIdle, className: "text-neutral-500" };
+  const Icon = config.icon;
+
+  return (
+    <div className={`mt-2 flex items-start gap-1.5 font-mono text-[11px] leading-4 ${config.className}`} aria-live="polite">
+      <Icon className={`mt-0.5 h-3 w-3 shrink-0 ${runtime.status === "loading" ? "animate-spin" : ""}`} aria-hidden="true" />
+      <span>{config.label}{runtime.status === "error" && runtime.message ? ` — ${runtime.message}` : ""}</span>
+    </div>
+  );
+};
+
+interface PairPreviewProps {
+  preset: WorkbenchPreset;
+  copy: CopyText;
+  bodyText: string;
+  headingFont?: Font;
+  bodyFont?: Font;
+  uiFont?: Font;
+  headingWeight: number;
+  bodyWeight: number;
+  uiWeight: number;
+  headingStyle: "normal" | "italic";
+  bodyStyle: "normal" | "italic";
+  uiStyleValue: "normal" | "italic";
+  sizes: number[];
+  lineHeight: number;
+  tracking: number;
+}
+
+const PairPreview = ({ preset, copy, bodyText, headingFont, bodyFont, uiFont, headingWeight, bodyWeight, uiWeight, headingStyle: headingStyleValue, bodyStyle: bodyStyleValue, uiStyleValue, sizes, lineHeight, tracking }: PairPreviewProps) => {
+  const headingStyle: React.CSSProperties = {
+    fontFamily: headingFont ? getEffectiveCssStack(headingFont) : "sans-serif",
+    fontWeight: headingWeight,
+    fontStyle: headingStyleValue,
+    lineHeight: Math.max(1, lineHeight - 0.35),
+    letterSpacing: `${tracking}em`,
+  };
+  const bodyStyle: React.CSSProperties = {
+    fontFamily: bodyFont ? getEffectiveCssStack(bodyFont) : "sans-serif",
+    fontWeight: bodyWeight,
+    fontStyle: bodyStyleValue,
+    lineHeight,
+    letterSpacing: `${tracking}em`,
+  };
+  const uiStyle: React.CSSProperties = {
+    fontFamily: uiFont ? getEffectiveCssStack(uiFont) : "sans-serif",
+    fontWeight: uiWeight,
+    fontStyle: uiStyleValue,
+  };
+
+  if (preset === "interface") {
+    return (
+      <section className="mx-auto w-full max-w-5xl border border-neutral-300 bg-neutral-50 p-4 sm:p-8" aria-label={copy.interface}>
+        <div className="mb-8 flex items-center justify-between border-b border-neutral-300 pb-4" style={uiStyle}>
+          <span className="text-sm">ONOD / 018</span><span className="text-xs uppercase tracking-widest">Index</span>
+        </div>
+        <div className="grid gap-8 lg:grid-cols-[1fr_240px]">
+          <div>
+            <h1 className="mb-5" style={{ ...headingStyle, fontSize: `${sizes[3]}px` }}>{copy.interfaceHeading}</h1>
+            <p className="max-w-2xl text-neutral-700" style={{ ...bodyStyle, fontSize: `${sizes[0]}px` }}>{bodyText || copy.interfaceBody}</p>
+          </div>
+          <div className="space-y-3 border-t border-neutral-300 pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0" style={uiStyle}>
+            {["Sans Serif", "Serif", "Monospace"].map((item, index) => <div key={item} className="flex justify-between border-b border-neutral-200 pb-2 text-xs"><span>{item}</span><span>0{index + 4}</span></div>)}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (preset === "hero") {
+    return (
+      <section className="mx-auto flex min-h-[560px] w-full max-w-6xl flex-col justify-between border border-neutral-300 bg-white p-6 sm:p-12" aria-label={copy.hero}>
+        <div className="flex justify-between border-b border-neutral-300 pb-4 text-xs uppercase tracking-widest" style={uiStyle}><span>ONOD Fonts</span><span>2026</span></div>
+        <div className="py-16">
+          <h1 className="max-w-5xl" style={{ ...headingStyle, fontSize: `${sizes[4]}px` }}>{copy.heroHeading}</h1>
+          <p className="mt-8 max-w-xl text-neutral-600" style={{ ...bodyStyle, fontSize: `${sizes[1]}px` }}>{bodyText || copy.heroBody}</p>
+        </div>
+        <button type="button" className="w-fit border border-neutral-900 px-6 py-3 text-sm" style={uiStyle}>{copy.addCandidate}</button>
+      </section>
+    );
+  }
+
+  return (
+    <article className="mx-auto w-full max-w-4xl bg-white px-2 py-8 sm:px-8 sm:py-14" aria-label={copy.article}>
+      <div className="mb-10 flex items-center justify-between border-b border-neutral-300 pb-3 text-xs uppercase tracking-widest" style={uiStyle}><span>Essay 018</span><span>8 min</span></div>
+      <h1 className="max-w-3xl" style={{ ...headingStyle, fontSize: `${sizes[4]}px` }}>{copy.previewHeading}</h1>
+      <p className="mt-8 max-w-2xl text-neutral-700" style={{ ...bodyStyle, fontSize: `${sizes[1]}px` }}>{bodyText || copy.previewBody}</p>
+      <div className="mt-14 grid gap-8 border-t border-neutral-300 pt-8 sm:grid-cols-[160px_1fr]">
+        <div className="text-xs uppercase tracking-widest" style={uiStyle}>Typography<br />Workbench</div>
+        <div className="space-y-6" style={{ ...bodyStyle, fontSize: `${sizes[0]}px` }}>
+          <p>{copy.previewBody}</p>
+          <p className="text-neutral-600">{copy.interfaceBody}</p>
+        </div>
+      </div>
+    </article>
+  );
+};
+
+export const ComparePage: React.FC<CompareProps> = ({ fonts, allFonts = [], previewText, setPreviewText, removeFromCompare, toggleCompare, onReorder, onBack }) => {
+  const { t, language } = useLanguage();
+  const copy = COPY[language];
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchString = searchParams.toString();
+  const initialUrl = useRef(parseWorkbenchSearch(searchString));
+  const initial = initialUrl.current.settings;
+  const [mode, setMode] = useState<WorkbenchMode>(initial.mode);
+  const [preset, setPreset] = useState<WorkbenchPreset>(initial.preset);
+  const [baseSize, setBaseSize] = useState(initial.baseSize);
+  const [scaleRatio, setScaleRatio] = useState(initial.scaleRatio);
+  const [lineHeight, setLineHeight] = useState(initial.lineHeight);
+  const [tracking, setTracking] = useState(initial.tracking);
+  const [comparisonText, setComparisonText] = useState(initialUrl.current.sharedText ?? previewText);
+  const [headingFontId, setHeadingFontId] = useState(initial.headingFontId);
+  const [bodyFontId, setBodyFontId] = useState(initial.bodyFontId);
+  const [uiFontId, setUiFontId] = useState(initial.uiFontId);
+  const [includeTextInShare, setIncludeTextInShare] = useState(false);
+  const [controlsOpen, setControlsOpen] = useState(true);
+  const [exportFormat, setExportFormat] = useState<WorkbenchExportFormat>("css");
+  const [shareFallbackUrl, setShareFallbackUrl] = useState("");
+  const [urlHydrationRevision, setUrlHydrationRevision] = useState(0);
+  const lastObservedSearch = useRef<string | null>(null);
+  const lastWrittenSearch = useRef<string | null>(null);
+  const skipSerializationForSearch = useRef<string | null>(null);
+
+  const fontIds = useMemo(() => fonts.slice(0, 3).map(font => font.id), [fonts]);
+  const fontIdsKey = fontIds.join(",");
 
   useEffect(() => {
-    if (!fonts.length) return;
-    setHeadingFontId(previous => fonts.some(font => font.id === previous) ? previous : fonts[0].id);
-    setBodyFontId(previous => fonts.some(font => font.id === previous) ? previous : (fonts[1]?.id || fonts[0].id));
-  }, [fonts]);
+    if (lastObservedSearch.current === searchString) return;
+    lastObservedSearch.current = searchString;
+    if (lastWrittenSearch.current === searchString) {
+      lastWrittenSearch.current = null;
+      return;
+    }
+
+    const parsed = parseWorkbenchSearch(searchString);
+    skipSerializationForSearch.current = searchString;
+    setMode(parsed.settings.mode);
+    setPreset(parsed.settings.preset);
+    setBaseSize(parsed.settings.baseSize);
+    setScaleRatio(parsed.settings.scaleRatio);
+    setLineHeight(parsed.settings.lineHeight);
+    setTracking(parsed.settings.tracking);
+    setHeadingFontId(parsed.settings.headingFontId);
+    setBodyFontId(parsed.settings.bodyFontId);
+    setUiFontId(parsed.settings.uiFontId);
+    // Both explicit shared links and old `content=` links are consumed once.
+    // The normal serializer removes the text from the visible address bar.
+    if (parsed.sharedText !== undefined) {
+      setComparisonText(parsed.sharedText);
+      setPreviewText(parsed.sharedText);
+    }
+    setIncludeTextInShare(false);
+    // Guarantees a follow-up serialization pass even when every parsed value
+    // already equals local state (needed to scrub a legacy content parameter).
+    setUrlHydrationRevision(revision => revision + 1);
+  }, [searchString, setPreviewText]);
 
   useEffect(() => {
-    if (!hydratedFromUrl.current || !fonts.length || !headingFontId || !bodyFontId) return;
-    setSearchParams(current => {
-      const next = new URLSearchParams(current);
-      next.set('fonts', fonts.map(font => font.id).join(','));
-      next.set('heading', headingFontId);
-      next.set('body', bodyFontId);
-      next.set('base', String(baseSize));
-      next.set('ratio', String(scaleRatio));
-      next.delete('h');
-      next.delete('b');
-      if (customContent) next.set('content', customContent.slice(0, 1000));
-      else next.delete('content');
-      return next;
-    }, { replace: true });
-  }, [fonts, headingFontId, bodyFontId, baseSize, scaleRatio, customContent, setSearchParams]);
+    setHeadingFontId(previous => resolveRoleId(fonts, previous, 0));
+    setBodyFontId(previous => resolveRoleId(fonts, previous, 1));
+    setUiFontId(previous => resolveRoleId(fonts, previous, 2));
+  }, [fontIdsKey, fonts]);
 
-  const scaleSteps = ["base", "lg", "xl", "2xl", "3xl", "4xl"];
-  const calculatedSizes = useMemo(() => scaleSteps.map((_, i) => Math.round(baseSize * Math.pow(scaleRatio, i))), [baseSize, scaleRatio]);
-  const headingFont = fonts.find(font => font.id === headingFontId) || fonts[0];
-  const bodyFont = fonts.find(font => font.id === bodyFontId) || fonts[0];
-  const headingName = headingFont ? getEffectiveFamilyName(headingFont) : "";
-  const bodyName = bodyFont ? getEffectiveFamilyName(bodyFont) : "";
-  const headingStack = headingFont ? getEffectiveCssStack(headingFont) : "sans-serif";
-  const bodyStack = bodyFont ? getEffectiveCssStack(bodyFont) : "sans-serif";
+  const resolvedHeadingId = resolveRoleId(fonts, headingFontId, 0);
+  const resolvedBodyId = resolveRoleId(fonts, bodyFontId, 1);
+  const resolvedUiId = resolveRoleId(fonts, uiFontId, 2);
+  const urlSettings = useMemo<WorkbenchUrlSettings>(() => ({
+    mode,
+    preset,
+    headingFontId: resolvedHeadingId,
+    bodyFontId: resolvedBodyId,
+    uiFontId: resolvedUiId,
+    baseSize,
+    scaleRatio,
+    lineHeight,
+    tracking,
+  }), [mode, preset, resolvedHeadingId, resolvedBodyId, resolvedUiId, baseSize, scaleRatio, lineHeight, tracking]);
+  const canonicalSearch = useMemo(
+    () => serializeWorkbenchSearch(urlSettings, fontIds, searchString).toString(),
+    [urlSettings, fontIdsKey, searchString],
+  );
+
+  useEffect(() => {
+    if (skipSerializationForSearch.current === searchString) {
+      skipSerializationForSearch.current = null;
+      return;
+    }
+    if (sameSerializedSearch(canonicalSearch, searchString)) return;
+    lastWrittenSearch.current = canonicalSearch;
+    setSearchParams(new URLSearchParams(canonicalSearch), { replace: true });
+  }, [canonicalSearch, searchString, setSearchParams, urlHydrationRevision]);
+
+  const calculatedSizes = useMemo(
+    () => SCALE_STEPS.map((_, index) => Math.round(baseSize * Math.pow(scaleRatio, index))),
+    [baseSize, scaleRatio],
+  );
+  const headingFont = fonts.find(font => font.id === resolvedHeadingId) || fonts[0];
+  const bodyFont = fonts.find(font => font.id === resolvedBodyId) || fonts[1] || fonts[0];
+  const uiFont = fonts.find(font => font.id === resolvedUiId) || fonts[2] || fonts[1] || fonts[0];
+  const weightFor = (font?: Font) => font ? closestAvailableWeight(getEffectiveWeights(font), 400) : 400;
+  const headingWeight = weightFor(headingFont);
+  const bodyWeight = weightFor(bodyFont);
+  const uiWeight = weightFor(uiFont);
+  const headingStyle = actualStyleFor(headingFont);
+  const bodyStyle = actualStyleFor(bodyFont);
+  const uiStyle = actualStyleFor(uiFont);
 
   const suggestedFont = useMemo(() => {
     if (fonts.length >= 3 || fonts.length === 0 || !allFonts.length) return null;
     const baseFont = fonts[fonts.length - 1];
-    const isSerif = baseFont.categories.includes("serif");
-    let targetCat = "sans-serif";
-    if (!isSerif && !baseFont.categories.includes("monospaced")) targetCat = "serif";
-    if (baseFont.categories.includes("monospaced")) targetCat = "sans-serif";
-    const candidates = allFonts.filter(font => font.categories.includes(targetCat) && !fonts.some(existing => existing.id === font.id));
-    if (!candidates.length) return null;
-    return candidates[baseFont.id.length % candidates.length];
+    const targetCategory = baseFont.categories.includes("serif") ? "sans-serif" : "serif";
+    return allFonts.find(font => font.categories.includes(targetCategory) && !fonts.some(existing => existing.id === font.id)) || null;
   }, [fonts, allFonts]);
 
-  const generateConfig = () => `
-// tailwind.config.js theme extension
-fontFamily: {
-  'body': ['"${bodyName}"', '${fallbackFamily(bodyFont)}'],
-  'display': ['"${headingName}"', '${fallbackFamily(headingFont)}'],
-},
-fontSize: {
-  'base': '${baseSize}px',
-  'lg': '${calculatedSizes[1]}px',
-  'xl': '${calculatedSizes[2]}px',
-  '2xl': '${calculatedSizes[3]}px',
-  '3xl': '${calculatedSizes[4]}px',
-  '4xl': '${calculatedSizes[5]}px',
-}
-  `.trim();
+  const exportConfig = useMemo<WorkbenchExportConfig>(() => {
+    const roleToken = (font: Font | undefined, role: WorkbenchFontToken["role"], weight: number, style: "normal" | "italic", roleLineHeight: number): WorkbenchFontToken | null => font ? {
+      role,
+      family: getEffectiveFamilyName(font),
+      stack: getEffectiveCssStack(font),
+      fallback: fallbackFamily(font),
+      fontSize: mode === "compare" ? calculatedSizes[2] : role === "heading" ? calculatedSizes[preset === "interface" ? 3 : 4] : role === "body" ? calculatedSizes[preset === "interface" ? 0 : 1] : baseSize,
+      weight,
+      style,
+      lineHeight: roleLineHeight,
+      tracking,
+      sourceLabel: getEffectiveSourceLabel(font),
+      sourceUrl: getEffectiveSourceUrl(font),
+      sourceCss: sourceCssFor(font, weight, style),
+    } : null;
+    return {
+      version: 1,
+      baseSize,
+      scaleRatio,
+      roles: [
+        roleToken(headingFont, "heading", headingWeight, headingStyle, Math.max(1, lineHeight - 0.35)),
+        roleToken(bodyFont, "body", bodyWeight, bodyStyle, lineHeight),
+        roleToken(uiFont, "ui", uiWeight, uiStyle, 1.2),
+      ].filter((role): role is WorkbenchFontToken => Boolean(role)),
+    };
+  }, [headingFont, bodyFont, uiFont, headingWeight, bodyWeight, uiWeight, headingStyle, bodyStyle, uiStyle, lineHeight, tracking, baseSize, scaleRatio, calculatedSizes, mode, preset]);
+  const exportCode = useMemo(() => buildWorkbenchExport(exportFormat, exportConfig), [exportFormat, exportConfig]);
 
-  const copyConfig = async () => {
-    const config = generateConfig();
-    if (await copyToClipboard(config)) toast.success(language === 'ru' ? 'Конфиг Tailwind скопирован' : 'Tailwind config copied');
-    else {
-      setConfigCode(config);
-      setIsDialogOpen(true);
-    }
+  const updateComparisonText = (value: string) => {
+    const bounded = value.slice(0, 1000);
+    setComparisonText(bounded);
+    setPreviewText(bounded);
   };
-
-  const canonicalWorkbenchUrl = () => {
-    const url = new URL(window.location.href);
-    url.searchParams.set('fonts', fonts.map(font => font.id).join(','));
-    if (headingFont?.id) url.searchParams.set('heading', headingFont.id);
-    if (bodyFont?.id) url.searchParams.set('body', bodyFont.id);
-    url.searchParams.set('base', String(baseSize));
-    url.searchParams.set('ratio', String(scaleRatio));
-    url.searchParams.delete('h');
-    url.searchParams.delete('b');
-    if (customContent) url.searchParams.set('content', customContent.slice(0, 1000));
-    else url.searchParams.delete('content');
-    return url.toString();
+  const resetTypography = () => {
+    setBaseSize(DEFAULT_WORKBENCH_SETTINGS.baseSize);
+    setScaleRatio(DEFAULT_WORKBENCH_SETTINGS.scaleRatio);
+    setLineHeight(DEFAULT_WORKBENCH_SETTINGS.lineHeight);
+    setTracking(DEFAULT_WORKBENCH_SETTINGS.tracking);
   };
-
+  const resetRoles = () => {
+    setHeadingFontId(fonts[0]?.id || "");
+    setBodyFontId(fonts[1]?.id || fonts[0]?.id || "");
+    setUiFontId(fonts[2]?.id || fonts[1]?.id || fonts[0]?.id || "");
+    setPreset(DEFAULT_WORKBENCH_SETTINGS.preset);
+  };
+  const reorder = (index: number, direction: -1 | 1) => {
+    if (!onReorder) return;
+    const nextIndex = index + direction;
+    if (nextIndex < 0 || nextIndex >= fontIds.length) return;
+    const next = [...fontIds];
+    [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
+    onReorder(next);
+  };
+  const copyExport = async () => {
+    if (await copyToClipboard(exportCode)) toast.success(copy.copied);
+    else toast.error(copy.copyFailed);
+  };
   const shareUrl = async () => {
-    const url = canonicalWorkbenchUrl();
-    if (await copyToClipboard(url)) toast.success(language === 'ru' ? 'Переносимая ссылка Workbench скопирована' : 'Portable Workbench URL copied');
-    else toast.info(`URL: ${url}`);
-  };
-
-  const updateContent = (value: string) => {
-    setCustomContent(value);
-    setPreviewText(value);
+    const url = new URL(window.location.href);
+    url.search = serializeWorkbenchSearch(urlSettings, fontIds, url.search, includeTextInShare ? comparisonText : undefined).toString();
+    if (await copyToClipboard(url.toString())) {
+      setShareFallbackUrl("");
+      toast.success(copy.shareCopied);
+    } else {
+      setShareFallbackUrl(url.toString());
+      toast.error(copy.shareFailed);
+    }
   };
 
   if (fonts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[80vh] text-center p-8 bg-white">
-        <div className="w-24 h-24 border border-neutral-200 rounded-full flex items-center justify-center mb-8"><Scale className="w-8 h-8 text-neutral-400" /></div>
-        <h2 className="text-6xl md:text-8xl tracking-tighter mb-8 uppercase leading-none" style={{ fontWeight: 700 }}>{t('compare.emptyTitle')}</h2>
-        <p className="font-mono text-xs md:text-sm uppercase tracking-[0.2em] text-neutral-500 mb-12 max-w-md leading-relaxed">{t('compare.emptyDesc')}</p>
-        <button type="button" onClick={onBack} className="px-12 py-5 bg-neutral-800 text-white font-mono text-xs uppercase tracking-widest hover:bg-neutral-700 transition-colors">{t('compare.return')}</button>
+      <div className="flex min-h-[80vh] flex-col items-center justify-center bg-white p-8 text-center">
+        <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-full border border-neutral-200"><Scale className="h-8 w-8 text-neutral-400" /></div>
+        <h2 className="mb-8 text-6xl uppercase leading-none tracking-tighter md:text-8xl" style={{ fontWeight: 700 }}>{t("compare.emptyTitle")}</h2>
+        <p className="mb-12 max-w-md font-mono text-xs uppercase leading-relaxed tracking-[0.2em] text-neutral-500 md:text-sm">{t("compare.emptyDesc")}</p>
+        <button type="button" onClick={onBack} className="onod-button bg-neutral-900 px-12 py-5 font-mono text-xs uppercase tracking-widest text-white transition-colors hover:bg-neutral-700">{t("compare.return")}</button>
       </div>
     );
   }
 
   return (
-    <div className="w-full min-h-screen bg-white text-black font-sans flex flex-col">
-      <FontLoader fonts={fonts} />
-
-      <div className="sticky top-16 z-40 bg-white border-b border-neutral-200 flex justify-between h-16">
-        <div className="flex items-center min-w-0">
-          <button type="button" onClick={onBack} className="h-full px-6 border-r border-neutral-200 hover:bg-neutral-100 transition-colors flex items-center gap-2 group"><ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /><span className="font-mono text-xs uppercase tracking-widest hidden sm:inline">{t('back')}</span></button>
-          <div className="px-4 md:px-6 flex items-center gap-2 min-w-0"><span className="font-bold tracking-tight hidden sm:inline">{t('compare.systemWorkbench')}</span><span className="font-mono text-[10px] uppercase bg-neutral-800 text-white px-2 py-0.5 whitespace-nowrap">{fonts.length} {t('compare.sources')}</span></div>
+    <div className="min-h-screen w-full bg-white text-black" style={{fontSynthesis:"none"}}>
+      <FontLoader fonts={fonts} requests={fonts.map(font => ({fontId:font.id,weight:weightFor(font),style:actualStyleFor(font)}))} />
+      <header className="sticky top-16 z-40 flex min-h-16 flex-wrap items-stretch justify-between border-b border-neutral-300 bg-white">
+        <div className="flex min-w-0 items-center">
+          <button type="button" onClick={onBack} aria-label={t("back")} className="flex min-h-16 items-center gap-2 border-r border-neutral-300 px-4 transition-colors hover:bg-neutral-100 sm:px-6"><ArrowLeft className="h-4 w-4" aria-hidden="true" /><span className="hidden font-mono text-xs uppercase tracking-widest sm:inline">{t("back")}</span></button>
+          <div className="min-w-0 px-4 sm:px-6"><div className="truncate text-sm font-semibold">{t("compare.systemWorkbench")}</div><div className="font-mono text-[11px] uppercase tracking-wide text-neutral-500">{fonts.length} {t("compare.sources")}</div></div>
         </div>
-        <div className="flex h-full shrink-0">
-          <button type="button" onClick={shareUrl} className="px-4 md:px-6 border-l border-neutral-200 bg-white text-black hover:bg-neutral-100 font-mono text-xs uppercase tracking-widest transition-colors flex items-center gap-2" aria-label={t('share')}><Share2 className="w-3 h-3" /><span className="hidden sm:inline">{t('share')}</span></button>
-          <button type="button" onClick={copyConfig} className="px-4 md:px-6 border-l border-neutral-200 bg-neutral-800 text-white hover:bg-neutral-700 font-mono text-xs uppercase tracking-widest transition-colors flex items-center gap-2"><Copy className="w-3 h-3" /><span className="hidden sm:inline">{t('compare.export')}</span></button>
+        <div className="flex min-h-16 items-stretch">
+          <label className="hidden max-w-56 cursor-pointer items-center gap-2 border-l border-neutral-300 px-4 font-mono text-[11px] leading-4 text-neutral-600 md:flex"><input type="checkbox" checked={includeTextInShare} onChange={event => setIncludeTextInShare(event.target.checked)} className="h-4 w-4 accent-black" />{copy.shareText}</label>
+          <button type="button" onClick={shareUrl} className="onod-button flex items-center gap-2 border-l border-neutral-300 px-4 font-mono text-xs uppercase tracking-widest transition-colors hover:bg-neutral-100 sm:px-6" aria-label={t("share")}><Share2 className="h-4 w-4" aria-hidden="true" /><span className="hidden sm:inline">{t("share")}</span></button>
         </div>
-      </div>
+      </header>
 
-      <div className="flex-grow flex flex-col xl:flex-row">
-        <div className="w-full xl:w-[400px] bg-neutral-50 border-b xl:border-b-0 xl:border-r border-neutral-200 flex flex-col h-auto xl:h-[calc(100vh-128px)] overflow-y-auto">
-          <div className="p-6 border-b border-neutral-200">
-            <h3 className="font-mono text-xs uppercase tracking-widest text-neutral-400 mb-4">{t('compare.customContent')}</h3>
-            <textarea value={customContent} onChange={(e) => updateContent(e.target.value)} placeholder={t('preview.placeholder')} className="w-full h-24 bg-white border border-neutral-200 p-3 text-sm resize-none focus:outline-none focus:border-neutral-400 placeholder:text-neutral-300 transition-colors" />
-          </div>
-
-          <div className="p-6 border-b border-neutral-200">
-            <h3 className="font-mono text-xs uppercase tracking-widest text-neutral-400 mb-4">{t('compare.roles')}</h3>
-            <div className="space-y-4">
-              <div className="bg-white border border-neutral-200 p-4">
-                <label htmlFor="workbench-heading" className="block font-bold text-xs uppercase mb-2">{t('compare.heading')}</label>
-                <select id="workbench-heading" className="w-full bg-transparent border-b border-neutral-200 pb-1 font-mono text-xs focus:outline-none focus:border-neutral-400" value={headingFont?.id || ''} onChange={(e) => setHeadingFontId(e.target.value)}>{fonts.map(f => <option key={f.id} value={f.id}>{getEffectiveFamilyName(f)} ({f.categories[0]})</option>)}</select>
-              </div>
-              <div className="bg-white border border-neutral-200 p-4">
-                <label htmlFor="workbench-body" className="block font-bold text-xs uppercase mb-2">{t('compare.body')}</label>
-                <select id="workbench-body" className="w-full bg-transparent border-b border-neutral-200 pb-1 font-mono text-xs focus:outline-none focus:border-neutral-400" value={bodyFont?.id || ''} onChange={(e) => setBodyFontId(e.target.value)}>{fonts.map(f => <option key={f.id} value={f.id}>{getEffectiveFamilyName(f)} ({f.categories[0]})</option>)}</select>
-              </div>
+        <button type="button" aria-expanded={controlsOpen} aria-controls="workbench-controls" onClick={() => setControlsOpen(previous => !previous)} className="onod-button flex items-center justify-between border-b border-neutral-300 bg-neutral-50 px-5 py-4 font-mono text-xs uppercase tracking-widest lg:hidden"><span>{controlsOpen ? copy.hideControls : copy.showControls}</span><Type className="h-4 w-4" aria-hidden="true" /></button>
+      <div className="grid lg:grid-cols-[320px_minmax(0,1fr)]">
+        <section aria-label={language === "ru" ? "Результат сравнения" : "Comparison preview"} className="min-w-0 bg-white p-4 sm:p-8 lg:col-start-2 lg:row-start-1 lg:min-h-[calc(100vh-128px)] lg:p-12 xl:p-16">
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-neutral-300 pb-5">
+            <div className="flex gap-1" role="group" aria-label={language === "ru" ? "Режим верстака" : "Workbench mode"}>
+              {(["compare", "pair"] as WorkbenchMode[]).map(item => <button key={item} type="button" aria-pressed={mode === item} onClick={() => setMode(item)} className={`onod-button border px-4 py-2 font-mono text-[11px] uppercase tracking-widest transition-colors ${mode === item ? "border-neutral-900 bg-neutral-900 text-white" : "border-neutral-300 bg-white hover:bg-neutral-100"}`}>{item === "compare" ? copy.comparison : copy.pairing}</button>)}
             </div>
+            <div className="font-mono text-[11px] uppercase tracking-wide text-neutral-500">{mode === "compare" ? copy.sampleHint : `${copy.heading} / ${copy.body} / ${copy.ui}`}</div>
           </div>
 
-          <div className="p-6 border-b border-neutral-200">
-            <h3 className="font-mono text-xs uppercase tracking-widest text-neutral-400 mb-4">{t('compare.scale')}</h3>
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div><label htmlFor="workbench-base" className="block font-mono text-[10px] uppercase mb-1">{t('compare.base')}</label><input id="workbench-base" type="number" min="8" max="96" value={baseSize} onChange={(e) => setBaseSize(validNumber(e.target.value, 16, 8, 96))} className="w-full border border-neutral-200 p-2 font-mono text-sm focus:outline-none focus:border-neutral-400 transition-colors" /></div>
-              <div><label htmlFor="workbench-ratio" className="block font-mono text-[10px] uppercase mb-1">{t('compare.ratio')}</label><select id="workbench-ratio" value={scaleRatio} onChange={(e) => setScaleRatio(Number(e.target.value))} className="w-full border border-neutral-200 p-2 font-mono text-sm bg-white focus:outline-none focus:border-neutral-400 transition-colors"><option value="1.067">1.067 (Minor Second)</option><option value="1.125">1.125 (Major Second)</option><option value="1.200">1.200 (Minor Third)</option><option value="1.250">1.250 (Major Third)</option><option value="1.333">1.333 (Perfect Fourth)</option><option value="1.414">1.414 (Augmented Fourth)</option><option value="1.500">1.500 (Perfect Fifth)</option><option value="1.618">1.618 (Golden Ratio)</option></select></div>
+          {mode === "compare" ? (
+            <section className="grid gap-px border border-neutral-300 bg-neutral-300 md:grid-cols-2 2xl:grid-cols-3" aria-label={copy.comparison}>
+              {fonts.slice(0, 3).map(font => {
+                const family = getEffectiveFamilyName(font);
+                const actualWeight = weightFor(font);
+                return (
+                  <article key={font.id} className="flex min-h-[300px] flex-col bg-white p-6 sm:p-8">
+                    <div className="mb-12 border-b border-neutral-200 pb-4"><div className="flex items-baseline justify-between gap-3"><h2 className="text-sm font-semibold">{family}</h2><span className="font-mono text-[11px] text-neutral-500">{actualWeight} / {actualStyleFor(font)}</span></div><FontRuntimeBadge font={font} copy={copy} /></div>
+                    <FontCoverageNotice font={font} text={comparisonText || copy.previewHeading} /><p className="break-words" style={{ fontFamily: getEffectiveCssStack(font), fontSize: `${calculatedSizes[2]}px`, fontWeight: actualWeight, fontStyle: actualStyleFor(font), lineHeight, letterSpacing: `${tracking}em` }}>{comparisonText || copy.previewHeading}</p>
+                    <div className="mt-auto pt-12 font-mono text-[11px] uppercase tracking-wide text-neutral-500">{getEffectiveAuthor(font)} · {getEffectiveSourceLabel(font)}</div>
+                  </article>
+                );
+              })}
+            </section>
+          ) : (
+            <><div className="mb-5 grid gap-3 sm:grid-cols-2">{fonts.map(font => <div key={font.id}><span className="text-sm font-semibold">{getEffectiveFamilyName(font)}</span><FontRuntimeBadge font={font} copy={copy} /><FontCoverageNotice font={font} text={comparisonText || copy.previewHeading} /></div>)}</div><PairPreview preset={preset} copy={copy} bodyText={comparisonText} headingFont={headingFont} bodyFont={bodyFont} uiFont={uiFont} headingWeight={headingWeight} bodyWeight={bodyWeight} uiWeight={uiWeight} headingStyle={headingStyle} bodyStyle={bodyStyle} uiStyleValue={uiStyle} sizes={calculatedSizes} lineHeight={lineHeight} tracking={tracking} /></>
+          )}
+        </section>
+
+
+
+        <aside id="workbench-controls" className={`${controlsOpen ? "block" : "hidden"} order-first min-w-0 border-r border-neutral-300 bg-neutral-50 lg:order-none lg:col-start-1 lg:row-start-1 lg:block`} aria-label={copy.controls}>
+          <section className="border-b border-neutral-300 p-5">
+            <div className="mb-3 flex items-center justify-between"><h2 className="font-mono text-[11px] uppercase tracking-widest text-neutral-600">{copy.sample}</h2><button type="button" onClick={() => updateComparisonText("")} className="onod-button flex items-center gap-1 font-mono text-[11px] uppercase text-neutral-500 hover:text-black"><RotateCcw className="h-3 w-3" />{copy.reset}</button></div>
+            <textarea aria-label={copy.sample} value={comparisonText} onChange={event => updateComparisonText(event.target.value)} maxLength={1000} placeholder={t("preview.placeholder")} className="onod-input min-h-24 w-full resize-y border border-neutral-300 bg-white p-3 text-sm leading-relaxed outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-600" />
+            <p className="mt-2 text-[11px] leading-4 text-neutral-500">{copy.sampleHint}</p>
+            <label className="mt-4 flex cursor-pointer items-start gap-2 border-t border-neutral-200 pt-4 text-[11px] leading-4 text-neutral-700 md:hidden"><input type="checkbox" checked={includeTextInShare} onChange={event => setIncludeTextInShare(event.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-black" /><span>{copy.shareText}<span className="mt-1 block text-neutral-500">{copy.shareTextHint}</span></span></label>
+            {shareFallbackUrl && <div className="mt-4"><label htmlFor="workbench-share-fallback" className="mb-1 block font-mono text-[11px] uppercase text-neutral-600">URL</label><textarea id="workbench-share-fallback" readOnly value={shareFallbackUrl} onFocus={event => event.currentTarget.select()} className="w-full resize-y border border-neutral-300 bg-white p-2 font-mono text-[11px] leading-4" /></div>}
+          </section>
+
+          {mode === "pair" && (
+            <section className="border-b border-neutral-300 p-5">
+              <div className="mb-4 flex items-center justify-between"><h2 className="font-mono text-[11px] uppercase tracking-widest text-neutral-600">{copy.roles}</h2><button type="button" onClick={resetRoles} className="onod-button flex items-center gap-1 font-mono text-[11px] uppercase text-neutral-500 hover:text-black"><RotateCcw className="h-3 w-3" />{copy.reset}</button></div>
+              <div className="space-y-3">
+                {([
+                  ["workbench-heading", copy.heading, resolvedHeadingId, setHeadingFontId],
+                  ["workbench-body", copy.body, resolvedBodyId, setBodyFontId],
+                  ["workbench-ui", copy.ui, resolvedUiId, setUiFontId],
+                ] as const).map(([id, label, value, setter]) => <div key={id}><label htmlFor={id} className="mb-1.5 block font-mono text-[11px] uppercase tracking-wide text-neutral-600">{label}</label><select id={id} value={value} onChange={event => setter(event.target.value)} className="onod-input w-full border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-600">{fonts.map(font => <option key={font.id} value={font.id}>{getEffectiveFamilyName(font)}</option>)}</select></div>)}
+              </div>
+              <div className="mb-1.5 mt-4 font-mono text-[11px] uppercase tracking-wide text-neutral-600">{copy.layout}</div>
+              <div className="flex gap-1" role="group" aria-label={copy.layout}>{(["article", "interface", "hero"] as WorkbenchPreset[]).map(item => <button key={item} type="button" aria-pressed={preset === item} onClick={() => setPreset(item)} className={`onod-button flex-1 border px-2 py-2 font-mono text-[11px] ${preset === item ? "border-neutral-900 bg-neutral-900 text-white" : "border-neutral-300 bg-white"}`}>{copy[item]}</button>)}</div>
+            </section>
+          )}
+
+          <section className="border-b border-neutral-300 p-5">
+            <div className="mb-4 flex items-center justify-between"><h2 className="font-mono text-[11px] uppercase tracking-widest text-neutral-600">{copy.typography}</h2><button type="button" onClick={resetTypography} className="onod-button flex items-center gap-1 font-mono text-[11px] uppercase text-neutral-500 hover:text-black"><RotateCcw className="h-3 w-3" />{copy.reset}</button></div>
+            <div className="grid grid-cols-2 gap-3">
+              <CommittedNumberField id="workbench-base" label={copy.base} value={baseSize} min={8} max={96} step={1} onCommit={setBaseSize} />
+              <div><label htmlFor="workbench-ratio" className="mb-1.5 block font-mono text-[11px] uppercase tracking-wide text-neutral-600">{copy.ratio}</label><select id="workbench-ratio" value={String(scaleRatio)} onChange={event => setScaleRatio(Number(event.target.value))} className="onod-input w-full border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-600">{WORKBENCH_RATIOS.map(value => <option key={value} value={String(value)}>{value.toFixed(3)}</option>)}</select></div>
+              <CommittedNumberField id="workbench-line" label={copy.lineHeight} value={lineHeight} min={1} max={2.4} step={0.05} onCommit={setLineHeight} />
+              <CommittedNumberField id="workbench-tracking" label={copy.tracking} value={tracking} min={-0.08} max={0.2} step={0.005} onCommit={setTracking} />
             </div>
-            <div className="space-y-1">{calculatedSizes.slice().reverse().map((size, i) => { const index = calculatedSizes.length - 1 - i; return <div key={index} className="flex items-center justify-between text-xs border-b border-neutral-100 py-2"><span className="font-mono text-neutral-400 w-12">{scaleSteps[index]}</span><span className="font-mono">{size}px</span><div className="w-16 h-2 bg-black" style={{ opacity: 0.1 + (index * 0.15) }} /></div>; })}</div>
-          </div>
+            <div className="mt-5 space-y-1 border-t border-neutral-200 pt-3">{calculatedSizes.map((size, index) => <div key={SCALE_STEPS[index]} className="flex items-center justify-between py-1 font-mono text-[11px]"><span className="text-neutral-500">{SCALE_STEPS[index]}</span><span>{size}px</span></div>)}</div>
+          </section>
 
-          <div className="p-6 mt-auto">
-            <h3 className="font-mono text-xs uppercase tracking-widest text-neutral-400 mb-4">{t('compare.active')}</h3>
-            <div className="space-y-2 mb-6">{fonts.map(f => { const name = getEffectiveFamilyName(f); return <div key={f.id} className="flex justify-between items-center text-sm group"><span>{name}</span><button type="button" onClick={() => removeFromCompare(f.id)} className="text-neutral-300 hover:text-neutral-500 transition-colors" aria-label={`Remove ${name}`}><X className="w-4 h-4" /></button></div>; })}</div>
-            {suggestedFont && toggleCompare && <div className="bg-neutral-100 border border-neutral-200 p-4"><div className="flex items-center justify-between mb-2"><span className="font-mono text-[10px] uppercase text-neutral-400">{language === 'ru' ? 'Контрастная эвристика' : 'Contrast heuristic'}</span><span className="font-mono text-[10px] uppercase bg-black text-white px-1">PAIR</span></div><div className="font-bold text-lg mb-1">{getEffectiveFamilyName(suggestedFont)}</div><div className="font-mono text-[10px] text-neutral-500 mb-2 uppercase">{suggestedFont.categories[0]} / {getEffectiveAuthor(suggestedFont)}</div><p className="font-mono text-[8px] text-neutral-400 mb-3">{language === 'ru' ? 'Предложение основано на контрасте категории, не на метрическом анализе.' : 'Based on category contrast, not metric type analysis.'}</p><button type="button" onClick={() => toggleCompare(suggestedFont.id)} className="w-full py-2 border border-neutral-300 hover:bg-neutral-800 hover:text-white hover:border-neutral-800 transition-colors font-mono text-xs uppercase flex items-center justify-center gap-2"><Type className="w-3 h-3" />{language === 'ru' ? 'Добавить' : 'Add to stack'}</button></div>}
-          </div>
-        </div>
+          <section className="border-b border-neutral-300 p-5">
+            <h2 className="mb-4 font-mono text-[11px] uppercase tracking-widest text-neutral-600">{copy.selected}</h2>
+            <div className="space-y-2">
+              {fonts.map((font, index) => {
+                const family = getEffectiveFamilyName(font);
+                const roles = [resolvedHeadingId === font.id ? copy.heading : "", resolvedBodyId === font.id ? copy.body : "", resolvedUiId === font.id ? copy.ui : ""].filter(Boolean).join(" · ");
+                return <div key={font.id} className="border border-neutral-300 bg-white p-3"><div className="flex items-start justify-between gap-2"><div className="min-w-0"><div className="truncate text-sm font-medium">{family}</div><div className="mt-1 font-mono text-[11px] leading-4 text-neutral-500">{index === 2 ? copy.candidate : roles || copy.source}</div></div><div className="flex shrink-0">{onReorder && <><button type="button" onClick={() => reorder(index, -1)} disabled={index === 0} aria-label={`${copy.moveUp}: ${family}`} className="onod-button p-1 text-neutral-500 hover:text-black disabled:opacity-25"><ArrowUp className="h-3.5 w-3.5" /></button><button type="button" onClick={() => reorder(index, 1)} disabled={index === fonts.length - 1} aria-label={`${copy.moveDown}: ${family}`} className="onod-button p-1 text-neutral-500 hover:text-black disabled:opacity-25"><ArrowDown className="h-3.5 w-3.5" /></button></>}<button type="button" onClick={() => removeFromCompare(font.id)} aria-label={`${copy.remove}: ${family}`} className="onod-button p-1 text-neutral-500 hover:text-black"><X className="h-4 w-4" /></button></div></div><FontRuntimeBadge font={font} copy={copy} /></div>;
+              })}
+            </div>
+            {suggestedFont && toggleCompare && <button type="button" onClick={() => toggleCompare(suggestedFont.id)} className="onod-button mt-3 flex w-full items-center justify-center gap-2 border border-neutral-300 bg-white px-3 py-2 text-sm hover:border-neutral-600"><Type className="h-4 w-4" />{copy.addCandidate}: {getEffectiveFamilyName(suggestedFont)}</button>}
+          </section>
 
-        <div className="flex-grow bg-white p-8 md:p-16 overflow-y-auto h-auto xl:h-[calc(100vh-128px)]">
-          <div className="max-w-3xl mx-auto space-y-16">
-            <section className="space-y-6">
-              <p className="font-mono text-xs uppercase tracking-widest text-neutral-400 mb-8 border-b border-neutral-200 pb-2">Preview / Article Layout</p>
-              <h1 style={{ fontFamily: headingStack, fontSize: `${calculatedSizes[5]}px`, lineHeight: 1.1 }} className="font-bold tracking-tight">{customContent || t('preview.title')}</h1>
-              <p style={{ fontFamily: bodyStack, fontSize: `${calculatedSizes[2]}px` }} className="text-neutral-500 font-light leading-relaxed max-w-2xl">{customContent || t('preview.subtitle')}</p>
-            </section>
-
-            <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
-              <div className="md:col-span-4 border-t border-neutral-200 pt-4"><span className="font-mono text-[10px] uppercase mb-2 block">{t('preview.meta')}</span><div style={{ fontFamily: bodyStack, fontSize: `${baseSize}px` }} className="space-y-1"><div>{t('preview.author')}: {headingFont ? getEffectiveAuthor(headingFont) : ''}</div><div>{t('preview.date')}: Nov 28, 2024</div><div>{t('preview.read')}: 5 min</div></div></div>
-              <div className="md:col-span-8 border-t border-neutral-200 pt-4 space-y-8"><p style={{ fontFamily: bodyStack, fontSize: `${calculatedSizes[1]}px`, lineHeight: 1.6 }}>{customContent || t('preview.body1').replace('{heading}', headingName).replace('{body}', bodyName)}</p><h2 style={{ fontFamily: headingStack, fontSize: `${calculatedSizes[3]}px` }} className="font-bold pt-8">{t('compare.scale')}</h2><p style={{ fontFamily: bodyStack, fontSize: `${baseSize}px`, lineHeight: 1.6 }}>{customContent || t('preview.body2').replace('{ratio}', scaleRatio.toString()).replace('{base}', baseSize.toString())}</p><blockquote className="pl-6 border-l-4 border-neutral-300 py-2 my-8"><p style={{ fontFamily: headingStack, fontSize: `${calculatedSizes[2]}px` }} className="italic">“{t('preview.quote')}”</p></blockquote></div>
-            </section>
-
-            <section className="border-t border-neutral-200 pt-12 pb-24"><h3 className="font-mono text-xs uppercase tracking-widest text-neutral-400 mb-8">{t('preview.ui')}</h3><div className="flex flex-wrap gap-4"><button type="button" className="bg-neutral-800 text-white px-8 py-4 hover:opacity-80 transition-opacity" style={{ fontFamily: bodyStack, fontSize: `${baseSize}px` }}>{t('preview.primary')}</button><button type="button" className="border border-neutral-300 bg-transparent text-black px-8 py-4 hover:bg-neutral-50 transition-colors" style={{ fontFamily: bodyStack, fontSize: `${baseSize}px` }}>{t('preview.secondary')}</button></div></section>
-          </div>
-        </div>
+          <section className="p-5">
+            <h2 className="mb-4 font-mono text-[11px] uppercase tracking-widest text-neutral-600">{copy.export}</h2>
+            <label htmlFor="workbench-export-format" className="mb-1.5 block font-mono text-[11px] uppercase tracking-wide text-neutral-600">{copy.format}</label>
+            <div className="flex gap-2"><select id="workbench-export-format" value={exportFormat} onChange={event => setExportFormat(event.target.value as WorkbenchExportFormat)} className="onod-input min-w-0 flex-1 border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-600">{(Object.keys(WORKBENCH_EXPORT_LABELS) as WorkbenchExportFormat[]).map(format => <option key={format} value={format}>{WORKBENCH_EXPORT_LABELS[format]}</option>)}</select><button type="button" onClick={copyExport} className="onod-button flex items-center gap-1.5 border border-neutral-900 bg-neutral-900 px-3 py-2 font-mono text-[11px] uppercase text-white hover:bg-neutral-700"><Copy className="h-3.5 w-3.5" />{copy.copy}</button></div>
+            <pre tabIndex={0} className="mt-3 max-h-80 overflow-auto whitespace-pre-wrap break-words border border-neutral-300 bg-white p-3 font-mono text-[11px] leading-5 text-neutral-800">{exportCode}</pre>
+          </section>
+        </aside>
       </div>
-
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>{t('compare.export')}</DialogTitle><DialogDescription>{language === 'ru' ? 'Автоматическое копирование заблокировано. Скопируйте код вручную.' : 'Automatic copying is blocked by browser permissions. Please copy the code below.'}</DialogDescription></DialogHeader>
-          <div className="bg-neutral-100 p-4 rounded-md overflow-x-auto border border-black/10"><pre className="text-xs font-mono">{configCode}</pre></div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

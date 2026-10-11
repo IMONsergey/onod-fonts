@@ -16,6 +16,9 @@ interface VerifiedGoogleFont {
   subsets: string[];
   axes: Record<string, { min: number; default?: number; max: number }>;
   weights: number[];
+  styles: string[];
+  faces: { style: string; weight: number }[];
+  technicalVerified: boolean;
   repositoryUrl?: string;
   metadataPath: string;
 }
@@ -32,6 +35,7 @@ export interface VerifiedFontshareFont {
   axes: Record<string, { min: number; default?: number; max: number }>;
   weights: number[];
   variable: boolean;
+  styles?: string[];
   sourceUrl: string;
 }
 
@@ -225,11 +229,11 @@ export function getFontTrustReport(font: Font): FontTrustReport {
       confidence: "curated",
       identityVerified: true,
       licenseVerified: true,
-      weightsVerified: true,
-      variableVerified: true,
-      scriptsVerified: true,
+      weightsVerified: google.technicalVerified && google.weights.length > 0,
+      variableVerified: google.technicalVerified,
+      scriptsVerified: google.subsets.length > 0,
       licenseLabel: google.license,
-      warnings: [],
+      warnings: google.technicalVerified ? [] : ["Technical metadata has not been successfully validated. Weight and variable capability are unknown."],
       upstreamVerified: true,
       verificationSource: google.metadataPath,
       provider: "Google Fonts",
@@ -446,7 +450,7 @@ export function getEffectiveWeights(font: Font) {
 
 export function isEffectivelyVariable(font: Font) {
   const google = getVerifiedGoogleFont(font);
-  if (google) return Object.keys(google.axes).length > 0;
+  if (google) return google.technicalVerified && Object.keys(google.axes).length > 0;
   const correction = getCatalogCorrectionRelation(font);
   if (correction) return correction.canonical.variable;
   const fontshare = getVerifiedFontshareFont(font);
@@ -558,4 +562,32 @@ export function getEffectiveLicenseLabel(font: Font) {
 
 export function getEffectiveFontshareSlug(font: Font) {
   return getVerifiedFontshareFont(font)?.slug;
+}
+
+/** Verified style groups; unknown providers receive a conservative normal preview only. */
+export function getEffectiveStyles(font: Font): string[] {
+  const google = getVerifiedGoogleFont(font);
+  if (google) return google.technicalVerified ? ['normal', 'italic'].filter(style => google.styles.includes(style)) : ['normal'];
+  const fontshare = getVerifiedFontshareFont(font);
+  if (fontshare?.styles?.length) return ['normal', 'italic'].filter(style => fontshare.styles.includes(style));
+  return ['normal'];
+}
+
+export function getEffectiveAxes(font: Font): Record<string, { min: number; max: number }> {
+  const google = getVerifiedGoogleFont(font);
+  if (google) return google.technicalVerified ? google.axes : {};
+  const fontshare = getVerifiedFontshareFont(font);
+  if (fontshare) return fontshare.axes;
+  const independent = getVerifiedIndependentFont(font);
+  if (independent?.technical.variableVerified) return independent.technical.axes || {};
+  return getVerifiedHistoricalArtifact(font)?.axes || {};
+}
+
+/** A catalog license label is not a blanket grant of distribution rights. */
+export function getLicenseCategory(font: Font): 'open-source' | 'proprietary-free' | 'unknown' {
+  const trust = getFontTrustReport(font);
+  if (!trust.licenseVerified) return 'unknown';
+  const fontshare = getVerifiedFontshareFont(font);
+  if (fontshare?.licenseType === 'itf_ffl') return 'proprietary-free';
+  return /OFL|Apache|Ubuntu|MIT|GPL|CC0|Unlicense/i.test(trust.licenseLabel) ? 'open-source' : 'unknown';
 }

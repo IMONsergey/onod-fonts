@@ -20,8 +20,8 @@ export const LicensePage = () => {
           <section>
             <h2 className="font-sans text-xl font-bold uppercase tracking-wide mb-4">{ru ? '1. Что делает ONOD Fonts' : '1. What ONOD Fonts does'}</h2>
             <p>{ru
-              ? 'ONOD Fonts — каталог и инструмент предпросмотра. Каталог не меняет лицензию гарнитуры и не передаёт пользователю дополнительных прав на шрифт.'
-              : 'ONOD Fonts is a catalog and preview tool. The catalog does not change a typeface license or grant additional rights to use the font.'}</p>
+              ? 'ONOD Fonts — каталог и инструмент предпросмотра гарнитур с разными условиями использования. Бесплатное использование не означает открытую лицензию; например, Fontshare ITF FFL и SIL OFL — разные категории лицензий. Каталог не меняет лицензию гарнитуры и не передаёт пользователю дополнительных прав на шрифт.'
+              : 'ONOD Fonts is a typeface catalog and preview tool with different usage terms for each family. Free use is not the same as an open-source license; Fontshare ITF FFL and SIL OFL are distinct license categories. The catalog does not change a typeface license or grant additional rights to use the font.'}</p>
           </section>
 
           <section>

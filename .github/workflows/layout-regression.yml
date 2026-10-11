@@ -1,76 +1,54 @@
-name: Layout Regression
-
+name: Layout and Browser QA
 on:
   pull_request:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
-
 permissions:
   contents: read
-
 concurrency:
-  group: onod-fonts-layout-regression-${{ github.ref }}
+  group: onod-fonts-browser-qa-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
-  layout-regression:
+  browser-qa:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build production app
-        run: npm run build
-
-      - name: Confirm browser stack
+      - run: npm ci
+      - run: npm run check
+      - name: Use installed Chrome
         run: |
           google-chrome --version
-          "${CHROMEWEBDRIVER}/chromedriver" --version
-
-      - name: Start Vite preview
+          echo "QA_CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+      - name: Start production preview
         run: |
-          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/onod-preview.log 2>&1 &
-          for attempt in {1..50}; do
+          npm run preview -- --host 127.0.0.1 --port 4173 --strictPort > /tmp/onod-preview.log 2>&1 &
+          for attempt in {1..60}; do
             if curl --fail --silent http://127.0.0.1:4173/onod-fonts/ >/dev/null; then exit 0; fi
-            sleep 0.2
+            sleep 0.5
           done
           cat /tmp/onod-preview.log
           exit 1
-
-      - name: Start ChromeDriver
-        run: |
-          "${CHROMEWEBDRIVER}/chromedriver" --port=9515 --log-path=/tmp/chromedriver.log > /tmp/chromedriver.stdout 2>&1 &
-          for attempt in {1..50}; do
-            if curl --fail --silent http://127.0.0.1:9515/status >/dev/null; then exit 0; fi
-            sleep 0.2
-          done
-          cat /tmp/chromedriver.stdout
-          cat /tmp/chromedriver.log || true
-          exit 1
-
-      - name: Verify fixed and sticky layout behavior
+      - name: Fixed and sticky regression contract
         env:
           QA_BASE_URL: http://127.0.0.1:4173/onod-fonts/
-          WEBDRIVER_URL: http://127.0.0.1:9515
-        run: node scripts/layout-regression.mjs
-
-      - name: Dump logs on failure
+        run: npm run test:layout
+      - name: Functional, responsive and accessibility gates
+        env:
+          QA_BASE_URL: http://127.0.0.1:4173/onod-fonts/
+        run: npm run test:browser
+      - name: Preserve browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: onod-browser-qa
+          path: .worklogs/browser-qa/
+          include-hidden-files: true
+          retention-days: 14
+      - name: Preview diagnostics
         if: failure()
-        run: |
-          echo '--- Vite preview ---'
-          cat /tmp/onod-preview.log || true
-          echo '--- ChromeDriver stdout ---'
-          cat /tmp/chromedriver.stdout || true
-          echo '--- ChromeDriver log ---'
-          cat /tmp/chromedriver.log || true
+        run: cat /tmp/onod-preview.log || true

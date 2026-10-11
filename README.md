@@ -4,6 +4,10 @@ Standalone web application for **ONOD FONTS | DESIGN SPACE** — a curated inter
 
 The product was originally prototyped in Figma Make. The repository is now a regular React/Vite codebase and no longer depends on Figma Make runtime features.
 
+## Current review update
+
+See [the 11 October 2026 implementation and acceptance report](docs/UPDATE-2026-10-11.md) for the reliability/UX changes, measured verification and outstanding scope. Production is unchanged until the review branch is approved and merged.
+
 ## Stack
 
 - React 18
@@ -16,7 +20,7 @@ The product was originally prototyped in Figma Make. The repository is now a reg
 ## Local development
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -30,7 +34,7 @@ npm run build:validate
 npm run check
 ```
 
-`npm run check` is the release gate: catalog integrity/trust policy, TypeScript, production build, and GitHub Pages bundle validation must all pass.
+`npm run check` validates evidence/catalog integrity, unit tests, TypeScript, the production build and actual emitted static routes/assets. With a production preview running, `npm run test:layout` and `npm run test:browser` are separate release gates. CI runs all three.
 
 Preview the production bundle:
 
@@ -42,7 +46,7 @@ npm run preview
 
 Production is deployed automatically from `main` by `.github/workflows/deploy-pages.yml`.
 The workflow installs dependencies with `npm ci`, runs the full `npm run check` quality gate,
-builds the Vite application, preserves a SPA `404.html`, adds `.nojekyll`, and publishes the
+builds the Vite application, materializes known static route shells and a noindex `404.html`, adds `.nojekyll`, and publishes the
 resulting `dist/` directory to the `gh-pages` branch root in a single deterministic publish step.
 
 GitHub Pages remains configured to serve the root of `gh-pages`. The production Vite base path

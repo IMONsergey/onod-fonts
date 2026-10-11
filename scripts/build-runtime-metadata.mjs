@@ -41,6 +41,9 @@ const googleRuntime = Object.fromEntries(Object.entries(googleEvidence)
     subsets: metadata.subsets,
     axes: metadata.axes,
     weights: metadata.weights,
+    styles: metadata.styles || [],
+    faces: (metadata.faces || []).map(({ style, weight }) => ({ style, weight })),
+    technicalVerified: metadata.schemaVersion === 2 && metadata.technicalVerified === true && metadata.faces?.length > 0,
     ...(metadata.repositoryUrl ? { repositoryUrl: metadata.repositoryUrl } : {}),
     metadataPath: metadata.metadataPath,
   }]));
@@ -80,6 +83,7 @@ const fontshareRuntime = Object.fromEntries(Object.entries(fontshareEvidence)
     script: metadata.script || undefined,
     axes: axisMap(metadata.axes),
     weights: styleWeights(metadata.styles),
+    styles: [...new Set((metadata.styles || []).map(style => style.italic ? "italic" : "normal"))],
     variable: (metadata.styles || []).some(style => Boolean(style.variable)) || (metadata.axes || []).length > 0,
     sourceUrl: metadata.sourceUrl,
   }]));

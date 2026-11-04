@@ -99,3 +99,16 @@ The trust overlay lives in `src/app/lib/fontTrust.ts`, runtime font readiness in
 ## Source of truth
 
 The `main` branch of this GitHub repository is the single source of truth for ONOD Fonts. All subsequent product changes and deployments should be committed here.
+
+## IMON server deployment
+
+Public server URL: https://onod.imon.world. The server build uses the domain root:
+
+```bash
+npm ci
+npm run check:server
+```
+
+`ONOD_BASE_PATH=/` configures Vite, bundle validation and production smoke checks together. With the variable unset, the existing GitHub Pages build remains `/onod-fonts/`. The server serves only the validated `dist` directory with Nginx; no development server is exposed.
+
+Server release layout: `/srv/onod/releases/<release>`, active symlink `/srv/onod/current`. Publish the complete build to a new release directory, switch the symlink atomically, then verify the catalog, a direct font route, comparison and persistence. Rollback switches the symlink to the previous release. HTTPS certificates renew through certbot.timer.

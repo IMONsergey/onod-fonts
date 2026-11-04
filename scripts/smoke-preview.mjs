@@ -3,9 +3,9 @@ import { spawn } from 'node:child_process';
 const host = '127.0.0.1';
 const port = 4173;
 const origin = `http://${host}:${port}`;
-const base = '/onod-fonts/';
+const base = process.env.ONOD_BASE_PATH || '/onod-fonts/';
 
-const child = spawn(process.execPath, ['./node_modules/vite/bin/vite.js', 'preview', '--host', host, '--port', String(port), '--strictPort'], {
+const child = spawn(process.execPath, ['./node_modules/vite/bin/vite.js', 'preview', '--host', host, '--port', String(port), '--strictPort', '--base', base], {
   stdio: ['ignore', 'pipe', 'pipe'],
   env: { ...process.env },
 });
@@ -38,7 +38,7 @@ async function assertHtml(path) {
 }
 
 async function assertAssets(html) {
-  const urls = Array.from(html.matchAll(/(?:src|href)="(\/onod-fonts\/assets\/[^"]+)"/g), match => match[1]);
+  const urls = Array.from(html.matchAll(/(?:src|href)="([^"]+)"/g), match => match[1]).filter(url => url.startsWith(`${base}assets/`));
   if (!urls.length) throw new Error('No production assets were referenced from the application shell.');
   const unique = Array.from(new Set(urls));
   for (const url of unique) {

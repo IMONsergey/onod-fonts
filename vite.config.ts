@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig(({ mode }) => ({
-  base: mode === 'production' ? '/onod-fonts/' : '/',
+  base: process.env.ONOD_BASE_PATH || (mode === 'production' ? '/onod-fonts/' : '/'),
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

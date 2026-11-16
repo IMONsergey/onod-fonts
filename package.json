@@ -26,6 +26,7 @@
     "check:server": "ONOD_BASE_PATH=/ npm run check"
   },
   "dependencies": {
+    "@floating-ui/react-dom": "2.1.6",
     "clsx": "2.1.1",
     "lucide-react": "0.487.0",
     "motion": "12.23.24",

@@ -5,6 +5,7 @@ import { Font } from "@/data/mockFonts";
 import { orderCatalog, type CatalogSort } from "@/data/editorialOrder";
 import { FontCard } from "@/components/FontCard";
 import { FilterPanel, FilterState } from "@/components/FilterPanel";
+import { Dropdown } from "@/components/ui/Dropdown";
 import { FontLoader } from "@/components/FontLoader";
 import { useFontFilter } from "@/hooks/useFontFilter";
 import { cn } from "@/lib/utils";
@@ -208,16 +209,15 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({
               className="min-w-0 flex-1 bg-transparent outline-none text-base md:text-xl font-light placeholder:text-neutral-300"
             />
 
-            <label className="sr-only" htmlFor="catalog-sort">{t("sort.label")}</label>
-            <select
-              id="catalog-sort"
-              value={sortMode}
-              onChange={event => setSortMode(event.target.value as CatalogSort)}
-              className="absolute right-3 top-2 h-10 max-w-32 sm:static sm:h-9 bg-white border border-neutral-200 px-2 font-mono text-[9px] uppercase outline-none focus:border-neutral-400"
-            >
-              <option value="default">{t('sort.editorial')}</option>
-              <option value="alpha">{t('sort.alpha')}</option>
-            </select>
+            <Dropdown<CatalogSort>
+              id="catalog-sort" label={t("sort.label")} value={sortMode} onChange={setSortMode}
+              options={[
+                { value: "default", label: t("sort.editorial") },
+                { value: "alpha", label: t("sort.alpha") },
+              ]}
+              align="end"
+              className="absolute right-3 top-2 h-10 w-32 sm:static sm:h-9 shrink-0 font-mono text-[10px] uppercase"
+            />
 
             <div className="flex shrink-0 border border-neutral-200">
               <button

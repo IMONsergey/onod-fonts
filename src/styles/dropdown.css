@@ -1,0 +1,106 @@
+.onod-dropdown {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-inline: 12px;
+  min-width: 0;
+  border: 1px solid #d4d4d4;
+  border-radius: 0;
+  background: #fff;
+  color: #171717;
+  text-align: start;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.onod-dropdown:enabled:hover, .onod-dropdown[aria-expanded="true"] {
+  border-color: #525252;
+}
+
+.onod-dropdown:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 2px;
+}
+
+.onod-dropdown:disabled {
+  cursor: default;
+  opacity: .45;
+}
+
+.onod-dropdown-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.onod-dropdown-arrow {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  color: #525252;
+  stroke-width: 1.65;
+}
+
+.onod-dropdown[aria-expanded="true"] .onod-dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.onod-dropdown-menu {
+  z-index: 65;
+  width: max-content;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0;
+  padding: 3px;
+  list-style: none;
+  border: 1px solid #525252;
+  border-radius: 0;
+  background: #fff;
+  color: #171717;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.onod-dropdown-menu [role="option"] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 36px;
+  padding: 7px 10px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.onod-dropdown-menu [role="option"] > span {
+  overflow-wrap: anywhere;
+}
+
+.onod-dropdown-menu [role="option"][data-active] {
+  color: #fff;
+  background: #171717;
+}
+
+.onod-dropdown-menu [role="option"] svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.6;
+}
+
+@media (pointer: coarse) {
+  .onod-dropdown-menu [role="option"] { min-height: 44px; }
+}
+
+@media (forced-colors: active) {
+  .onod-dropdown-menu [role="option"][data-active] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}

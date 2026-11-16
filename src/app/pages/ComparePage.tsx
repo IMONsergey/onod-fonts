@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Font, hasInteractiveSpecimen } from "@/data/mockFonts";
 import { X, ArrowLeft, Type, Copy, Share2, Scale } from "lucide-react";
 import { toast } from "sonner";
+import { Dropdown } from "@/components/ui/Dropdown";
 import { FontLoader } from "@/components/FontLoader";
 import { useLanguage } from "@/lib/i18n";
 import { copyToClipboard } from "@/lib/clipboard";
@@ -120,6 +121,15 @@ export const ComparePage: React.FC<CompareProps> = ({
   const headingStack = headingFont ? getEffectiveCssStack(headingFont) : "sans-serif";
   const bodyStack = bodyFont ? getEffectiveCssStack(bodyFont) : "sans-serif";
 
+  const familyOptions = fonts.map(font => ({
+    value: font.id,
+    label: `${getEffectiveFamilyName(font)} (${font.categories[0]})`,
+  }));
+  const ratioOptions = Array.from(scaleRatios, ([ratio, name]) => ({
+    value: String(ratio), label: `${ratio.toFixed(3)} (${name})`,
+  }));
+  if (!scaleRatios.has(scaleRatio)) ratioOptions.unshift({ value: String(scaleRatio), label: String(scaleRatio) });
+
   const suggestedFont = useMemo(() => {
     if (fonts.length >= 3 || fonts.length === 0 || !allFonts.length) return null;
     const baseFont = fonts[fonts.length - 1];
@@ -223,11 +233,13 @@ fontSize: {
             <div className="space-y-4">
               <div className="bg-white border border-neutral-200 p-4">
                 <label htmlFor="workbench-heading" className="block font-bold text-xs uppercase mb-2">{t('compare.heading')}</label>
-                <select id="workbench-heading" className="w-full bg-transparent border-b border-neutral-200 pb-1 font-mono text-xs focus:outline-none focus:border-neutral-400" value={headingFont?.id || ''} onChange={(e) => setHeadingFontId(e.target.value)}>{fonts.map(f => <option key={f.id} value={f.id}>{getEffectiveFamilyName(f)} ({f.categories[0]})</option>)}</select>
+                <Dropdown id="workbench-heading" label={t("compare.heading")} value={headingFont?.id || ""}
+                  options={familyOptions} onChange={setHeadingFontId} className="w-full h-10 font-mono text-xs" />
               </div>
               <div className="bg-white border border-neutral-200 p-4">
                 <label htmlFor="workbench-body" className="block font-bold text-xs uppercase mb-2">{t('compare.body')}</label>
-                <select id="workbench-body" className="w-full bg-transparent border-b border-neutral-200 pb-1 font-mono text-xs focus:outline-none focus:border-neutral-400" value={bodyFont?.id || ''} onChange={(e) => setBodyFontId(e.target.value)}>{fonts.map(f => <option key={f.id} value={f.id}>{getEffectiveFamilyName(f)} ({f.categories[0]})</option>)}</select>
+                <Dropdown id="workbench-body" label={t("compare.body")} value={bodyFont?.id || ""}
+                  options={familyOptions} onChange={setBodyFontId} className="w-full h-10 font-mono text-xs" />
               </div>
             </div>
           </div>
@@ -238,10 +250,9 @@ fontSize: {
               <div><label htmlFor="workbench-base" className="block font-mono text-[10px] uppercase mb-1">{t('compare.base')}</label><input id="workbench-base" type="number" min="8" max="96" value={baseSize} onChange={(e) => setBaseSize(validNumber(e.target.value, 16, 8, 96))} className="w-full border border-neutral-200 p-2 font-mono text-sm focus:outline-none focus:border-neutral-400 transition-colors" /></div>
               <div className="min-w-0">
                 <label htmlFor="workbench-ratio" className="block font-mono text-[10px] uppercase mb-1">{t('compare.ratio')}</label>
-                <select id="workbench-ratio" value={scaleRatio} onChange={e => setScaleRatio(Number(e.target.value))} className="w-full border border-neutral-200 p-2 font-mono text-sm bg-white focus:outline-none focus:border-neutral-400 transition-colors">
-                  {!scaleRatios.has(scaleRatio) && <option value={scaleRatio}>{scaleRatio}</option>}
-                  {Array.from(scaleRatios, ([value, name]) => <option key={value} value={value}>{value.toFixed(3)} ({name})</option>)}
-                </select>
+                <Dropdown id="workbench-ratio" label={t("compare.ratio")} value={String(scaleRatio)}
+                  options={ratioOptions} onChange={value => setScaleRatio(Number(value))}
+                  className="w-full h-10 font-mono text-xs" />
               </div>
             </div>
             <div className="space-y-1">{calculatedSizes.slice().reverse().map((size, i) => { const index = calculatedSizes.length - 1 - i; return <div key={index} className="flex items-center justify-between text-xs border-b border-neutral-100 py-2"><span className="font-mono text-neutral-400 w-12">{scaleSteps[index]}</span><span className="font-mono">{size}px</span><div className="w-16 h-2 bg-black" style={{ opacity: 0.1 + (index * 0.15) }} /></div>; })}</div>

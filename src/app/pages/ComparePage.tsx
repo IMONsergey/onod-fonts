@@ -25,6 +25,17 @@ interface CompareProps {
   onBack: () => void;
 }
 
+const scaleRatios = new Map([
+  [1.067, 'Minor Second'],
+  [1.125, 'Major Second'],
+  [1.2, 'Minor Third'],
+  [1.25, 'Major Third'],
+  [1.333, 'Perfect Fourth'],
+  [1.414, 'Augmented Fourth'],
+  [1.5, 'Perfect Fifth'],
+  [1.618, 'Golden Ratio'],
+]);
+
 const validNumber = (value: string | null, fallback: number, min: number, max: number) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed >= min && parsed <= max ? parsed : fallback;
@@ -223,9 +234,15 @@ fontSize: {
 
           <div className="p-6 border-b border-neutral-200">
             <h3 className="font-mono text-xs uppercase tracking-widest text-neutral-400 mb-4">{t('compare.scale')}</h3>
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 min-[390px]:grid-cols-[minmax(4.5rem,1fr)_minmax(0,3.5fr)] gap-4 mb-6">
               <div><label htmlFor="workbench-base" className="block font-mono text-[10px] uppercase mb-1">{t('compare.base')}</label><input id="workbench-base" type="number" min="8" max="96" value={baseSize} onChange={(e) => setBaseSize(validNumber(e.target.value, 16, 8, 96))} className="w-full border border-neutral-200 p-2 font-mono text-sm focus:outline-none focus:border-neutral-400 transition-colors" /></div>
-              <div><label htmlFor="workbench-ratio" className="block font-mono text-[10px] uppercase mb-1">{t('compare.ratio')}</label><select id="workbench-ratio" value={scaleRatio} onChange={(e) => setScaleRatio(Number(e.target.value))} className="w-full border border-neutral-200 p-2 font-mono text-sm bg-white focus:outline-none focus:border-neutral-400 transition-colors"><option value="1.067">1.067 (Minor Second)</option><option value="1.125">1.125 (Major Second)</option><option value="1.200">1.200 (Minor Third)</option><option value="1.250">1.250 (Major Third)</option><option value="1.333">1.333 (Perfect Fourth)</option><option value="1.414">1.414 (Augmented Fourth)</option><option value="1.500">1.500 (Perfect Fifth)</option><option value="1.618">1.618 (Golden Ratio)</option></select></div>
+              <div className="min-w-0">
+                <label htmlFor="workbench-ratio" className="block font-mono text-[10px] uppercase mb-1">{t('compare.ratio')}</label>
+                <select id="workbench-ratio" value={scaleRatio} onChange={e => setScaleRatio(Number(e.target.value))} className="w-full border border-neutral-200 p-2 font-mono text-sm bg-white focus:outline-none focus:border-neutral-400 transition-colors">
+                  {!scaleRatios.has(scaleRatio) && <option value={scaleRatio}>{scaleRatio}</option>}
+                  {Array.from(scaleRatios, ([value, name]) => <option key={value} value={value}>{value.toFixed(3)} ({name})</option>)}
+                </select>
+              </div>
             </div>
             <div className="space-y-1">{calculatedSizes.slice().reverse().map((size, i) => { const index = calculatedSizes.length - 1 - i; return <div key={index} className="flex items-center justify-between text-xs border-b border-neutral-100 py-2"><span className="font-mono text-neutral-400 w-12">{scaleSteps[index]}</span><span className="font-mono">{size}px</span><div className="w-16 h-2 bg-black" style={{ opacity: 0.1 + (index * 0.15) }} /></div>; })}</div>
           </div>

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n";
 import { copyToClipboard } from "@/lib/clipboard";
 import { useFontRuntimeStatus } from "@/lib/fontRuntime";
-import { getEffectiveAuthor, getEffectiveCssStack, getEffectiveFamilyName, getEffectiveLanguages, getEffectiveSourceLabel, getEffectiveSourceUrl, getEffectiveWeights, getSpecimenWeights, getFontTrustReport, isEffectivelyVariable } from "@/lib/fontTrust";
+import { getEffectiveAuthor, getEffectiveCssStack, getEffectiveFamilyName, getEffectiveLanguages, getEffectiveSourceLabel, getEffectiveSourceUrl, getEffectiveWeights, getGoogleSpecimenUrl, getSpecimenWeights, getFontTrustReport, isEffectivelyVariable } from "@/lib/fontTrust";
 import { toast } from "sonner";
 
 interface FontDetailsProps {
@@ -22,14 +22,6 @@ interface FontDetailsProps {
 
 type Tab = "specimen" | "glyphs" | "about";
 type Align = "left" | "center" | "right";
-
-const googleImportUrl = (font: Font) => {
-  const weights = getEffectiveWeights(font).sort((a, b) => Number(a) - Number(b));
-  let family = getEffectiveFamilyName(font);
-  if (isEffectivelyVariable(font) && weights.length > 1) family += `:wght@${weights[0]}..${weights.at(-1)}`;
-  else family += `:wght@${weights.join(";")}`;
-  return `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, "+")}&display=swap`;
-};
 
 export const FontDetailsPage: React.FC<FontDetailsProps> = ({ font, onBack, toggleFavorite, isFavorite, toggleCompare, isCompare, testPairing, previewText }) => {
   const { t, language } = useLanguage();
@@ -76,7 +68,7 @@ export const FontDetailsPage: React.FC<FontDetailsProps> = ({ font, onBack, togg
 
   const related = useMemo(() => mockFonts.filter(item => item.id !== font.id && hasInteractiveSpecimen(item) && item.categories.some(category => font.categories.includes(category))).slice(0, 6), [font]);
   const snippets = useMemo(() => {
-    const cssUrl = sourceLabel === "Google Fonts" && !commercialPackage ? googleImportUrl(font) : font.customCssUrl;
+    const cssUrl = sourceLabel === "Google Fonts" && !commercialPackage ? getGoogleSpecimenUrl(font) : font.customCssUrl;
     return {
       import: cssUrl ? `@import url('${cssUrl}');` : `/* Load ${familyName} from its verified source: ${sourceUrl} */`,
       css: `font-family: ${cssStack};${fontSynthesis ? "\nfont-synthesis: none;" : ""}`,

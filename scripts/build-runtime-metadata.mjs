@@ -41,6 +41,7 @@ const googleRuntime = Object.fromEntries(Object.entries(googleEvidence)
     subsets: metadata.subsets,
     axes: metadata.axes,
     weights: metadata.weights,
+    ...(metadata.styles?.length && metadata.styles.every(style => style === "italic") ? { italicOnly: true } : {}),
     ...(metadata.repositoryUrl ? { repositoryUrl: metadata.repositoryUrl } : {}),
     metadataPath: metadata.metadataPath,
   }]));

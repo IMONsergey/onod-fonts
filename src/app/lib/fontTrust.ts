@@ -11,6 +11,8 @@ export type FontDataConfidence = "curated" | "derived";
 
 interface VerifiedGoogleFont {
   family: string;
+  upstreamFamily?: string;
+  italicOnly?: boolean;
   designer: string;
   license: string;
   subsets: string[];
@@ -214,7 +216,7 @@ export function getEffectiveFamilyName(font: Font) {
 
 export function getSpecimenFamily(font: Font, weight?: number | string) {
   const packaged = font.commercialPackage;
-  if (!packaged?.cssFamily) return getEffectiveFamilyName(font);
+  if (!packaged?.cssFamily) return getVerifiedGoogleFont(font)?.upstreamFamily || getEffectiveFamilyName(font);
   const matching = packaged.previewFaces?.filter(face => face.weight === Number(weight));
   return matching?.find(face => face.style === "normal")?.cssFamily || matching?.[0]?.cssFamily || packaged.cssFamily;
 }
@@ -234,7 +236,7 @@ export function getEffectiveCssStack(font: Font, weight?: number | string) {
     const fallback = font.cssStack.slice(JSON.stringify(packaged.cssFamily).length);
     return JSON.stringify(getSpecimenFamily(font, weight)) + fallback;
   }
-  const family = getEffectiveFamilyName(font);
+  const family = getSpecimenFamily(font, weight);
   if (family === font.name) return font.cssStack;
   const comma = font.cssStack.indexOf(',');
   const fallback = comma >= 0 ? font.cssStack.slice(comma) : ', sans-serif';
@@ -482,6 +484,20 @@ export function getEffectiveWeights(font: Font) {
   if (!trust.weightsVerified) return ["400"];
   const weights = font.weights.filter(weight => /^\d+$/.test(weight));
   return weights.length ? weights : ["400"];
+}
+
+export function getGoogleSpecimenUrl(font: Font) {
+  const google = getVerifiedGoogleFont(font);
+  const weights = getEffectiveWeights(font).map(Number).sort((a, b) => a - b);
+  const continuous = google ? Boolean(google.axes.wght) : isEffectivelyVariable(font);
+  const weightSpecs = continuous && weights.length > 1 ? [`${weights[0]}..${weights.at(-1)}`] : weights.map(String);
+  const axes = google?.italicOnly ? "ital,wght" : "wght";
+  const values = weightSpecs.map(weight => google?.italicOnly ? `1,${weight}` : weight).join(";");
+  const params = new URLSearchParams({
+    family: `${getSpecimenFamily(font)}:${axes}@${values}`,
+    display: "swap",
+  });
+  return `https://fonts.googleapis.com/css2?${params}`;
 }
 
 export function isEffectivelyVariable(font: Font) {

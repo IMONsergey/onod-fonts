@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { LayoutGrid, List as ListIcon, Search, Settings2, X } from "lucide-react";
+import { LayoutGrid, List as ListIcon, RotateCcw, Search, Settings2, X } from "lucide-react";
 import { useSearchParams } from "react-router";
 import { Font } from "@/data/mockFonts";
 import { orderCatalog, type CatalogSort } from "@/data/editorialOrder";
@@ -9,6 +9,7 @@ import { FontLoader } from "@/components/FontLoader";
 import { useFontFilter } from "@/hooks/useFontFilter";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n";
+import "../../styles/catalog-preview.css";
 
 interface FontCatalogPageProps {
   fonts: Font[];
@@ -24,13 +25,39 @@ interface FontCatalogPageProps {
 
 type ViewMode = "grid" | "list";
 
+interface CatalogSliderProps {
+  id: string;
+  label: string;
+  min: number;
+  max: number;
+  value: number;
+  unit?: string;
+  step?: number;
+  onChange: (value: number) => void;
+}
+
+function CatalogSlider({ id, label, min, max, value, unit = "", step = 1, onChange }: CatalogSliderProps) {
+  return (
+    <div className="min-w-0">
+      <div className="flex items-baseline justify-between gap-1 font-mono text-[10px] leading-tight">
+        <label htmlFor={id} className="truncate text-[10px] leading-tight font-normal text-neutral-600">{label}</label>
+        <output htmlFor={id} aria-live="off" className="shrink-0 tabular-nums text-neutral-900">{value}{unit}</output>
+      </div>
+      <input id={id} type="range" min={min} max={max} step={step} value={value}
+        aria-valuetext={`${value}${unit}`} onChange={event => onChange(event.currentTarget.valueAsNumber)}
+        className="catalog-preview-range" />
+    </div>
+  );
+}
+
 const parseList = (params: URLSearchParams, key: string) => (params.get(key) || "")
   .split(",")
   .map(item => item.trim())
   .filter(Boolean);
 
-const parseNumber = (value: string | null, fallback: number, min: number, max: number) => {
-  const parsed = Number(value);
+const parseNumber = (value: string | null, fallback: number, min: number, max: number, step = 1) => {
+  if (!value?.trim()) return fallback;
+  const parsed = Math.round(Number(value) / step) * step;
   return Number.isFinite(parsed) && parsed >= min && parsed <= max ? parsed : fallback;
 };
 
@@ -62,6 +89,15 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({
   const [viewMode, setViewMode] = useState<ViewMode>(() => initialParams.current.get("view") === "grid" ? "grid" : "list");
   const [sortMode, setSortMode] = useState<CatalogSort>(() => initialParams.current.get("sort") === "alpha" ? "alpha" : "default");
   const [globalFontSize, setGlobalFontSize] = useState(() => parseNumber(initialParams.current.get("size"), 64, 24, 120));
+  const [tracking, setTracking] = useState(() => parseNumber(initialParams.current.get("tracking"), 0, -5, 20));
+  const [weight, setWeight] = useState(() => parseNumber(initialParams.current.get("weight"), 400, 100, 900, 10));
+  const previewChanged = globalFontSize !== 64 || tracking !== 0 || weight !== 400;
+
+  const resetPreview = () => {
+    setGlobalFontSize(64);
+    setTracking(0);
+    setWeight(400);
+  };
 
   useEffect(() => {
     const urlPreview = initialParams.current.get("preview");
@@ -81,17 +117,18 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({
       sortMode === "alpha" ? next.set("sort", "alpha") : next.delete("sort");
       viewMode === "grid" ? next.set("view", "grid") : next.delete("view");
       globalFontSize !== 64 ? next.set("size", String(globalFontSize)) : next.delete("size");
+      tracking !== 0 ? next.set("tracking", String(tracking)) : next.delete("tracking");
+      weight !== 400 ? next.set("weight", String(weight)) : next.delete("weight");
       previewText ? next.set("preview", previewText.slice(0, 500)) : next.delete("preview");
 
       next.delete("source");
       next.delete("license");
       next.delete("minw");
-      next.delete("tracking");
       next.delete("pangram");
 
       return next.toString() === current.toString() ? current : next;
     }, { replace: true });
-  }, [filters, sortMode, viewMode, globalFontSize, previewText, setSearchParams]);
+  }, [filters, sortMode, viewMode, globalFontSize, tracking, weight, previewText, setSearchParams]);
 
   const filteredFonts = useFontFilter(fonts, filters);
   const sortedFonts = React.useMemo(
@@ -102,7 +139,7 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({
   const BATCH_SIZE = 20;
   const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
   const loadMoreRef = useRef<HTMLDivElement>(null);
-  const currentFonts = sortedFonts.slice(0, visibleCount);
+  const currentFonts = React.useMemo(() => sortedFonts.slice(0, visibleCount), [sortedFonts, visibleCount]);
 
   const loadMore = useCallback(() => {
     if (visibleCount < sortedFonts.length) {
@@ -171,19 +208,6 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({
               className="min-w-0 flex-1 bg-transparent outline-none text-base md:text-xl font-light placeholder:text-neutral-300"
             />
 
-            <div className="hidden lg:flex items-center gap-3 w-44 shrink-0">
-              <span className="font-mono text-[9px] text-neutral-400 tabular-nums">{globalFontSize}px</span>
-              <input
-                aria-label="Preview size"
-                type="range"
-                min="24"
-                max="120"
-                value={globalFontSize}
-                onChange={event => setGlobalFontSize(Number(event.target.value))}
-                className="w-full h-px bg-black appearance-none cursor-pointer accent-black"
-              />
-            </div>
-
             <label className="sr-only" htmlFor="catalog-sort">{t("sort.label")}</label>
             <select
               id="catalog-sort"
@@ -225,15 +249,33 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({
         </aside>
 
         <div className="md:pl-72 min-h-screen">
-          <div className="h-12 px-4 md:px-6 border-b border-neutral-200 flex items-center justify-between gap-4">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-neutral-400">
-              {filteredFonts.length} {t('fonts.count.' + pluralRules.select(filteredFonts.length))}
-            </span>
-            {hasFilters && (
-              <button type="button" onClick={resetFilters} className="font-mono text-[9px] uppercase tracking-widest text-neutral-400 hover:text-black transition-colors">
-                {t('filters.reset')}
-              </button>
-            )}
+          <div className="sticky top-44 z-20 border-b border-neutral-200 bg-white md:top-32 lg:flex lg:items-center lg:justify-between">
+            <div className="grid grid-cols-3 gap-4 px-3 pt-3 sm:gap-6 md:px-6 lg:order-2 lg:w-3/5 lg:max-w-2xl lg:pb-1">
+              <CatalogSlider id="catalog-size" label={t("catalog.size")} value={globalFontSize} unit=" px"
+                min={24} max={120} onChange={setGlobalFontSize} />
+              <CatalogSlider id="catalog-tracking" label={t("catalog.tracking")} value={tracking} unit="%"
+                min={-5} max={20} onChange={setTracking} />
+              <CatalogSlider id="catalog-weight" label={t("catalog.weight")} value={weight}
+                min={100} max={900} step={10} onChange={setWeight} />
+            </div>
+
+            <div className="flex min-h-9 items-center gap-3 px-3 md:px-6 lg:min-h-12">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
+                {filteredFonts.length} {t('fonts.count.' + pluralRules.select(filteredFonts.length))}
+              </span>
+              {previewChanged && (
+                <button type="button" id="catalog-reset-preview" onClick={resetPreview}
+                  aria-label={t("catalog.resetPreview")} title={t("catalog.resetPreview")}
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center text-neutral-500 hover:text-black focus-visible:outline">
+                  <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+                </button>
+              )}
+              {hasFilters && (
+                <button type="button" onClick={resetFilters} className="font-mono text-[9px] uppercase tracking-widest text-neutral-500 hover:text-black">
+                  {t('filters.reset')}
+                </button>
+              )}
+            </div>
           </div>
 
           {filteredFonts.length === 0 ? (
@@ -253,7 +295,8 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({
                   previewText={previewText}
                   isFavorite={favorites.includes(font.id)}
                   fontSize={globalFontSize}
-                  letterSpacing={0}
+                  letterSpacing={tracking / 100}
+                  requestedWeight={weight}
                   onToggleFavorite={toggleFavorite}
                   onViewDetails={viewDetails}
                   layout={viewMode}

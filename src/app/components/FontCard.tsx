@@ -4,7 +4,8 @@ import { Font, hasInteractiveSpecimen } from "@/data/mockFonts";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n";
 import { useFontRuntimeStatus } from "@/lib/fontRuntime";
-import { getEffectiveAuthor, getEffectiveCssStack, getEffectiveFamilyName, getSpecimenWeights } from "@/lib/fontTrust";
+import { getEffectiveAuthor, getEffectiveCssStack, getEffectiveFamilyName } from "@/lib/fontTrust";
+import { resolveCatalogWeight } from "@/lib/catalogWeight";
 
 interface FontCardProps {
   font: Font;
@@ -14,6 +15,7 @@ interface FontCardProps {
   layout?: "grid" | "list";
   fontSize: number;
   letterSpacing: number;
+  requestedWeight?: number;
   onToggleFavorite: (id: string) => void;
   onToggleCompare?: (id: string) => void;
   onViewDetails: (id: string) => void;
@@ -26,35 +28,35 @@ export const FontCard: React.FC<FontCardProps> = memo(({
   layout = "list",
   fontSize,
   letterSpacing,
+  requestedWeight = 400,
   onToggleFavorite,
   onViewDetails,
 }) => {
   const { t } = useLanguage();
   const runtime = useFontRuntimeStatus(font.id);
   const familyName = getEffectiveFamilyName(font);
-  const weights = getSpecimenWeights(font);
   const author = getEffectiveAuthor(font);
-  const defaultWeight = weights.includes("400") ? 400 : Number(weights[0] || 400);
+  const specimenWeight = resolveCatalogWeight(font, requestedWeight);
   const displayPreview = previewText || font.commercialPackage?.sample || familyName;
   const interactive = hasInteractiveSpecimen(font);
   const staticSpecimen = font.commercialPackage?.previewImageUrl;
   const categories = font.categories.slice(0, 2).join(" · ");
 
   const previewStyle = {
-    fontFamily: getEffectiveCssStack(font, defaultWeight),
-    fontSynthesis: font.commercialPackage?.previewFaces?.length ? "none" : undefined,
-    fontWeight: defaultWeight,
+    fontFamily: getEffectiveCssStack(font, specimenWeight),
+    fontSynthesis: "none",
+    fontWeight: specimenWeight,
     fontSize: `${fontSize}px`,
     letterSpacing: `${letterSpacing}em`,
   };
 
-  function renderSpecimen(grid: boolean) {
+  function renderSpecimen() {
     if (!interactive) {
       return staticSpecimen
         ? <img src={staticSpecimen} alt={familyName} loading="lazy" className="max-h-40 w-full object-contain" />
         : <span className="font-mono text-xs text-neutral-500">{t("details.sourceSpecimen")}</span>;
     }
-    return <p className="w-full text-center leading-tight break-words" style={grid ? { ...previewStyle, fontSize: `${Math.min(fontSize, 68)}px` } : previewStyle}>{displayPreview}</p>;
+    return <p className="w-full text-center leading-tight break-words" style={previewStyle}>{displayPreview}</p>;
   }
 
   const FavoriteButton = ({ compact = false }: { compact?: boolean }) => (
@@ -97,7 +99,7 @@ export const FontCard: React.FC<FontCardProps> = memo(({
           className="relative flex-1 min-h-[220px] p-5 flex items-center justify-center overflow-hidden text-left hover:bg-neutral-50 transition-colors"
           aria-label={`Open ${familyName} details`}
         >
-          {renderSpecimen(true)}
+          {renderSpecimen()}
           {runtime.status === "error" && (
             <span className="absolute bottom-3 left-4 right-4 text-center font-mono text-[8px] uppercase tracking-widest text-neutral-400">Fallback preview</span>
           )}
@@ -138,7 +140,7 @@ export const FontCard: React.FC<FontCardProps> = memo(({
         className="relative flex-1 min-h-[230px] p-6 md:p-8 flex items-center justify-center overflow-hidden hover:bg-neutral-50 transition-colors"
         aria-label={`Open ${familyName} details`}
       >
-        {renderSpecimen(false)}
+        {renderSpecimen()}
         <span className="absolute top-4 right-5 font-mono text-[8px] uppercase tracking-widest text-neutral-300 opacity-0 group-hover:opacity-100 transition-opacity">Open details ↗</span>
       </button>
     </article>

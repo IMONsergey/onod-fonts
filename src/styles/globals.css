@@ -204,6 +204,31 @@
   }
 }
 
+/* Keep the native menu and its keyboard behavior; reserve space for its indicator. */
+select:not([multiple]):is(:not([size]), [size="1"]) {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-inline-end: 2.125rem;
+  text-overflow: ellipsis;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23737373' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m2 4 4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 0.75rem 0.75rem;
+  background-position: right 0.75rem center;
+}
+
+select:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+@media (forced-colors: active) {
+  select:not([multiple]):is(:not([size]), [size="1"]) {
+    -webkit-appearance: auto;
+    appearance: auto;
+    background-image: none;
+  }
+}
+
 html { font-size: var(--font-size); }
 @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 

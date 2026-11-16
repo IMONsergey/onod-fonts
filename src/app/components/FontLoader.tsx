@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Font } from '../data/mockFonts';
 import editorialPreviews from '../data/verified/editorial-previews.json';
 import { setFontRuntimeStatus } from '../lib/fontRuntime';
-import { getEffectiveFamilyName, getSpecimenFamily, getSpecimenWeights, getEffectiveFontshareSlug, getEffectiveLanguages, getEffectiveSourceLabel, getEffectiveWeights, isEffectivelyVariable } from '../lib/fontTrust';
+import { getGoogleSpecimenUrl, getSpecimenFamily, getSpecimenWeights, getEffectiveFontshareSlug, getEffectiveLanguages, getEffectiveSourceLabel, getEffectiveWeights } from '../lib/fontTrust';
 import { getVerifiedHistoricalFontArtifact, getVerifiedOpenFontArtifact, type VerifiedHistoricalFontArtifact, type VerifiedOpenFontArtifact } from '../lib/fontArtifactRuntime';
 
 interface FontLoaderProps {
@@ -39,14 +39,6 @@ const verifyFontFace = async (font: Font) => {
   } catch (error) {
     setFontRuntimeStatus(font.id, 'error', error instanceof Error ? error.message : 'Font face verification failed.');
   }
-};
-
-const googleFontUrl = (font: Font) => {
-  const weights = getEffectiveWeights(font).sort((a, b) => Number(a) - Number(b));
-  let family = getEffectiveFamilyName(font);
-  if (isEffectivelyVariable(font) && weights.length > 1) family += `:wght@${weights[0]}..${weights.at(-1)}`;
-  else family += `:wght@${weights.join(';')}`;
-  return `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, '+')}&display=swap`;
 };
 
 const artifactWeightDescriptor = (font: Font, artifact: RuntimeArtifact) => {
@@ -170,10 +162,9 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
 
       if (sourceLabel === 'Google Fonts') {
         const localPreview = (editorialPreviews as Record<string, string>)[font.name];
-        const weights = getEffectiveWeights(font);
-        const url = localPreview && weights.length === 1 && weights[0] === '400'
+        const url = localPreview
           ? `${import.meta.env.BASE_URL}assets/editorial/${localPreview}/regular.css`
-          : googleFontUrl(font);
+          : getGoogleSpecimenUrl(font);
         addStylesheet(font, url, stylesheetId('google', font));
         return;
       }

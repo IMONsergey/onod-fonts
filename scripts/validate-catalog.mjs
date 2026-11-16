@@ -157,6 +157,13 @@ for (const [name, directory] of Object.entries(localPreviews)) {
   if (!urls.length || !notice.includes('SIL OPEN FONT LICENSE') || !sheet.includes(`font-family: '${name}'`)) {
     addError(null, `Missing editorial font or license for ${name}.`);
   }
+  const declarations = new Set([...sheet.matchAll(/font-weight:\s*([\d ]+);/g)].map(match => match[1]));
+  const metadata = googleEvidence[name];
+  const axis = metadata?.axes.wght;
+  const normalWeights = axis ? [`${axis.min} ${axis.max}`] : (metadata?.weights || []).map(String);
+  if (!normalWeights.length || declarations.size !== normalWeights.length || normalWeights.some(weight => !declarations.has(weight))) {
+    addError(null, `Local editorial specimens disagree with verified upright weights: ${name}.`);
+  }
   for (const url of urls) {
     if (!/^[a-f0-9]{16}\.woff2$/.test(url) || readFileSync(resolve(root, url)).subarray(0, 4).toString() !== 'wOF2') {
       addError(null, `Invalid webfont for ${name}: ${url}`);

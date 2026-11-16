@@ -12,7 +12,7 @@ import { ProtocolPage } from './pages/ProtocolPage';
 import { PrivacyPage } from './pages/policies/PrivacyPage';
 import { TermsPage } from './pages/policies/TermsPage';
 import { LicensePage } from './pages/policies/LicensePage';
-import { mockFonts } from './data/mockFonts';
+import { hasInteractiveSpecimen, mockFonts } from './data/mockFonts';
 import type { Font } from './data/mockFonts';
 import { getEffectiveFamilyName } from './lib/fontTrust';
 import { toast } from 'sonner';
@@ -37,7 +37,7 @@ function readStoredFontIds(key: string): string[] {
 }
 
 function validFontIds(ids: string[]) {
-  return Array.from(new Set(ids.filter(id => mockFonts.some(font => font.id === id)))).slice(0, 3);
+  return Array.from(new Set(ids.filter(id => mockFonts.some(font => font.id === id && hasInteractiveSpecimen(font))))).slice(0, 3);
 }
 
 function sameIds(a: string[], b: string[]) {

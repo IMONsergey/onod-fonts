@@ -46,8 +46,9 @@ if (!Array.isArray(mockFonts)) {
     if (!Array.isArray(font.categories) || font.categories.length === 0) addError(font, 'categories must be a non-empty array.');
     else for (const category of font.categories) if (!allowedCategories.has(category)) addWarning(font, `unrecognized category: ${category}`);
 
-    if (!Array.isArray(font.languages) || font.languages.length === 0) addError(font, 'languages must be a non-empty array.');
-    if (!Array.isArray(font.weights) || font.weights.length === 0) addError(font, 'weights must be a non-empty array.');
+    const expanded = font.commercialPackage?.collection === 'expanded';
+    if (!Array.isArray(font.languages) || (!expanded && font.languages.length === 0)) addError(font, 'missing script metadata.');
+    if (!Array.isArray(font.weights) || (font.weights.length === 0 && !font.commercialPackage?.sourceOnly)) addError(font, 'weights must be a non-empty array.');
     else {
       const numericWeights = font.weights.map(value => Number(value));
       if (numericWeights.some(value => !Number.isFinite(value) || value < 1 || value > 1000)) addError(font, `invalid weight list: ${font.weights.join(', ')}`);
@@ -93,12 +94,36 @@ const legacyNames = mockFonts.filter(font => !font.commercialPackage).map(font =
 const normalizedFamilies = new Set([...legacyNames, ...Object.values(reviewedAliases)].map(normalizeName));
 const packageKeys = new Set();
 for (const font of mockFonts.filter(font => font.commercialPackage)) {
-  const { key, licenseUrl } = font.commercialPackage;
+  const { collection, key, licenseUrl, sourceOnly, usage, previewImageUrl, cssFamily, previewFaces } = font.commercialPackage;
   const canonicalName = normalizeName(font.name);
   if (normalizedFamilies.has(canonicalName)) addError(font, 'packaged family duplicates a catalog family or alias.');
   normalizedFamilies.add(canonicalName);
   if (packageKeys.has(key)) addError(font, 'duplicate immutable package key.');
   packageKeys.add(key);
+  if (collection === 'expanded') {
+    if (!/^[a-z0-9][a-z0-9_-]*$/.test(key) || !/^[a-z0-9][a-z0-9_-]*$/.test(font.id)) {
+      addError(font, 'invalid collection key or route id.');
+    }
+    if (!isHttpUrl(licenseUrl) || !licenseUrl.startsWith('https://')) addError(font, 'missing secure license evidence.');
+    if (!font.license || /personal.use.only|non.?commercial|^CC-BY-NC|^unknown$|^free$/i.test(font.license)) {
+      addError(font, 'missing or incompatible commercial-use license.');
+    }
+    if (usage && (!usage.ru?.trim() || !usage.en?.trim())) addError(font, 'commercial usage summary is missing a translation.');
+    if (previewImageUrl && !/^https:\/\//.test(previewImageUrl) && !/^\/assets\/type\//.test(previewImageUrl)) addError(font, 'invalid specimen image URL.');
+    if (previewFaces && (!cssFamily || !Array.isArray(previewFaces) || previewFaces.some(face =>
+      !face.cssFamily?.trim() || !Number.isInteger(face.weight) || face.weight < 1 || face.weight > 1000 || !['normal', 'italic', 'oblique'].includes(face.style)
+    ))) addError(font, 'invalid per-style preview aliases.');
+    if (cssFamily && (!sourceOnly || !font.customCssUrl || !cssFamily.trim())) addError(font, 'CSS family alias requires an authorized external specimen stylesheet.');
+    if (sourceOnly) {
+      if (!isHttpUrl(font.downloadUrl) || !font.downloadUrl.startsWith('https://')) addError(font, 'missing original download source.');
+    } else {
+      const base = `https://onod.space/assets/type/${key}`;
+      if (font.downloadUrl !== `${base}/family.zip` || font.customCssUrl !== `${base}/preview.css`) {
+        addError(font, 'missing self-hosted family package or specimen.');
+      }
+    }
+    continue;
+  }
   if (!/^(?:gf|it)-[a-z0-9][a-z0-9-]*-[0-9a-f]{12}$/.test(key) || font.id !== `ofl-${key.slice(0, -13)}`) {
     addError(font, 'invalid versioned package or unstable route ID.');
   }

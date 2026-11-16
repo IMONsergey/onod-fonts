@@ -4,6 +4,7 @@ import { Font } from "@/data/mockFonts";
 import { getEffectiveAuthor, getEffectiveFamilyName, getEffectiveLanguages, getEffectiveSourceLabel, getEffectiveSourceUrl, getEffectiveWeights, getFontTrustReport, isEffectivelyVariable } from "@/lib/fontTrust";
 
 const toRuntimeSafeFont = (font: Font): Font => {
+  if (font.commercialPackage) return font;
   const trust = getFontTrustReport(font);
   return {
     ...font,
@@ -23,7 +24,7 @@ export const useFontFilter = (fonts: Font[], filters: FilterState) => {
 
     return fonts
       .filter((font) => {
-        if (filters.oflPackageOnly && !font.commercialPackage) return false;
+        if (filters.collection && font.commercialPackage?.collection !== filters.collection) return false;
         const familyName = getEffectiveFamilyName(font);
         const author = getEffectiveAuthor(font);
         const source = getEffectiveSourceLabel(font);

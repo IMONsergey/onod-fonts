@@ -208,10 +208,32 @@ export function getVerifiedIndependentFont(font: Font): VerifiedIndependentFont 
 }
 
 export function getEffectiveFamilyName(font: Font) {
+  if (font.commercialPackage) return font.name;
   return getCatalogCorrectionRelation(font)?.canonical.family || font.name;
 }
 
-export function getEffectiveCssStack(font: Font) {
+export function getSpecimenFamily(font: Font, weight?: number | string) {
+  const packaged = font.commercialPackage;
+  if (!packaged?.cssFamily) return getEffectiveFamilyName(font);
+  const matching = packaged.previewFaces?.filter(face => face.weight === Number(weight));
+  return matching?.find(face => face.style === "normal")?.cssFamily || matching?.[0]?.cssFamily || packaged.cssFamily;
+}
+
+export function getSpecimenWeights(font: Font) {
+  const weights = getEffectiveWeights(font);
+  const previews = font.commercialPackage?.previewFaces;
+  if (!previews?.length || font.variable) return weights;
+  const available = new Set(previews.map(face => face.weight));
+  const matched = weights.filter(weight => available.has(Number(weight)));
+  return matched.length ? matched : weights;
+}
+
+export function getEffectiveCssStack(font: Font, weight?: number | string) {
+  const packaged = font.commercialPackage;
+  if (packaged?.cssFamily) {
+    const fallback = font.cssStack.slice(JSON.stringify(packaged.cssFamily).length);
+    return JSON.stringify(getSpecimenFamily(font, weight)) + fallback;
+  }
   const family = getEffectiveFamilyName(font);
   if (family === font.name) return font.cssStack;
   const comma = font.cssStack.indexOf(',');
@@ -225,10 +247,10 @@ export function getFontTrustReport(font: Font): FontTrustReport {
       confidence: "curated",
       identityVerified: true,
       licenseVerified: true,
-      weightsVerified: true,
-      variableVerified: true,
-      scriptsVerified: true,
-      licenseLabel: "OFL-1.1",
+      weightsVerified: font.commercialPackage.technicalVerified,
+      variableVerified: font.commercialPackage.technicalVerified,
+      scriptsVerified: font.commercialPackage.technicalVerified,
+      licenseLabel: font.license,
       warnings: [],
       upstreamVerified: true,
       verificationSource: font.commercialPackage.licenseUrl,
@@ -422,6 +444,7 @@ const variableWeightSteps = (min: number, max: number) => {
 };
 
 export function getEffectiveWeights(font: Font) {
+  if (font.commercialPackage) return font.commercialPackage.technicalVerified && font.weights.length ? font.weights : ["400"];
   const google = getVerifiedGoogleFont(font);
   if (google) {
     const weightAxis = google.axes.wght;
@@ -462,6 +485,7 @@ export function getEffectiveWeights(font: Font) {
 }
 
 export function isEffectivelyVariable(font: Font) {
+  if (font.commercialPackage) return font.commercialPackage.technicalVerified && font.variable;
   const google = getVerifiedGoogleFont(font);
   if (google) return Object.keys(google.axes).length > 0;
   const correction = getCatalogCorrectionRelation(font);
@@ -493,7 +517,7 @@ const subsetToScript = (subset: string) => {
 };
 
 export function getEffectiveLanguages(font: Font) {
-  if (font.commercialPackage) return font.languages;
+  if (font.commercialPackage) return font.commercialPackage.technicalVerified ? font.languages : [];
   const google = getVerifiedGoogleFont(font);
   if (google) {
     const scripts = new Set(google.subsets.map(subsetToScript).filter((value): value is string => Boolean(value)));
@@ -539,6 +563,7 @@ export function getEffectiveLanguages(font: Font) {
 }
 
 export function getEffectiveAuthor(font: Font) {
+  if (font.commercialPackage) return font.author;
   return getVerifiedGoogleFont(font)?.designer
     || getCatalogCorrectionRelation(font)?.canonical.designer
     || getVerifiedFontshareFont(font)?.designer
@@ -549,6 +574,7 @@ export function getEffectiveAuthor(font: Font) {
 }
 
 export function getEffectiveSourceUrl(font: Font) {
+  if (font.commercialPackage) return font.sourceUrl;
   return getVerifiedGoogleFont(font)?.repositoryUrl
     || getCatalogCorrectionRelation(font)?.canonical.sourceUrl
     || getVerifiedFontshareFont(font)?.sourceUrl
@@ -560,6 +586,7 @@ export function getEffectiveSourceUrl(font: Font) {
 }
 
 export function getEffectiveSourceLabel(font: Font) {
+  if (font.commercialPackage) return font.source;
   if (getVerifiedGoogleFont(font) || getCatalogCorrectionRelation(font)) return "Google Fonts";
   if (getVerifiedFontshareFont(font)) return "Fontshare";
   if (getVerifiedIndependentFont(font)) return "Independent";

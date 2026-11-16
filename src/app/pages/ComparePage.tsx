@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import { Font } from "@/data/mockFonts";
+import { Font, hasInteractiveSpecimen } from "@/data/mockFonts";
 import { X, ArrowLeft, Type, Copy, Share2, Scale } from "lucide-react";
 import { toast } from "sonner";
 import { FontLoader } from "@/components/FontLoader";
@@ -116,16 +116,19 @@ export const ComparePage: React.FC<CompareProps> = ({
     let targetCat = "sans-serif";
     if (!isSerif && !baseFont.categories.includes("monospaced")) targetCat = "serif";
     if (baseFont.categories.includes("monospaced")) targetCat = "sans-serif";
-    const candidates = allFonts.filter(font => font.categories.includes(targetCat) && !fonts.some(existing => existing.id === font.id));
+    const candidates = allFonts.filter(font => hasInteractiveSpecimen(font) && font.categories.includes(targetCat) && !fonts.some(existing => existing.id === font.id));
     if (!candidates.length) return null;
     return candidates[baseFont.id.length % candidates.length];
   }, [fonts, allFonts]);
 
+  const configFamilies = (font: Font | undefined, displayName: string) =>
+    JSON.stringify([JSON.stringify(font?.commercialPackage?.cssFamily || displayName), fallbackFamily(font)]);
+
   const generateConfig = () => `
 // tailwind.config.js theme extension
 fontFamily: {
-  'body': ['"${bodyName}"', '${fallbackFamily(bodyFont)}'],
-  'display': ['"${headingName}"', '${fallbackFamily(headingFont)}'],
+  'body': ${configFamilies(bodyFont, bodyName)},
+  'display': ${configFamilies(headingFont, headingName)},
 },
 fontSize: {
   'base': '${baseSize}px',

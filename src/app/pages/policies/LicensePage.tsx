@@ -27,8 +27,8 @@ export const LicensePage = () => {
           <section>
             <h2 className="font-sans text-xl font-bold uppercase tracking-wide mb-4">{ru ? '2. Подтверждённые данные' : '2. Verified metadata'}</h2>
             <p>{ru
-              ? 'Если карточка помечена VERIFIED / UPSTREAM VERIFIED, отображаемый идентификатор лицензии и связанные метаданные получены из зафиксированного первичного источника. Ссылка «Источник» ведёт к исходному проекту или провайдеру, когда такой URL доступен.'
-              : 'When a card is marked VERIFIED / UPSTREAM VERIFIED, the displayed license identifier and related metadata come from a versioned upstream source. The Source action points to the originating project or provider when that URL is available.'}</p>
+              ? 'В карточке с подтвержденной лицензией указаны ее название и источник. Для новых поступлений это текст лицензии в оригинальном пакете или условия, опубликованные автором либо дистрибьютором. Кнопка скачивания ведет к архиву ONOD или на сайт источника.'
+              : 'Verified entries show the license and its source. For new arrivals, the evidence is the license in the original font package or the terms published by the author or distributor. The download action opens the ONOD archive or the original source.'}</p>
           </section>
 
           <section>
@@ -41,12 +41,12 @@ export const LicensePage = () => {
           <section>
             <h2 className="font-sans text-xl font-bold uppercase tracking-wide mb-4">{ru ? '4. Использование и распространение' : '4. Use and redistribution'}</h2>
             <p>{ru
-              ? 'Перед использованием гарнитуры в проекте проверяйте актуальный текст лицензии у правообладателя или исходного провайдера. Особенно отдельно проверяйте право на распространение самих font-файлов: бесплатное использование шрифта и право перераспространять его файлы — не одно и то же.'
-              : 'Before using a typeface in a project, verify the current license text with the rights holder or originating provider. Check redistribution rights separately: permission to use a font does not automatically mean permission to redistribute its files.'}</p>
+              ? 'В карточке выберите ссылку на лицензию семейства. Проверьте условия для своего проекта, особенно при передаче файлов клиенту, размещении веб-шрифтов или встраивании в приложение. Сохраняйте требуемые сведения об авторстве и лицензии вместе с файлами.'
+              : 'Open the family license for the terms that apply to your project, particularly when supplying font files to a client, self-hosting webfonts or embedding fonts in an app. Keep any required attribution and license notices with the files.'}</p>
           </section>
 
           <div className="pt-12 border-t border-neutral-200 mt-12">
-            <p className="font-mono text-[10px] uppercase text-neutral-400 tracking-widest">ONOD Fonts · {ru ? 'редакция 10 августа 2026' : 'updated August 10, 2026'}</p>
+            <p className="font-mono text-[10px] uppercase text-neutral-400 tracking-widest">ONOD Fonts · {ru ? 'редакция 16 ноября 2026' : 'updated November 16, 2026'}</p>
           </div>
         </div>
       </div>

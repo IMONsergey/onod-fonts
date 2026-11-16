@@ -4,6 +4,8 @@ location ^~ /assets/type/ {
     autoindex off;
     types {
         text/css css;
+        image/png png;
+        image/webp webp;
         text/plain txt;
         application/json json;
         application/zip zip;

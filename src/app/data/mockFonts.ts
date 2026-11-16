@@ -1,6 +1,12 @@
 import googlePackages from "./verified/commercial/google.json" with { type: "json" };
 import collletttivoPackages from "./verified/commercial/collletttivo.json" with { type: "json" };
 
+import expandedPackages from "./verified/commercial/expanded.json" with { type: "json" };
+
+export type CommercialCollection = "ofl" | "expanded";
+type PreviewFace = { weight: number; style: string; cssFamily: string };
+type UsageSummary = { ru: string; en: string };
+
 // --- Interfaces ---
 export interface Font {
   id: string;
@@ -16,6 +22,14 @@ export interface Font {
   downloadUrl?: string;
   commercialPackage?: {
     key: string;
+    collection: CommercialCollection;
+    sourceOnly: boolean;
+    technicalVerified: boolean;
+    usage?: UsageSummary;
+    credit?: string;
+    cssFamily?: string;
+    previewFaces?: PreviewFace[];
+    previewImageUrl?: string;
     licenseUrl: string;
     sample?: string;
   };
@@ -25,6 +39,8 @@ export interface Font {
   tags: string[];
   cssStack: string;
 }
+
+export const hasInteractiveSpecimen = (font: Font) => !font.commercialPackage?.sourceOnly || Boolean(font.customCssUrl);
 
 // --- KNOWN CYRILLIC FONTS LIST (Expanded) ---
 const CYRILLIC_SUPPORTED = new Set([
@@ -1681,9 +1697,22 @@ interface LicensedFamily {
     variable: boolean;
     weights: number[];
     sample?: string;
+    license?: string;
+    sourceOnly?: boolean;
+    technicalVerified?: boolean;
+    credit?: string;
+    previewCssUrl?: string;
+    cssFamily?: string;
+    previewFaces?: PreviewFace[];
+    previewImageUrl?: string;
+    downloadUrl?: string;
+    usage?: UsageSummary;
 }
 
-const licensedFamilies: LicensedFamily[] = [...googlePackages, ...collletttivoPackages];
+const packagesByCollection: Record<CommercialCollection, LicensedFamily[]> = {
+    ofl: [...googlePackages, ...collletttivoPackages],
+    expanded: expandedPackages,
+};
 const fallbacks: Record<string, string> = {
     "sans-serif": "sans-serif",
     serif: "serif",
@@ -1692,28 +1721,44 @@ const fallbacks: Record<string, string> = {
     monospaced: "monospace",
 };
 
-for (const family of licensedFamilies) {
-    const base = `https://onod.space/assets/type/${family.key}`;
-    // Keep the historical URLs and IDs stable. The catalog gate rejects name collisions.
-    fonts.push({
-        id: family.id,
-        name: family.name,
-        author: family.author,
-        description: "",
-        variable: family.variable,
-        categories: [family.category],
-        languages: family.languages,
-        license: "OFL-1.1",
-        source: family.source,
-        sourceUrl: family.sourceUrl,
-        downloadUrl: `${base}/family.zip`,
-        customCssUrl: `${base}/preview.css`,
-        weights: family.weights.map(String),
-        styles: family.styles,
-        tags: ["OFL-1.1"],
-        cssStack: `${JSON.stringify(family.name)}, ${fallbacks[family.category] || "sans-serif"}`,
-        commercialPackage: { key: family.key, licenseUrl: family.licenseUrl, sample: family.sample },
-    });
+for (const collection of Object.keys(packagesByCollection) as CommercialCollection[]) {
+    for (const family of packagesByCollection[collection]) {
+        const base = `https://onod.space/assets/type/${family.key}`;
+        const sourceOnly = family.sourceOnly === true;
+        const cssFamily = sourceOnly ? family.cssFamily : undefined;
+        const license = family.license || (collection === "ofl" ? "OFL-1.1" : "");
+        fonts.push({
+            id: family.id,
+            name: family.name,
+            author: family.author,
+            description: "",
+            variable: family.variable,
+            categories: [family.category],
+            languages: family.languages,
+            license,
+            source: family.source,
+            sourceUrl: family.sourceUrl,
+            downloadUrl: sourceOnly ? family.downloadUrl || family.sourceUrl : `${base}/family.zip`,
+            customCssUrl: sourceOnly ? family.previewCssUrl : `${base}/preview.css`,
+            weights: family.weights.map(String),
+            styles: family.styles,
+            tags: [license],
+            cssStack: `${JSON.stringify(cssFamily || family.name)}, ${fallbacks[family.category] || "sans-serif"}`,
+            commercialPackage: {
+                collection,
+                key: family.key,
+                licenseUrl: family.licenseUrl,
+                sample: family.sample,
+                sourceOnly,
+                technicalVerified: family.technicalVerified ?? !sourceOnly,
+                credit: family.credit,
+                cssFamily,
+                previewFaces: sourceOnly ? family.previewFaces : undefined,
+                usage: family.usage,
+                previewImageUrl: family.previewImageUrl,
+            },
+        });
+    }
 }
 
 // Keep catalog order stable across builds, sessions and screenshots.

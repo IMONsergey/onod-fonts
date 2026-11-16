@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Font } from '../data/mockFonts';
 import { setFontRuntimeStatus } from '../lib/fontRuntime';
-import { getEffectiveFamilyName, getEffectiveFontshareSlug, getEffectiveLanguages, getEffectiveSourceLabel, getEffectiveWeights, isEffectivelyVariable } from '../lib/fontTrust';
+import { getEffectiveFamilyName, getSpecimenFamily, getSpecimenWeights, getEffectiveFontshareSlug, getEffectiveLanguages, getEffectiveSourceLabel, getEffectiveWeights, isEffectivelyVariable } from '../lib/fontTrust';
 import { getVerifiedHistoricalFontArtifact, getVerifiedOpenFontArtifact, type VerifiedHistoricalFontArtifact, type VerifiedOpenFontArtifact } from '../lib/fontArtifactRuntime';
 
 interface FontLoaderProps {
@@ -13,12 +13,12 @@ type RuntimeArtifact = VerifiedOpenFontArtifact | VerifiedHistoricalFontArtifact
 const globalReadyIds = new Set<string>();
 const globalLoadPromises = new Map<string, Promise<void>>();
 const stylesheetId = (prefix: string, font: Font) => `${prefix}-${font.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
-const primaryFamily = (font: Font) => getEffectiveFamilyName(font);
+const primaryFamily = (font: Font) => getSpecimenFamily(font);
 
 const fontDescriptor = (font: Font) => {
-  const weights = getEffectiveWeights(font).map(Number).filter(Number.isFinite);
+  const weights = getSpecimenWeights(font).map(Number).filter(Number.isFinite);
   const weight = weights.includes(400) ? 400 : weights[0] || 400;
-  return `${weight} 16px "${primaryFamily(font).replace(/"/g, '\\"')}"`;
+  return `${weight} 16px ${JSON.stringify(getSpecimenFamily(font, weight))}`;
 };
 
 const verifyFontFace = async (font: Font) => {
@@ -152,7 +152,8 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
     }, { rootMargin: '500px 0px' });
 
     for (const font of fonts) {
-      if (font.commercialPackage && font.customCssUrl) {
+      if (font.commercialPackage) {
+        if (!font.customCssUrl) continue;
         const card = visibleCards.get(font.id);
         if (card && observer) {
           packageByCard.set(card, font);

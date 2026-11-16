@@ -1,10 +1,10 @@
 import React, { memo } from "react";
 import { Heart } from "lucide-react";
-import { Font } from "@/data/mockFonts";
+import { Font, hasInteractiveSpecimen } from "@/data/mockFonts";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n";
 import { useFontRuntimeStatus } from "@/lib/fontRuntime";
-import { getEffectiveAuthor, getEffectiveCssStack, getEffectiveFamilyName, getEffectiveWeights } from "@/lib/fontTrust";
+import { getEffectiveAuthor, getEffectiveCssStack, getEffectiveFamilyName, getSpecimenWeights } from "@/lib/fontTrust";
 
 interface FontCardProps {
   font: Font;
@@ -32,19 +32,30 @@ export const FontCard: React.FC<FontCardProps> = memo(({
   const { t } = useLanguage();
   const runtime = useFontRuntimeStatus(font.id);
   const familyName = getEffectiveFamilyName(font);
-  const cssStack = getEffectiveCssStack(font);
-  const weights = getEffectiveWeights(font);
+  const weights = getSpecimenWeights(font);
   const author = getEffectiveAuthor(font);
   const defaultWeight = weights.includes("400") ? 400 : Number(weights[0] || 400);
   const displayPreview = previewText || font.commercialPackage?.sample || familyName;
+  const interactive = hasInteractiveSpecimen(font);
+  const staticSpecimen = font.commercialPackage?.previewImageUrl;
   const categories = font.categories.slice(0, 2).join(" · ");
 
   const previewStyle = {
-    fontFamily: cssStack,
+    fontFamily: getEffectiveCssStack(font, defaultWeight),
+    fontSynthesis: font.commercialPackage?.previewFaces?.length ? "none" : undefined,
     fontWeight: defaultWeight,
     fontSize: `${fontSize}px`,
     letterSpacing: `${letterSpacing}em`,
   };
+
+  function renderSpecimen(grid: boolean) {
+    if (!interactive) {
+      return staticSpecimen
+        ? <img src={staticSpecimen} alt={familyName} loading="lazy" className="max-h-40 w-full object-contain" />
+        : <span className="font-mono text-xs text-neutral-500">{t("details.sourceSpecimen")}</span>;
+    }
+    return <p className="w-full text-center leading-tight break-words" style={grid ? { ...previewStyle, fontSize: `${Math.min(fontSize, 68)}px` } : previewStyle}>{displayPreview}</p>;
+  }
 
   const FavoriteButton = ({ compact = false }: { compact?: boolean }) => (
     <button
@@ -86,9 +97,7 @@ export const FontCard: React.FC<FontCardProps> = memo(({
           className="relative flex-1 min-h-[220px] p-5 flex items-center justify-center overflow-hidden text-left hover:bg-neutral-50 transition-colors"
           aria-label={`Open ${familyName} details`}
         >
-          <p className="w-full text-center leading-tight break-words" style={{ ...previewStyle, fontSize: `${Math.min(fontSize, 68)}px` }}>
-            {displayPreview}
-          </p>
+          {renderSpecimen(true)}
           {runtime.status === "error" && (
             <span className="absolute bottom-3 left-4 right-4 text-center font-mono text-[8px] uppercase tracking-widest text-neutral-400">Fallback preview</span>
           )}
@@ -129,7 +138,7 @@ export const FontCard: React.FC<FontCardProps> = memo(({
         className="relative flex-1 min-h-[230px] p-6 md:p-8 flex items-center justify-center overflow-hidden hover:bg-neutral-50 transition-colors"
         aria-label={`Open ${familyName} details`}
       >
-        <p className="w-full text-center leading-tight break-words" style={previewStyle}>{displayPreview}</p>
+        {renderSpecimen(false)}
         <span className="absolute top-4 right-5 font-mono text-[8px] uppercase tracking-widest text-neutral-300 opacity-0 group-hover:opacity-100 transition-opacity">Open details ↗</span>
       </button>
     </article>

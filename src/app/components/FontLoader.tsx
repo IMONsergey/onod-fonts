@@ -28,7 +28,12 @@ const verifyFontFace = async (font: Font) => {
   try {
     const descriptor = fontDescriptor(font);
     const sample = font.commercialPackage?.sample || (getEffectiveLanguages(font).includes('Cyrillic') ? 'Hamburgefontsiv Привет' : 'Hamburgefontsiv');
-    const faces = await document.fonts.load(descriptor, sample);
+    let faces = await document.fonts.load(descriptor, sample);
+    // A cached stylesheet can fire load before WebKit registers its @font-face rules.
+    if (!faces.length) {
+      await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+      faces = await document.fonts.load(descriptor, sample);
+    }
     const ready = faces.length > 0 && faces.every(face => face.status === 'loaded');
     setFontRuntimeStatus(font.id, ready ? 'ready' : 'error', ready ? undefined : 'Font face was not registered; preview is using fallback.');
   } catch (error) {

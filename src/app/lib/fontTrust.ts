@@ -189,6 +189,7 @@ const getVerifiedHistoricalArtifact = (font: Font): VerifiedHistoricalArtifact |
 };
 
 export function getVerifiedGoogleFont(font: Font): VerifiedGoogleFont | undefined {
+  if (font.commercialPackage) return undefined;
   const candidate = verifiedGoogleFonts[font.name];
   if (!candidate || candidate.family !== font.name) return undefined;
   return candidate;
@@ -219,6 +220,22 @@ export function getEffectiveCssStack(font: Font) {
 }
 
 export function getFontTrustReport(font: Font): FontTrustReport {
+  if (font.commercialPackage) {
+    return {
+      confidence: "curated",
+      identityVerified: true,
+      licenseVerified: true,
+      weightsVerified: true,
+      variableVerified: true,
+      scriptsVerified: true,
+      licenseLabel: "OFL-1.1",
+      warnings: [],
+      upstreamVerified: true,
+      verificationSource: font.commercialPackage.licenseUrl,
+      provider: font.source === "Google Fonts" ? "Google Fonts" : "Independent",
+    };
+  }
+
   const google = getVerifiedGoogleFont(font);
   if (google) {
     return {
@@ -476,6 +493,7 @@ const subsetToScript = (subset: string) => {
 };
 
 export function getEffectiveLanguages(font: Font) {
+  if (font.commercialPackage) return font.languages;
   const google = getVerifiedGoogleFont(font);
   if (google) {
     const scripts = new Set(google.subsets.map(subsetToScript).filter((value): value is string => Boolean(value)));

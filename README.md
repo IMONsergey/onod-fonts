@@ -50,7 +50,7 @@ is `/onod-fonts/`, so generated JS/CSS assets resolve correctly at the project P
 Do not maintain a separate hand-written fallback page in `gh-pages`; production output must come
 from the canonical React/Vite application in `main`.
 
-Public site: https://imonsergey.github.io/onod-fonts/
+Public site: https://onod.space/. The GitHub Pages build is also available at https://imonsergey.github.io/onod-fonts/.
 
 ## Catalog trust model
 
@@ -92,7 +92,11 @@ The Figma Make export has been normalized for independent development:
 
 ## Font data
 
-The current bundled catalog contains 1,346 unique font records. Its generator and source manifests live in `src/app/data/mockFonts.ts`; generated binary blobs are not treated as source of truth.
+The November 2026 catalog contains 2,159 unique families. The original 1,346 entries retain their IDs. The additional 813 families have version-pinned, downloadable SIL OFL 1.1 packages (798 from Google Fonts and 15 from Collletttivo). They include 1,281 installable font files. In 89 families at least one original font covers the entire modern Russian alphabet in uppercase and lowercase, including Ё and ё. Open [the licensed collection](https://onod.space/?collection=ofl) or [filter by Cyrillic](https://onod.space/?collection=ofl&script=Cyrillic).
+
+The catalog combines the recovered source manifest in `src/app/data/mockFonts.ts` with the family manifests in `src/app/data/verified/commercial/`. Each packaged family has a stable detail route, an upstream license URL, a preview stylesheet and a ZIP containing the original installable fonts and license. Static archive and preview URLs include the upstream revision. Family files remain in original publisher formats.
+
+To reproduce the packages, use the two `scripts/font-data/import-commercial-*.py` importers with Python and fontTools. The existing-name input consists of the original families (exclude entries with `commercialPackage`), reviewed aliases and canonical/successor names in `family-relations.json`. The Google importer requires a checkout of `google/fonts` at the full SHA in the family source URLs. Run `python3 scripts/font-data/validate-commercial-packages.py /path/to/type` before publishing. The server stores validated directories under `/srv/onod/type-library/` and serves them at `/assets/type/` with `deploy/commercial-font-assets.nginx`. Keep previously published revision directories available across app releases.
 
 The trust overlay lives in `src/app/lib/fontTrust.ts`, runtime font readiness in `src/app/lib/fontRuntime.ts`, and structural/trust validation in `scripts/validate-catalog.mjs`.
 
@@ -102,7 +106,7 @@ The `main` branch of this GitHub repository is the single source of truth for ON
 
 ## IMON server deployment
 
-Public server URL: https://onod.imon.world. The server build uses the domain root:
+Public server URL: https://onod.space/. The earlier https://onod.imon.world address also serves the catalog. The server build uses the domain root:
 
 ```bash
 npm ci

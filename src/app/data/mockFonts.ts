@@ -1,3 +1,6 @@
+import googlePackages from "./verified/commercial/google.json" with { type: "json" };
+import collletttivoPackages from "./verified/commercial/collletttivo.json" with { type: "json" };
+
 // --- Interfaces ---
 export interface Font {
   id: string;
@@ -11,6 +14,11 @@ export interface Font {
   source: string;
   sourceUrl: string;
   downloadUrl?: string;
+  commercialPackage?: {
+    key: string;
+    licenseUrl: string;
+    sample?: string;
+  };
   customCssUrl?: string; // New field for external CDNs (GitHub, Vercel, etc.)
   weights: string[];
   styles: string[];
@@ -1658,6 +1666,55 @@ gfB6.forEach(i=>{const[n,c,w,v]=i.split("|");addFont(createFont(n,c,"Various","G
 // Emigre, Colophon, Swiss Typefaces, Typotheque, Frere-Jones, Pangram Pangram,
 // Atipo, DJR, Displaay, system fonts, trendy indie — NOT open source.
 
+
+interface LicensedFamily {
+    id: string;
+    key: string;
+    name: string;
+    author: string;
+    category: string;
+    languages: string[];
+    licenseUrl: string;
+    source: string;
+    sourceUrl: string;
+    styles: string[];
+    variable: boolean;
+    weights: number[];
+    sample?: string;
+}
+
+const licensedFamilies: LicensedFamily[] = [...googlePackages, ...collletttivoPackages];
+const fallbacks: Record<string, string> = {
+    "sans-serif": "sans-serif",
+    serif: "serif",
+    handwriting: "cursive",
+    display: "sans-serif",
+    monospaced: "monospace",
+};
+
+for (const family of licensedFamilies) {
+    const base = `https://onod.space/assets/type/${family.key}`;
+    // Keep the historical URLs and IDs stable. The catalog gate rejects name collisions.
+    fonts.push({
+        id: family.id,
+        name: family.name,
+        author: family.author,
+        description: "",
+        variable: family.variable,
+        categories: [family.category],
+        languages: family.languages,
+        license: "OFL-1.1",
+        source: family.source,
+        sourceUrl: family.sourceUrl,
+        downloadUrl: `${base}/family.zip`,
+        customCssUrl: `${base}/preview.css`,
+        weights: family.weights.map(String),
+        styles: family.styles,
+        tags: ["OFL-1.1"],
+        cssStack: `${JSON.stringify(family.name)}, ${fallbacks[family.category] || "sans-serif"}`,
+        commercialPackage: { key: family.key, licenseUrl: family.licenseUrl, sample: family.sample },
+    });
+}
 
 // Keep catalog order stable across builds, sessions and screenshots.
 export const mockFonts = [...fonts].sort((a, b) =>

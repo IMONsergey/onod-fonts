@@ -1,0 +1,395 @@
+[
+  {
+    "id": "ofl-it-absans",
+    "name": "Absans",
+    "author": "Valerio Monopoli",
+    "category": "sans-serif",
+    "languages": [
+      "Latin"
+    ],
+    "fullRussian": false,
+    "weights": [
+      400
+    ],
+    "variable": false,
+    "styles": [
+      "Regular"
+    ],
+    "key": "it-absans-e1ba5d9a2359",
+    "sourceUrl": "https://github.com/collletttivo/absans/tree/e1ba5d9a2359934df024b4ebef4c1be76e0db263",
+    "licenseUrl": "https://github.com/collletttivo/absans/blob/e1ba5d9a2359934df024b4ebef4c1be76e0db263/LICENSE.txt",
+    "source": "Collletttivo"
+  },
+  {
+    "id": "ofl-it-aujournuit",
+    "name": "Aujournuit",
+    "author": "Teo Gaudet",
+    "category": "display",
+    "languages": [
+      "Latin"
+    ],
+    "fullRussian": false,
+    "weights": [
+      400
+    ],
+    "variable": true,
+    "styles": [
+      "Airy",
+      "Condensed",
+      "Densed",
+      "Regular",
+      "Variable",
+      "Wide"
+    ],
+    "key": "it-aujournuit-8b8aed12b674",
+    "sourceUrl": "https://github.com/collletttivo/aujournuit/tree/8b8aed12b67454ea6ae37009ad719bf33617b80d",
+    "licenseUrl": "https://github.com/collletttivo/aujournuit/blob/8b8aed12b67454ea6ae37009ad719bf33617b80d/LICENSE.txt",
+    "source": "Collletttivo"
+  },
+  {
+    "id": "ofl-it-borges",
+    "name": "Borges",
+    "author": "Matteo Bertin",
+    "category": "display",
+    "languages": [
+      "Latin"
+    ],
+    "fullRussian": false,
+    "weights": [
+      400
+    ],
+    "variable": false,
+    "styles": [
+      "Square Pixel Regular"
+    ],
+    "key": "it-borges-f0c851823886",
+    "sourceUrl": "https://github.com/collletttivo/borges/tree/f0c85182388603998ab55f84f9bc8cd8e8719383",
+    "licenseUrl": "https://github.com/collletttivo/borges/blob/f0c85182388603998ab55f84f9bc8cd8e8719383/LICENSE.txt",
+    "source": "Collletttivo"
+  },
+  {
+    "id": "ofl-it-coconat",
+    "name": "Coconat",
+    "author": "Sara Lavazza",
+    "category": "display",
+    "languages": [
+      "Latin"
+    ],
+    "fullRussian": false,
+    "weights": [
+      400,
+      900
+    ],
+    "variable": false,
+    "styles": [
+      "Bold",
+      "Demi",
+      "Regular"
+    ],
+    "key": "it-coconat-75f0bf21470d",
+    "sourceUrl": "https://github.com/collletttivo/coconat/tree/75f0bf21470de362ebee2f173e99505b7a7e977b",
+    "licenseUrl": "https://github.com/collletttivo/coconat/blob/75f0bf21470de362ebee2f173e99505b7a7e977b/LICENSE.txt",
+    "source": "Collletttivo"
+  },
+  {
+    "id": "ofl-it-halibut",
+    "name": "Halibut",
+    "author": "Matteo Maggi",
+    "category": "serif",
+    "languages": [
+      "Latin"
+    ],
+    "fullRussian": false,
+    "weights": [
+      20,
+      28,
+      30,
+      100,
+      400
+    ],
+    "variable": true,
+    "styles": [
+      "Condensed Regular",
+      "Condensed Thin",
+      "Expanded Regular",
+      "Expanded Thin",
+      "Regular",
+      "Thin",
+      "Variable"
+    ],
+    "key": "it-halibut-afa8478dd722",
+    "sourceUrl": "https://github.com/collletttivo/halibut/tree/afa8478dd72214dc3ec3b7ccebebe3052f167ef7",
+    "licenseUrl": "https://github.com/collletttivo/halibut/blob/afa8478dd72214dc3ec3b7ccebebe3052f167ef7/LICENSE.txt",
+    "source": "Collletttivo"
+  },
+  {
+    "id": "ofl-it-mattone",
+    "name": "Mattone",
+    "author": "Nunzio Mazzaferro",
+    "category": "sans-serif",
+    "languages": [
+      "Latin"
+    ],
+    "fullRussian": false,
+    "weights": [
+      400,
+      700,
+      900
+    ],
+    "variable": false,
+    "styles": [
+      "Black",
+      "Bold",
+      "Regular"
+    ],
+    "key": "it-mattone-b1dc55dc6a43",
+    "sourceUrl": "https://github.com/collletttivo/mattone/tree/b1dc55dc6a432708ab00329d452d8f6907c6e570",
+    "licenseUrl": "https://github.com/collletttivo/mattone/blob/b1dc55dc6a432708ab00329d452d8f6907c6e570/LICENSE.txt",
+    "source": "Collletttivo"
+  },
+  {
+    "id": "ofl-it-mazius-display",
+    "name": "Mazius Display",
+    "author": "Alberto Casagrande",
+    "category": "serif",
+    "languages": [
+      "Latin"
+    ],
+    "fullRussian": false,
+    "weights": [
+      400,
+      700
+    ],
+    "variable": false,
+    "styles": [
+      "Bold",
+      "Extra Italic Bold",
+      "Extra italic",
+      "Regular"
+    ],
+    "key": "it-mazius-display-5798d69b14f0",
+    "sourceUrl": "https://github.com/collletttivo/mazius-display/tree/5798d69b14f0b7c1691f031f2ecb98ebdb709b54",
+    "licenseUrl": "https://github.com/collletttivo/mazius-display/blob/5798d69b14f0b7c1691f031f2ecb98ebdb709b54/LICENSE.txt",
+    "source": "Collletttivo"
+  },
+  {
+    "id": "ofl-it-messapia",
+    "name": "Messapia",
+    "author": "Luca Marsano",
+    "category": "display",
+    "languages": [
+      "Latin"
+    ],
+    "fullRussian": false,
+    "weights": [
+      400
+    ],
+    "variable": false,
+    "styles": [
+      "Bold",
+      "Regular"
+    ],
+    "key": "it-messapia-c7fbc664055d",
+    "sourceUrl": "https://github.com/collletttivo/messapia/tree/c7fbc664055d3f16f5d7431271f738ab5cdc6373",
+    "licenseUrl": "https://github.com/collletttivo/messapia/blob/c7fbc664055d3f16f5d7431271f738ab5cdc6373/LICENSE.txt",
+    "source": "Collletttivo"
+  },
+  {
+    "id": "ofl-it-necto-mono",
+    "name": "Necto Mono",
+    "author": "Marco Condello",
+    "category": "monospaced",
+    "languages": [
+      "Latin"
+    ],
+    "fullRussian": false,
+    "weights": [
+      400
+    ],
+    "variable": false,
+    "styles": [
+      "Regular"
+    ],
+    "key": "it-necto-mono-db9edb73bace",
+    "sourceUrl": "https://github.com/collletttivo/necto-mono/tree/db9edb73bace38d64f36f29e698d9c7547045ce6",
+    "licenseUrl": "https://github.com/collletttivo/necto-mono/blob/db9edb73bace38d64f36f29e698d9c7547045ce6/LICENSE.txt",
+    "source": "Collletttivo"
+  },
+  {
+    "id": "ofl-it-ortica",
+    "name": "Ortica",
+    "author": "Ben Bovani",
+    "category": "serif",
+    "languages": [
+      "Latin"
+    ],
+    "fullRussian": false,
+    "weights": [
+      300,
+      400,
+      700
+    ],
+    "variable": false,
+    "styles": [
+      "Angular Bold",
+      "Linear Bold",
+      "Linear Light",
+      "Linear Regular"
+    ],
+    "key": "it-ortica-27bf44d3ea50",
+    "sourceUrl": "https://github.com/collletttivo/ortica/tree/27bf44d3ea5057b7abcd09a8922d43d0b37a4f06",
+    "licenseUrl": "https://github.com/collletttivo/ortica/blob/27bf44d3ea5057b7abcd09a8922d43d0b37a4f06/LICENSE.txt",
+    "source": "Collletttivo"
+  },
+  {
+    "id": "ofl-it-ribes",
+    "name": "Ribes",
+    "author": "Luigi Gorlero",
+    "category": "display",
+    "languages": [
+      "Latin"
+    ],
+    "fullRussian": false,
+    "weights": [
+      200,
+      400,
+      900
+    ],
+    "variable": false,
+    "styles": [
+      "Black",
+      "Light",
+      "Regular"
+    ],
+    "key": "it-ribes-e5f58f6ef719",
+    "sourceUrl": "https://github.com/collletttivo/ribes/tree/e5f58f6ef719ff69b599a3155c66f4cecaed0a0f",
+    "licenseUrl": "https://github.com/collletttivo/ribes/blob/e5f58f6ef719ff69b599a3155c66f4cecaed0a0f/LICENSE.txt",
+    "source": "Collletttivo"
+  },
+  {
+    "id": "ofl-it-ronzino",
+    "name": "Ronzino",
+    "author": "Luigi Gorlero, Nunzio Mazzaferro",
+    "category": "sans-serif",
+    "languages": [
+      "Latin"
+    ],
+    "fullRussian": false,
+    "weights": [
+      400,
+      500,
+      700
+    ],
+    "variable": false,
+    "styles": [
+      "Bold",
+      "Bold Oblique",
+      "Medium",
+      "Medium Oblique",
+      "Oblique",
+      "Regular"
+    ],
+    "key": "it-ronzino-24df8cdde479",
+    "sourceUrl": "https://github.com/collletttivo/ronzino/tree/24df8cdde479fef13948de629c3b10849e1dffb5",
+    "licenseUrl": "https://github.com/collletttivo/ronzino/blob/24df8cdde479fef13948de629c3b10849e1dffb5/LICENSE.txt",
+    "source": "Collletttivo"
+  },
+  {
+    "id": "ofl-it-sinistre",
+    "name": "Sinistre",
+    "author": "Jules Durand",
+    "category": "display",
+    "languages": [
+      "Cyrillic",
+      "Latin"
+    ],
+    "fullRussian": true,
+    "weights": [
+      400,
+      673,
+      700,
+      900
+    ],
+    "variable": true,
+    "styles": [
+      "Bold",
+      "Dark",
+      "Regular",
+      "Variable"
+    ],
+    "key": "it-sinistre-fbf85f113067",
+    "sourceUrl": "https://github.com/collletttivo/sinistre/tree/fbf85f1130670ff2e1b944a17ec13872996b4305",
+    "licenseUrl": "https://github.com/collletttivo/sinistre/blob/fbf85f1130670ff2e1b944a17ec13872996b4305/LICENSE.txt",
+    "source": "Collletttivo"
+  },
+  {
+    "id": "ofl-it-sneaky-times",
+    "name": "Sneaky Times",
+    "author": "Jules Durand",
+    "category": "serif",
+    "languages": [
+      "Latin"
+    ],
+    "fullRussian": false,
+    "weights": [
+      400
+    ],
+    "variable": false,
+    "styles": [
+      "Times"
+    ],
+    "key": "it-sneaky-times-7094a6215080",
+    "sourceUrl": "https://github.com/collletttivo/sneaky-times/tree/7094a621508090d479ccb95ce6a6b8827b3f9d4e",
+    "licenseUrl": "https://github.com/collletttivo/sneaky-times/blob/7094a621508090d479ccb95ce6a6b8827b3f9d4e/LICENSE.txt",
+    "source": "Collletttivo"
+  },
+  {
+    "id": "ofl-it-sprat",
+    "name": "Sprat",
+    "author": "Ethan Nakache",
+    "category": "serif",
+    "languages": [
+      "Latin"
+    ],
+    "fullRussian": false,
+    "weights": [
+      10,
+      40,
+      100,
+      120,
+      175,
+      200,
+      300,
+      400,
+      500,
+      700,
+      900
+    ],
+    "variable": true,
+    "styles": [
+      "Black",
+      "Bold",
+      "Condensed Black",
+      "Condensed Bold",
+      "Condensed Light",
+      "Condensed Medium",
+      "Condensed Thin",
+      "Condesed Regular",
+      "Extended Black",
+      "Extended Bold",
+      "Extended Light",
+      "Extended Medium",
+      "Extended Regular",
+      "Extended Thin",
+      "Light",
+      "Medium",
+      "Regular",
+      "Thin",
+      "Variable"
+    ],
+    "key": "it-sprat-bdf9c50243d6",
+    "sourceUrl": "https://github.com/collletttivo/sprat/tree/bdf9c50243d647290ecb21555b03a1aafba447ac",
+    "licenseUrl": "https://github.com/collletttivo/sprat/blob/bdf9c50243d647290ecb21555b03a1aafba447ac/LICENSE.txt",
+    "source": "Collletttivo"
+  }
+]

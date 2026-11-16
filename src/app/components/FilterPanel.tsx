@@ -12,6 +12,7 @@ export interface FilterState {
   categories: string[];
   languages: string[];
   variableOnly: boolean;
+  oflPackageOnly: boolean;
   licenses: string[];
   sources: string[];
   minWeights?: number;
@@ -26,11 +27,13 @@ const safeId = (prefix: string, value: string) => `${prefix}-${value.toLowerCase
 
 export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters }) => {
   const { t } = useLanguage();
+  const controlId = React.useId();
 
-  const { categories, languages, categoryCounts, languageCounts, variableCount } = useMemo(() => {
+  const { categories, languages, categoryCounts, languageCounts, variableCount, oflPackageCount } = useMemo(() => {
     const nextCategoryCounts: Record<string, number> = {};
     const nextLanguageCounts: Record<string, number> = {};
     let nextVariableCount = 0;
+    let oflPackageCount = 0;
 
     mockFonts.forEach(font => {
       font.categories.forEach(category => {
@@ -40,6 +43,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters })
         nextLanguageCounts[script] = (nextLanguageCounts[script] || 0) + 1;
       });
       if (isEffectivelyVariable(font)) nextVariableCount += 1;
+      if (font.commercialPackage) oflPackageCount += 1;
     });
 
     const categoryOrder = ["sans-serif", "serif", "display", "handwriting", "monospaced"];
@@ -55,6 +59,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters })
       categoryCounts: nextCategoryCounts,
       languageCounts: nextLanguageCounts,
       variableCount: nextVariableCount,
+      oflPackageCount,
     };
   }, []);
 
@@ -63,6 +68,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters })
     categories: [],
     languages: [],
     variableOnly: false,
+    oflPackageOnly: false,
     licenses: [],
     sources: [],
     minWeights: undefined,
@@ -79,7 +85,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters })
   };
 
   const FilterCheckbox = ({ group, value, checked, count }: { group: string; value: string; checked: boolean; count: number }) => {
-    const id = safeId(group, value);
+    const id = controlId + safeId(group, value);
     return (
       <div className="flex items-center gap-3 min-w-0 group">
         <Checkbox
@@ -106,13 +112,26 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, setFilters })
         </button>
       </div>
 
+      <div className="py-4 border-b border-neutral-200 flex items-center justify-between gap-4">
+        <Label htmlFor={controlId + "-ofl"} className="block cursor-pointer font-mono text-[11px] uppercase text-neutral-700">
+          {t('filters.oflPackage')}
+          <span aria-hidden="true" className="block mt-1 text-[9px] text-neutral-400">{oflPackageCount}</span>
+        </Label>
+        <Switch
+          id={controlId + "-ofl"}
+          checked={filters.oflPackageOnly}
+          onCheckedChange={checked => setFilters(previous => ({ ...previous, oflPackageOnly: checked }))}
+          className="data-[state=checked]:bg-neutral-900 border border-neutral-300"
+        />
+      </div>
+
       <div className="py-5 border-b border-neutral-200 flex items-center justify-between gap-4">
         <div>
-          <Label htmlFor="var-mode" className="cursor-pointer font-mono text-[11px] uppercase text-neutral-700">{t('filters.variable')}</Label>
+          <Label htmlFor={controlId + "-var"} className="cursor-pointer font-mono text-[11px] uppercase text-neutral-700">{t('filters.variable')}</Label>
           <div className="mt-1 font-mono text-[9px] text-neutral-400">{variableCount}</div>
         </div>
         <Switch
-          id="var-mode"
+          id={controlId + "-var"}
           checked={filters.variableOnly}
           onCheckedChange={checked => setFilters(previous => ({ ...previous, variableOnly: checked }))}
           className="data-[state=checked]:bg-neutral-900 border border-neutral-300"

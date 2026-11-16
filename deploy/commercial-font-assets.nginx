@@ -1,0 +1,19 @@
+# Public, versioned font packages and their original licenses.
+location ^~ /assets/type/ {
+    alias /srv/onod/type-library/;
+    autoindex off;
+    types {
+        text/css css;
+        text/plain txt;
+        application/json json;
+        application/zip zip;
+        font/otf otf;
+        font/ttf ttf;
+        font/collection ttc;
+        font/woff woff;
+        font/woff2 woff2;
+    }
+    add_header Access-Control-Allow-Origin "*" always;
+    add_header Cache-Control "public, max-age=31536000, immutable";
+    add_header X-Content-Type-Options nosniff always;
+}

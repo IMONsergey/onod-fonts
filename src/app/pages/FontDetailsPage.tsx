@@ -42,10 +42,11 @@ export const FontDetailsPage: React.FC<FontDetailsProps> = ({ font, onBack, togg
   const author = getEffectiveAuthor(font);
   const sourceUrl = getEffectiveSourceUrl(font);
   const sourceLabel = getEffectiveSourceLabel(font);
+  const oflPackage = font.commercialPackage;
   const variable = isEffectivelyVariable(font);
   const defaultWeight = weights.includes("400") ? "400" : weights[0] || "400";
   const [tab, setTab] = useState<Tab>("specimen");
-  const [text, setText] = useState(previewText || "The quick brown fox jumps over the lazy dog.");
+  const [text, setText] = useState(previewText || oflPackage?.sample || "The quick brown fox jumps over the lazy dog.");
   const [size, setSize] = useState(64);
   const [lineHeight, setLineHeight] = useState(1.2);
   const [tracking, setTracking] = useState(0);
@@ -63,10 +64,13 @@ export const FontDetailsPage: React.FC<FontDetailsProps> = ({ font, onBack, togg
   }, [font]);
 
   const related = useMemo(() => mockFonts.filter(item => item.id !== font.id && item.categories.some(category => font.categories.includes(category))).slice(0, 6), [font]);
-  const snippets = useMemo(() => ({
-    import: sourceLabel === "Google Fonts" ? `@import url('${googleImportUrl(font)}');` : font.customCssUrl ? `@import url('${font.customCssUrl}');` : `/* Load ${familyName} from its verified source: ${sourceUrl} */`,
-    css: `font-family: ${cssStack};`,
-  }), [font, familyName, cssStack, sourceLabel, sourceUrl]);
+  const snippets = useMemo(() => {
+    const cssUrl = sourceLabel === "Google Fonts" && !oflPackage ? googleImportUrl(font) : font.customCssUrl;
+    return {
+      import: cssUrl ? `@import url('${cssUrl}');` : `/* Load ${familyName} from its verified source: ${sourceUrl} */`,
+      css: `font-family: ${cssStack};`,
+    };
+  }, [font, familyName, cssStack, sourceLabel, sourceUrl, oflPackage]);
 
   const copy = async (key: string, value: string) => {
     if (!(await copyToClipboard(value))) return toast.error("Copy failed");
@@ -85,14 +89,14 @@ export const FontDetailsPage: React.FC<FontDetailsProps> = ({ font, onBack, togg
     : trust.identityVerified
       ? { label: "SOURCE VERIFIED / LICENSE?", className: "border-neutral-300 text-neutral-700 bg-neutral-50" }
       : { label: "SOURCE?", className: "border-neutral-300 text-neutral-700 bg-neutral-50" };
-  const showLegacyDownload = Boolean(font.downloadUrl && trust.identityVerified && trust.licenseVerified && trust.provider !== "Fontshare");
+  const showLegacyDownload = Boolean(!oflPackage && font.downloadUrl && trust.identityVerified && trust.licenseVerified && trust.provider !== "Fontshare");
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{};:,.?";
 
   return <div className="min-h-screen bg-white text-black">
     <FontLoader fonts={[font, pairing, ...related].filter(Boolean) as Font[]} />
 
     <div className="sticky top-16 z-50 h-16 bg-white border-b border-neutral-200 flex items-center">
-      <button type="button" onClick={onBack} className="h-full px-5 md:px-7 border-r border-neutral-200 hover:bg-neutral-50 flex items-center gap-2"><ArrowLeft className="w-4 h-4"/><span className="hidden sm:inline font-mono text-[10px] uppercase tracking-widest">{t("details.back")}</span></button>
+      <button type="button" onClick={onBack} aria-label={t("details.back")} className="h-full px-5 md:px-7 border-r border-neutral-200 hover:bg-neutral-50 flex items-center gap-2"><ArrowLeft className="w-4 h-4"/><span className="hidden sm:inline font-mono text-[10px] uppercase tracking-widest">{t("details.back")}</span></button>
       <div className="flex-1 min-w-0 px-4 text-center font-mono text-[10px] uppercase tracking-widest text-neutral-400 truncate">{familyName} / {font.categories.join(" + ")}</div>
       <button type="button" onClick={() => toggleCompare(font.id)} className="h-full px-5 border-l border-neutral-200" aria-label={isCompare ? t("card.removeFromCompare") : t("card.addToCompare")}>{isCompare ? <Minus className="w-4 h-4"/> : <Plus className="w-4 h-4"/>}</button>
       <button type="button" onClick={() => toggleFavorite(font.id)} className="h-full px-5 border-l border-neutral-200" aria-label={isFavorite ? t("card.removeFromFavorites") : t("card.addToFavorites")}><Heart className={cn("w-4 h-4", isFavorite && "fill-current")}/></button>
@@ -106,6 +110,19 @@ export const FontDetailsPage: React.FC<FontDetailsProps> = ({ font, onBack, togg
       <aside className="p-6 md:p-8 bg-neutral-50 border-b lg:border-b-0 lg:border-r border-neutral-200">
         <div className="flex items-center justify-between gap-3 mb-5"><span className="font-mono text-[9px] uppercase text-neutral-400">TYPEFACE / {sourceLabel}</span><span title={trust.verificationSource} className={cn("font-mono text-[8px] uppercase border px-1.5 py-1", overallStatus.className)}>{overallStatus.label}</span></div>
         <h1 className="text-5xl md:text-6xl tracking-tighter leading-[0.88] mb-8" style={{ fontFamily: cssStack, fontWeight: weight }}>{familyName}</h1>
+        {oflPackage && font.downloadUrl && (
+          <div className="mb-7">
+            <a href={font.downloadUrl} download={familyName + ".zip"} className="flex min-h-11 items-center justify-center gap-2 bg-neutral-900 px-3 py-2 text-white hover:bg-neutral-700 font-mono text-[11px] uppercase">
+              <Download aria-hidden="true" className="h-4 w-4 shrink-0" />
+              {t("details.downloadFamilyZip")}
+            </a>
+            <a href={oflPackage.licenseUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex min-h-10 items-center gap-1.5 text-sm underline underline-offset-4">
+              {t("details.oflLicense")}
+              <ExternalLink aria-hidden="true" className="h-3.5 w-3.5" />
+            </a>
+            <p className="text-xs leading-relaxed text-neutral-600">{t("details.oflUsage")}</p>
+          </div>
+        )}
         <dl className="font-mono text-[10px] uppercase tracking-wider space-y-3">
           {[[t("details.foundry"), author], [t("details.license"), trust.licenseLabel], [t("details.weights"), weightsValue], [language === "ru" ? "Вариативность" : "Variable", variableValue], [t("filters.languages"), scriptsValue], [t("details.source"), sourceLabel]].map(([label,value]) => <div key={label} className="flex justify-between gap-4 border-b border-neutral-200 pb-2"><dt className="text-neutral-400">{label}</dt><dd className="text-right">{value}</dd></div>)}
         </dl>

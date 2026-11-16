@@ -36,7 +36,7 @@ export const FontCard: React.FC<FontCardProps> = memo(({
   const weights = getEffectiveWeights(font);
   const author = getEffectiveAuthor(font);
   const defaultWeight = weights.includes("400") ? 400 : Number(weights[0] || 400);
-  const displayPreview = previewText || familyName;
+  const displayPreview = previewText || font.commercialPackage?.sample || familyName;
   const categories = font.categories.slice(0, 2).join(" · ");
 
   const previewStyle = {
@@ -65,7 +65,7 @@ export const FontCard: React.FC<FontCardProps> = memo(({
 
   if (layout === "grid") {
     return (
-      <article className="group bg-white border-b border-r border-neutral-200 flex flex-col min-h-[320px]">
+      <article data-onod-family={font.id} className="group bg-white border-b border-r border-neutral-200 flex flex-col min-h-[320px]">
         <div className="p-4 flex items-start justify-between gap-4 border-b border-neutral-100">
           <div className="min-w-0">
             <button
@@ -103,7 +103,7 @@ export const FontCard: React.FC<FontCardProps> = memo(({
   }
 
   return (
-    <article className="group bg-white border-b border-neutral-200 flex flex-col md:flex-row min-h-[230px]">
+    <article data-onod-family={font.id} className="group bg-white border-b border-neutral-200 flex flex-col md:flex-row min-h-[230px]">
       <div className="w-full md:w-64 shrink-0 p-5 md:p-6 md:border-r border-neutral-200 flex flex-col justify-between gap-8">
         <div>
           <button

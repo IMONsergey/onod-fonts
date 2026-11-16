@@ -23,6 +23,7 @@ export const useFontFilter = (fonts: Font[], filters: FilterState) => {
 
     return fonts
       .filter((font) => {
+        if (filters.oflPackageOnly && !font.commercialPackage) return false;
         const familyName = getEffectiveFamilyName(font);
         const author = getEffectiveAuthor(font);
         const source = getEffectiveSourceLabel(font);

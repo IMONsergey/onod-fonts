@@ -39,6 +39,7 @@ const initialFilters = (params: URLSearchParams): FilterState => ({
   categories: parseList(params, "cat"),
   languages: parseList(params, "script"),
   variableOnly: params.get("variable") === "1",
+  oflPackageOnly: params.get("collection") === "ofl",
   licenses: [],
   sources: [],
   minWeights: undefined,
@@ -72,6 +73,7 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({
       const setList = (key: string, values: string[]) => values.length ? next.set(key, values.join(",")) : next.delete(key);
 
       filters.search ? next.set("q", filters.search) : next.delete("q");
+      filters.oflPackageOnly ? next.set("collection", "ofl") : next.delete("collection");
       setList("cat", filters.categories);
       setList("script", filters.languages);
       filters.variableOnly ? next.set("variable", "1") : next.delete("variable");
@@ -124,12 +126,13 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({
     categories: [],
     languages: [],
     variableOnly: false,
+    oflPackageOnly: false,
     licenses: [],
     sources: [],
     minWeights: undefined,
   });
 
-  const hasFilters = Boolean(filters.search || filters.categories.length || filters.languages.length || filters.variableOnly);
+  const hasFilters = Boolean(filters.search || filters.categories.length || filters.languages.length || filters.variableOnly || filters.oflPackageOnly);
 
   return (
     <div className="min-h-screen bg-white text-black">

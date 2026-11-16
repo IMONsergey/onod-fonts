@@ -87,6 +87,30 @@ if (!Array.isArray(mockFonts)) {
   }
 }
 
+// Packaged families use exact upstream licenses and stable URLs independent of the application build.
+const normalizeName = value => value.normalize('NFKD').replace(/\p{Mark}/gu, '').toLowerCase().replace(/[^\p{Letter}\p{Number}]+/gu, '');
+const legacyNames = mockFonts.filter(font => !font.commercialPackage).map(font => font.name);
+const normalizedFamilies = new Set([...legacyNames, ...Object.values(reviewedAliases)].map(normalizeName));
+const packageKeys = new Set();
+for (const font of mockFonts.filter(font => font.commercialPackage)) {
+  const { key, licenseUrl } = font.commercialPackage;
+  const canonicalName = normalizeName(font.name);
+  if (normalizedFamilies.has(canonicalName)) addError(font, 'packaged family duplicates a catalog family or alias.');
+  normalizedFamilies.add(canonicalName);
+  if (packageKeys.has(key)) addError(font, 'duplicate immutable package key.');
+  packageKeys.add(key);
+  if (!/^(?:gf|it)-[a-z0-9][a-z0-9-]*-[0-9a-f]{12}$/.test(key) || font.id !== `ofl-${key.slice(0, -13)}`) {
+    addError(font, 'invalid versioned package or unstable route ID.');
+  }
+  if (!isHttpUrl(licenseUrl) || !licenseUrl.startsWith('https://') || !licenseUrl.includes(key.slice(-12))) {
+    addError(font, 'the original license must link to the upstream revision.');
+  }
+  const base = `https://onod.space/assets/type/${key}`;
+  if (font.license !== 'OFL-1.1' || font.downloadUrl !== `${base}/family.zip` || font.customCssUrl !== `${base}/preview.css`) {
+    addError(font, 'missing licensed download or preview.');
+  }
+}
+
 const catalogNames = new Set(mockFonts.map(font => font.name));
 let validEvidenceRecords = 0;
 let reviewedAliasRecords = 0;

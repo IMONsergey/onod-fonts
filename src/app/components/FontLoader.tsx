@@ -22,13 +22,13 @@ const fontDescriptor = (font: Font) => {
 };
 
 const verifyFontFace = async (font: Font) => {
-  if (!document.fonts) return setFontRuntimeStatus(font.id, 'ready');
+  if (!document.fonts) return setFontRuntimeStatus(font.id, 'error', 'Font verification is unavailable in this browser.');
 
   try {
     const descriptor = fontDescriptor(font);
-    const sample = getEffectiveLanguages(font).includes('Cyrillic') ? 'Hamburgefontsiv Привет' : 'Hamburgefontsiv';
-    await document.fonts.load(descriptor, sample);
-    const ready = document.fonts.check(descriptor, sample);
+    const sample = font.commercialPackage?.sample || (getEffectiveLanguages(font).includes('Cyrillic') ? 'Hamburgefontsiv Привет' : 'Hamburgefontsiv');
+    const faces = await document.fonts.load(descriptor, sample);
+    const ready = faces.length > 0 && faces.every(face => face.status === 'loaded');
     setFontRuntimeStatus(font.id, ready ? 'ready' : 'error', ready ? undefined : 'Font face was not registered; preview is using fallback.');
   } catch (error) {
     setFontRuntimeStatus(font.id, 'error', error instanceof Error ? error.message : 'Font face verification failed.');
@@ -138,7 +138,30 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
       globalLoadPromises.set(id, promise);
     };
 
+    const packageByCard = new Map<Element, Font>();
+    const visibleCards = new Map(
+      Array.from(document.querySelectorAll<HTMLElement>('article[data-onod-family]'), card => [card.dataset.onodFamily, card] as const),
+    );
+    const observer = typeof IntersectionObserver === 'undefined' ? null : new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const font = packageByCard.get(entry.target);
+        if (font?.customCssUrl) addStylesheet(font, font.customCssUrl, stylesheetId('commercial', font));
+        observer.unobserve(entry.target);
+      }
+    }, { rootMargin: '500px 0px' });
+
     for (const font of fonts) {
+      if (font.commercialPackage && font.customCssUrl) {
+        const card = visibleCards.get(font.id);
+        if (card && observer) {
+          packageByCard.set(card, font);
+          observer.observe(card);
+        } else {
+          addStylesheet(font, font.customCssUrl, stylesheetId('commercial', font));
+        }
+        continue;
+      }
       const sourceLabel = getEffectiveSourceLabel(font);
       const fontshareSlug = getEffectiveFontshareSlug(font);
       if (fontshareSlug) {
@@ -170,6 +193,7 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
 
       setFontRuntimeStatus(font.id, 'error', `No verified font loading strategy for canonical source: ${sourceLabel}`);
     }
+    return () => observer?.disconnect();
   }, [fonts]);
 
   return null;

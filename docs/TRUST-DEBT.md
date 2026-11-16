@@ -2,11 +2,11 @@
 
 > Generated from the canonical runtime trust layer. Do not edit counts manually.
 
-Catalog families: **1346**
+Catalog families: **2159**
 Identity trust debt: **20**
 License trust debt: **34**
 Source/license union debt: **34**
-Source + license clear: **1312**
+Source + license clear: **2125**
 
 Identity and license are independent facts. A family can have a verified primary source while its exact license remains pending; this state must not be collapsed back into “unverified source”.
 

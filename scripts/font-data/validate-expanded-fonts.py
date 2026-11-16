@@ -48,6 +48,16 @@ def verify_local_link(url, directory):
     local_path(directory, link.path[len(prefix):])
 
 
+def check_text_metrics(font, cmap):
+    """Reject unusable spacing on ordinary text, while preserving legitimate combining marks."""
+    units = font["head"].unitsPerEm
+    widths = font["hmtx"].metrics
+    for char in " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" + RUSSIAN:
+        name = cmap.get(ord(char))
+        if name and name in widths and widths[name][0] > 8 * units:
+            raise ValueError(f"implausible text advance for {char!r}")
+
+
 def supports_russian(font, cmap):
     glyph_names = [cmap.get(ord(char)) for char in RUSSIAN]
     if not all(glyph_names) or any(g in {".notdef", "space", "null", "nonmarkingreturn"} for g in glyph_names):
@@ -99,6 +109,7 @@ def verify_package(row, directory):
             with TTFont(BytesIO(package.read(entry)), lazy=True) as font:
                 cmap = font.getBestCmap()
                 require(bool(cmap), f"missing Unicode character map in {entry.filename}")
+                check_text_metrics(font, cmap)
                 has_russian |= supports_russian(font, cmap)
                 has_variable |= "fvar" in font and bool(font["fvar"].axes)
         require(has_russian == ("Cyrillic" in row["languages"]), "Russian coverage differs from the listed coverage")

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { mockFonts } from '../src/app/data/mockFonts.ts';
+import { hasInteractiveSpecimen, mockFonts } from '../src/app/data/mockFonts.ts';
+import { editorialFamilies, orderCatalog } from '../src/app/data/editorialOrder.ts';
 import { getEffectiveLanguages, getEffectiveWeights, getFontTrustReport, getVerifiedGoogleFont, isEffectivelyVariable } from '../src/app/lib/fontTrust.ts';
 
 const errors = [];
@@ -137,6 +138,39 @@ for (const font of mockFonts.filter(font => font.commercialPackage)) {
 }
 
 const catalogNames = new Set(mockFonts.map(font => font.name));
+const editorialNames = new Set(editorialFamilies);
+if (editorialNames.size !== editorialFamilies.length) addError(null, 'Duplicate name in the editorial selection.');
+for (const name of editorialNames) {
+  const font = mockFonts.find(candidate => candidate.name === name);
+  if (!font || !hasInteractiveSpecimen(font)) addError(null, `Editorial family lacks a catalog entry or live specimen: ${name}.`);
+}
+const localPreviews = JSON.parse(readFileSync('src/app/data/verified/editorial-previews.json', 'utf8'));
+for (const [name, directory] of Object.entries(localPreviews)) {
+  if (!editorialNames.has(name) || !/^[a-z0-9]+-[a-f0-9]{12}$/.test(directory)) {
+    addError(null, `Invalid editorial specimen entry: ${name}`);
+    continue;
+  }
+  const root = resolve('public/assets/editorial', directory);
+  const sheet = readFileSync(resolve(root, 'regular.css'), 'utf8');
+  const notice = readFileSync(resolve(root, 'OFL.txt'), 'utf8');
+  const urls = [...sheet.matchAll(/src:\s*url\(([^)]+)\)/g)].map(match => match[1]);
+  if (!urls.length || !notice.includes('SIL OPEN FONT LICENSE') || !sheet.includes(`font-family: '${name}'`)) {
+    addError(null, `Missing editorial font or license for ${name}.`);
+  }
+  for (const url of urls) {
+    if (!/^[a-f0-9]{16}\.woff2$/.test(url) || readFileSync(resolve(root, url)).subarray(0, 4).toString() !== 'wOF2') {
+      addError(null, `Invalid webfont for ${name}: ${url}`);
+    }
+  }
+}
+const defaultOrder = orderCatalog(mockFonts, 'default', '');
+if (editorialFamilies.some((name, index) => defaultOrder[index]?.name !== name)) {
+  addError(null, 'The default catalog must open in editorial order.');
+}
+if (orderCatalog(defaultOrder, 'alpha', '')[0]?.id !== mockFonts[0]?.id) {
+  addError(null, 'Alphabetical sorting must restore the alphabetical catalog.');
+}
+
 let validEvidenceRecords = 0;
 let reviewedAliasRecords = 0;
 for (const [name, evidence] of Object.entries(googleEvidence)) {

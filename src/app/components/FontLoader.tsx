@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Font } from '../data/mockFonts';
+import editorialPreviews from '../data/verified/editorial-previews.json';
 import { setFontRuntimeStatus } from '../lib/fontRuntime';
 import { getEffectiveFamilyName, getSpecimenFamily, getSpecimenWeights, getEffectiveFontshareSlug, getEffectiveLanguages, getEffectiveSourceLabel, getEffectiveWeights, isEffectivelyVariable } from '../lib/fontTrust';
 import { getVerifiedHistoricalFontArtifact, getVerifiedOpenFontArtifact, type VerifiedHistoricalFontArtifact, type VerifiedOpenFontArtifact } from '../lib/fontArtifactRuntime';
@@ -138,61 +139,72 @@ export const FontLoader: React.FC<FontLoaderProps> = ({ fonts }) => {
       globalLoadPromises.set(id, promise);
     };
 
-    const packageByCard = new Map<Element, Font>();
-    const visibleCards = new Map(
-      Array.from(document.querySelectorAll<HTMLElement>('article[data-onod-family]'), card => [card.dataset.onodFamily, card] as const),
-    );
-    const observer = typeof IntersectionObserver === 'undefined' ? null : new IntersectionObserver(entries => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        const font = packageByCard.get(entry.target);
-        if (font?.customCssUrl) addStylesheet(font, font.customCssUrl, stylesheetId('commercial', font));
-        observer.unobserve(entry.target);
-      }
-    }, { rootMargin: '500px 0px' });
-
-    for (const font of fonts) {
+    const loadFont = (font: Font) => {
       if (font.commercialPackage) {
-        if (!font.customCssUrl) continue;
-        const card = visibleCards.get(font.id);
-        if (card && observer) {
-          packageByCard.set(card, font);
-          observer.observe(card);
-        } else {
-          addStylesheet(font, font.customCssUrl, stylesheetId('commercial', font));
-        }
-        continue;
+        if (font.customCssUrl) addStylesheet(font, font.customCssUrl, stylesheetId('commercial', font));
+        return;
       }
       const sourceLabel = getEffectiveSourceLabel(font);
       const fontshareSlug = getEffectiveFontshareSlug(font);
       if (fontshareSlug) {
         addStylesheet(font, `https://api.fontshare.com/v2/css?f[]=${encodeURIComponent(fontshareSlug)}@1&display=swap`, stylesheetId('fontshare', font));
-        continue;
+        return;
       }
 
       const artifact = getVerifiedOpenFontArtifact(font);
       if (artifact) {
         addArtifactFace(font, artifact, 'current');
-        continue;
+        return;
       }
 
       const historicalArtifact = getVerifiedHistoricalFontArtifact(font);
       if (historicalArtifact) {
         addArtifactFace(font, historicalArtifact, 'historical');
-        continue;
+        return;
       }
 
       if (sourceLabel === 'Google Fonts') {
-        addStylesheet(font, googleFontUrl(font), stylesheetId('google', font));
-        continue;
+        const localPreview = (editorialPreviews as Record<string, string>)[font.name];
+        const weights = getEffectiveWeights(font);
+        const url = localPreview && weights.length === 1 && weights[0] === '400'
+          ? `${import.meta.env.BASE_URL}assets/editorial/${localPreview}/regular.css`
+          : googleFontUrl(font);
+        addStylesheet(font, url, stylesheetId('google', font));
+        return;
       }
 
       if (font.customCssUrl && sourceLabel === font.source) {
         addStylesheet(font, font.customCssUrl, stylesheetId('custom', font));
-        continue;
+        return;
       }
 
       setFontRuntimeStatus(font.id, 'error', `No verified font loading strategy for canonical source: ${sourceLabel}`);
+    };
+
+    const fontsById = new Map(fonts.map(font => [font.id, font]));
+    const cards = new Set<string>();
+    const observer = typeof IntersectionObserver === 'undefined' ? null : new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const id = (entry.target as HTMLElement).dataset.onodFamily;
+        const font = id && fontsById.get(id);
+        if (font) loadFont(font);
+        observer.unobserve(entry.target);
+      }
+    }, { rootMargin: '500px 0px' });
+
+    if (observer) {
+      document.querySelectorAll<HTMLElement>('article[data-onod-family]').forEach(card => {
+        const id = card.dataset.onodFamily;
+        if (id && fontsById.has(id)) {
+          cards.add(id);
+          observer.observe(card);
+        }
+      });
+    }
+
+    for (const font of fonts) {
+      if (!cards.has(font.id)) loadFont(font);
     }
     return () => observer?.disconnect();
   }, [fonts]);

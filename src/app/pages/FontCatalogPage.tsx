@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { LayoutGrid, List as ListIcon, Search, Settings2, X } from "lucide-react";
 import { useSearchParams } from "react-router";
 import { Font } from "@/data/mockFonts";
+import { orderCatalog, type CatalogSort } from "@/data/editorialOrder";
 import { FontCard } from "@/components/FontCard";
 import { FilterPanel, FilterState } from "@/components/FilterPanel";
 import { FontLoader } from "@/components/FontLoader";
@@ -22,7 +23,6 @@ interface FontCatalogPageProps {
 }
 
 type ViewMode = "grid" | "list";
-type SortMode = "default" | "alpha";
 
 const parseList = (params: URLSearchParams, key: string) => (params.get(key) || "")
   .split(",")
@@ -60,7 +60,7 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({
   const [filters, setFilters] = useState<FilterState>(() => initialFilters(initialParams.current));
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>(() => initialParams.current.get("view") === "grid" ? "grid" : "list");
-  const [sortMode, setSortMode] = useState<SortMode>(() => initialParams.current.get("sort") === "alpha" ? "alpha" : "default");
+  const [sortMode, setSortMode] = useState<CatalogSort>(() => initialParams.current.get("sort") === "alpha" ? "alpha" : "default");
   const [globalFontSize, setGlobalFontSize] = useState(() => parseNumber(initialParams.current.get("size"), 64, 24, 120));
 
   useEffect(() => {
@@ -94,10 +94,10 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({
   }, [filters, sortMode, viewMode, globalFontSize, previewText, setSearchParams]);
 
   const filteredFonts = useFontFilter(fonts, filters);
-  const sortedFonts = React.useMemo(() => {
-    if (sortMode !== "alpha") return filteredFonts;
-    return [...filteredFonts].sort((a, b) => a.name.localeCompare(b.name));
-  }, [filteredFonts, sortMode]);
+  const sortedFonts = React.useMemo(
+    () => orderCatalog(filteredFonts, sortMode, filters.search),
+    [filteredFonts, sortMode, filters.search],
+  );
 
   const BATCH_SIZE = 20;
   const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
@@ -141,7 +141,7 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({
 
       <div className="sticky top-16 z-40 bg-white border-b border-neutral-200">
         <div className="md:grid md:grid-cols-[18rem_minmax(0,1fr)]">
-          <div className="h-14 md:h-16 px-3 md:px-5 flex items-center gap-3 md:border-r border-neutral-200">
+          <div className="h-14 md:h-16 pl-3 pr-36 sm:pr-3 md:px-5 flex items-center gap-3 md:border-r border-neutral-200">
             <button
               type="button"
               onClick={() => setIsFilterOpen(true)}
@@ -184,14 +184,14 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({
               />
             </div>
 
-            <label className="sr-only" htmlFor="catalog-sort">Sort</label>
+            <label className="sr-only" htmlFor="catalog-sort">{t("sort.label")}</label>
             <select
               id="catalog-sort"
               value={sortMode}
-              onChange={event => setSortMode(event.target.value as SortMode)}
-              className="hidden sm:block h-9 bg-white border border-neutral-200 px-2 font-mono text-[9px] uppercase outline-none focus:border-neutral-400"
+              onChange={event => setSortMode(event.target.value as CatalogSort)}
+              className="absolute right-3 top-2 h-10 max-w-32 sm:static sm:h-9 bg-white border border-neutral-200 px-2 font-mono text-[9px] uppercase outline-none focus:border-neutral-400"
             >
-              <option value="default">{t('sort.popularity')}</option>
+              <option value="default">{t('sort.editorial')}</option>
               <option value="alpha">{t('sort.alpha')}</option>
             </select>
 

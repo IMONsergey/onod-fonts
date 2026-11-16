@@ -53,7 +53,8 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({
   toggleFavorite,
   viewDetails,
 }) => {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
+  const pluralRules = React.useMemo(() => new Intl.PluralRules(language), [language]);
   const [searchParams, setSearchParams] = useSearchParams();
   const initialParams = useRef(new URLSearchParams(searchParams));
   const [filters, setFilters] = useState<FilterState>(() => initialFilters(initialParams.current));
@@ -226,7 +227,7 @@ export const FontCatalogPage: React.FC<FontCatalogPageProps> = ({
         <div className="md:pl-72 min-h-screen">
           <div className="h-12 px-4 md:px-6 border-b border-neutral-200 flex items-center justify-between gap-4">
             <span className="font-mono text-[10px] uppercase tracking-widest text-neutral-400">
-              {filteredFonts.length} {t('fonts.label')}
+              {filteredFonts.length} {t('fonts.count.' + pluralRules.select(filteredFonts.length))}
             </span>
             {hasFilters && (
               <button type="button" onClick={resetFilters} className="font-mono text-[9px] uppercase tracking-widest text-neutral-400 hover:text-black transition-colors">
